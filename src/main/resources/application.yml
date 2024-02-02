@@ -1,0 +1,6 @@
+# runtime? ??? profile ??
+spring:
+  profiles:
+#    active: prod
+    active: dev
+#    active: test
