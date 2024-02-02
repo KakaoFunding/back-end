@@ -15,8 +15,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest # 실행 환경 지정
+
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -24,16 +25,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
-        with:
-          arguments: build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Package
-          path: build/libs
 
       - name: Caching Dependencies
         uses: actions/cache@v3
@@ -44,31 +35,22 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-  build:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Test with Gradle
         run: ./gradlew test
 
-  report:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
+
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}
