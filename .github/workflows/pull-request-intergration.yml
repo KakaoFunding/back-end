@@ -9,9 +9,13 @@ on:
     branches:
       - 'develop'
       - 'main'
+    paths:
+      - "feature/*"
 
 permissions:
-  checks: write
+  contents: read
+  pages: write
+  deployments: write
   pull-requests: write
 
 jobs:
