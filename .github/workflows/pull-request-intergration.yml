@@ -15,9 +15,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest # 실행 환경 지정
-
+  setup:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -25,7 +24,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - name: Caching Dependencies
         uses: actions/cache@v3
         with:
@@ -35,30 +33,33 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Test with Gradle
         run: ./gradlew test
 
+  report:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}
         with:
           files: build/test-results/**/*.xml
-
-#      - name: Cleanup Gradle Cache
-#        if: ${{ always() }}
-#        run: |
-#          rm -f ~/.gradle/caches/modules-2/modules-2.lock
-#          rm -f ~/.gradle/caches/modules-2/gc.properties
