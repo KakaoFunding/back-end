@@ -13,8 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.orders.entity.Orders;
-import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.order.entity.Order;
 
 
 @Entity
@@ -32,7 +31,7 @@ public class FundingDetail extends BaseTimeEntity {
     private BigDecimal rate;
 
     @OneToMany(mappedBy = "fundingDetail")
-    private List<Orders> orders;
+    private List<Order> orders;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funding_id", nullable = false)

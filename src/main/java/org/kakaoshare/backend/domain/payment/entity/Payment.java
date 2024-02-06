@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.orders.entity.Orders;
+import org.kakaoshare.backend.domain.order.entity.Order;
 
 
 @Entity
@@ -35,5 +35,5 @@ public class Payment extends BaseTimeEntity {
     private BigDecimal deliveryPrice;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orders_id", nullable = false)
-    private Orders orders;
+    private Order order;
 }
