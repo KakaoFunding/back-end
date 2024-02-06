@@ -10,6 +10,6 @@ spring:
     hibernate:
       ddl-auto: create
   datasource:
-    username: sa
+    username: ENC(2SkZyC/z/C0Um0i4IOtuAA==)
     password:
     driver-class-name: org.h2.Driver
