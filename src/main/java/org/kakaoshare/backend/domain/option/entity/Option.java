@@ -31,5 +31,5 @@ public class Option extends BaseTimeEntity {
     private Product product;
 
     @OneToMany(mappedBy = "option")
-    private List<OptionDetail> optionOptionDetails;
+    private List<OptionDetail> optionDetails;
 }
