@@ -26,10 +26,6 @@ public class Wish extends BaseTimeEntity {
     private Boolean isPublic;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_detail_id", nullable = false)
     private ProductDetail productDetail;
 }

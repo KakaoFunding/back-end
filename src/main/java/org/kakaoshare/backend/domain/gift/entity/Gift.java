@@ -31,10 +31,6 @@ public class Gift extends BaseTimeEntity {
     private String messagePhoto;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orders_id", nullable = false)
     private Order order;
 }
