@@ -32,7 +32,7 @@ public class Brand extends BaseTimeEntity {
 
     @Column(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @OneToMany(mappedBy = "brand")
