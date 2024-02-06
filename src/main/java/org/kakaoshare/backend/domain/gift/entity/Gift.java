@@ -10,7 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.orders.entity.Orders;
+import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
 
@@ -36,5 +36,5 @@ public class Gift extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orders_id", nullable = false)
-    private Orders orders;
+    private Order order;
 }

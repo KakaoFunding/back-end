@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.orders.entity;
+package org.kakaoshare.backend.domain.order.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.time.OffsetDateTime;
+import jakarta.persistence.Table;
 import java.util.List;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
@@ -22,14 +22,12 @@ import org.kakaoshare.backend.domain.member.entity.Member;
 
 @Entity
 @Getter
-public class Orders extends BaseTimeEntity {
+@Table(name = "orders")
+public class Order extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ordersId;
-
-    @Column(nullable = false)
-    private OffsetDateTime createdAt;
 
     @Column(nullable = false)
     private Integer stockQuantity;
@@ -53,9 +51,9 @@ public class Orders extends BaseTimeEntity {
     private FundingDetail fundingDetail;
 
     @OneToMany(mappedBy = "orders")
-    private List<Payment> ordersPayments;
+    private List<Payment> Payments;
 
     @OneToMany(mappedBy = "orders")
-    private List<Gift> ordersGifts;
+    private List<Gift> sGifts;
 
 }

@@ -9,7 +9,7 @@ import jakarta.persistence.OneToMany;
 import java.util.List;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.orders.entity.Orders;
+import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 
 
@@ -34,7 +34,7 @@ public class Member extends BaseTimeEntity {
     private String kakaoUuid;
 
     @OneToMany(mappedBy = "member")
-    private List<Orders> orders;
+    private List<Order> orders;
 
     @OneToMany(mappedBy = "member")
     private List<Funding> funding;

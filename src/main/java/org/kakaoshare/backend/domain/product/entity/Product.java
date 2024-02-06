@@ -20,7 +20,7 @@ import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.option.entity.Option;
-import org.kakaoshare.backend.domain.orders.entity.Orders;
+import org.kakaoshare.backend.domain.order.entity.Order;
 
 
 @Entity
@@ -64,7 +64,7 @@ public class Product extends BaseTimeEntity {
     private List<Theme> productThemes;
 
     @OneToMany(mappedBy = "product")
-    private List<Orders> productOrders;
+    private List<Order> productOrders;
 
     @OneToMany(mappedBy = "product")
     private List<Gift> productGifts;
