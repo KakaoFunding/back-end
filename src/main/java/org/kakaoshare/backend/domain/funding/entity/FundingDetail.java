@@ -32,7 +32,7 @@ public class FundingDetail extends BaseTimeEntity {
     private BigDecimal rate;
 
     @OneToMany(mappedBy = "fundingDetail")
-    private List<Orders> fundingDetailOrders;
+    private List<Orders> orders;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funding_id", nullable = false)
