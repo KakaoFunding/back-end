@@ -52,29 +52,29 @@ public class Product extends BaseTimeEntity {
     private ProductDetail productDetail;
 
     @OneToMany(mappedBy = "product")
-    private List<Option> productOptions;
+    private List<Option> options;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductHashtag> productProductHashtags;
+    private List<ProductHashtag> productHashtags;
 
     @OneToMany(mappedBy = "product")
-    private List<Wish> productWishes;
+    private List<Wish> wishes;
 
     @OneToMany(mappedBy = "product")
-    private List<Theme> productThemes;
+    private List<Theme> themes;
 
     @OneToMany(mappedBy = "product")
-    private List<Order> productOrders;
+    private List<Order> orders;
 
     @OneToMany(mappedBy = "product")
-    private List<Gift> productGifts;
+    private List<Gift> gifts;
 
     @OneToMany(mappedBy = "product")
-    private List<Funding> productFunding;
+    private List<Funding> funding;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductThumbnail> productProductThumbnails;
+    private List<ProductThumbnail> productThumbnails;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductDescriptionPhoto> productProductDescriptionPhotos;
+    private List<ProductDescriptionPhoto> productDescriptionPhotos;
 }
