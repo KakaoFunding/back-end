@@ -10,12 +10,14 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 @ActiveProfiles(value="test")
 class TestComponentTest {
     @Autowired
     TestComponent testComponent;
     @Autowired
     TestEntityRepository testEntityRepository;
+
     @Test
     void test_ci() {
         // given

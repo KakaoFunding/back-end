@@ -11,6 +11,8 @@ on:
       - 'main'
     paths:
       - "feature/*"
+    types:
+      - auto_merge_enabled
 
 permissions:
   checks: write
