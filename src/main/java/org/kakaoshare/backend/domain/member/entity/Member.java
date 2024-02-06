@@ -34,9 +34,9 @@ public class Member extends BaseTimeEntity {
     private String kakaoUuid;
 
     @OneToMany(mappedBy = "member")
-    private List<Orders> memberOrders;
+    private List<Orders> orders;
 
     @OneToMany(mappedBy = "member")
-    private List<Funding> memberFunding;
+    private List<Funding> funding;
 
 }
