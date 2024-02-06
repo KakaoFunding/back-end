@@ -43,6 +43,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - run: touch ./src/main/resources/application-secret.yml
+      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.yml
+      - run: cat ./src/main/resources/application-secret.yml
+
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
