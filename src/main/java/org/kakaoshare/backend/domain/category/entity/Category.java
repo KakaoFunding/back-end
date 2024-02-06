@@ -29,7 +29,7 @@ public class Category extends BaseTimeEntity {
     @JoinColumn(name = "parent_id")
     private Category parent;
 
-    @OneToMany(mappedBy = "parent")
-    private List<Category> parentCategories;
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    private List<Category> Categories;
 
 }
