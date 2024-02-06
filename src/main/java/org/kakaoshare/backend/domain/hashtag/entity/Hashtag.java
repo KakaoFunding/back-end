@@ -23,6 +23,6 @@ public class Hashtag extends BaseTimeEntity {
     private String name;
 
     @OneToMany(mappedBy = "hashtag")
-    private List<ProductHashtag> hashtagProductHashtags;
+    private List<ProductHashtag> ProductHashtags;
 
 }
