@@ -10,10 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class TestComponentTest {
-    @Autowired
-    TestComponent testComponent;
-
 @ActiveProfiles(value="test")
 class TestComponentTest {
     @Autowired
