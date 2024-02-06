@@ -51,30 +51,39 @@ public class Product extends BaseTimeEntity {
     @JoinColumn(name = "product_detail_id", nullable = false)
     private ProductDetail productDetail;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<Option> options;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<ProductHashtag> productHashtags;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<Wish> wishes;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<Theme> themes;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<Order> orders;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<Gift> gifts;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<Funding> funding;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<ProductThumbnail> productThumbnails;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private List<ProductDescriptionPhoto> productDescriptionPhotos;
 }
