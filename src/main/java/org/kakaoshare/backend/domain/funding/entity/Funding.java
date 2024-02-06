@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Getter;
@@ -30,10 +31,7 @@ public class Funding extends BaseTimeEntity {
     private String status;
 
     @Column(nullable = false)
-    private OffsetDateTime createdAt;
-
-    @Column(nullable = false)
-    private OffsetDateTime expiredAt;
+    private LocalDate expiredAt;
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal goalAmount;
@@ -50,7 +48,7 @@ public class Funding extends BaseTimeEntity {
     private Product product;
 
     @OneToMany(mappedBy = "funding")
-    private List<FundingDetail> fundingFundingDetails;
+    private List<FundingDetail> fundingDetails;
 
 
 }
