@@ -7,12 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.List;
+import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
 
 @Entity
+@Getter
 public class ProductDetail extends BaseTimeEntity {
 
     @Id
@@ -47,9 +49,9 @@ public class ProductDetail extends BaseTimeEntity {
     private String caution;
 
     @OneToMany(mappedBy = "productDetail")
-    private List<Product> productDetailProducts;
+    private List<Product> products;
 
     @OneToMany(mappedBy = "productDetail")
-    private List<Wish> productDetailWishes;
+    private List<Wish> wishes;
 
 }
