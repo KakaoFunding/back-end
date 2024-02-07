@@ -25,4 +25,7 @@ public class ProductHashtag extends BaseTimeEntity {
     @JoinColumn(name = "hashtag_id", nullable = false)
     private Hashtag hashtag;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 }

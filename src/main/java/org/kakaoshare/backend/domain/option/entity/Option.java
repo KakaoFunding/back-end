@@ -28,4 +28,8 @@ public class Option extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "option")
     private List<OptionDetail> optionDetails;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 }

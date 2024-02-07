@@ -46,5 +46,8 @@ public class Funding extends BaseTimeEntity {
     @OneToMany(mappedBy = "funding")
     private List<FundingDetail> fundingDetails;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
 }
