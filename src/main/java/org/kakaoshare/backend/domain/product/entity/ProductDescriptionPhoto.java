@@ -23,8 +23,4 @@ public class ProductDescriptionPhoto extends BaseTimeEntity {
 
     @Column
     private String photoUrl;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
 }

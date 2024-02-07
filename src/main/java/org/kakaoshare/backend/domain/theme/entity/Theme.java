@@ -27,7 +27,4 @@ public class Theme extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "text")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
 }
