@@ -4,3 +4,4 @@ spring:
 #    active: prod
     active: dev
 #    active: test
+    include: secret
