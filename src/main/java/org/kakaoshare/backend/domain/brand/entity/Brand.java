@@ -29,8 +29,7 @@ public class Brand extends BaseTimeEntity {
 
     @Column
     private String iconPhoto;
-
-    @Column(nullable = false)
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;

@@ -46,11 +46,11 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "funding_detail_id")
     private FundingDetail fundingDetail;
 
-    @OneToMany(mappedBy = "orders")
-    private List<Payment> Payments;
+    @OneToMany(mappedBy = "order")
+    private List<Payment> payments;
 
-    @OneToMany(mappedBy = "orders")
-    private List<Gift> sGifts;
+    @OneToMany(mappedBy = "order")
+    private List<Gift> gifts;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
