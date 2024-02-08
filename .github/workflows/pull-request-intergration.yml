@@ -1,4 +1,4 @@
-name: integrate pull request with test
+name: Integrate Pull Request with Test
 
 on:
   push:
@@ -22,11 +22,14 @@ permissions:
   pull-requests: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest # 실행 환경 지정
-    
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-dependencies.outputs.cache-key }}
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -34,6 +37,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Caching Dependencies
+        id: cache-dependencies
         uses: actions/cache@v3
         with:
           path: |
@@ -47,21 +51,38 @@ jobs:
       - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.yml
       - run: cat ./src/main/resources/application-secret.yml
 
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew build -x test
-
-      - name: Test with Gradle
-        run: ./gradlew test
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
 
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+  test:
+    needs: [setup,build]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test with Gradle
+        run: ./gradlew test
+
+  report:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}
