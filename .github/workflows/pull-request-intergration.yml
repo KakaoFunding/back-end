@@ -11,6 +11,8 @@ on:
       - 'main'
     paths:
       - "feature/*"
+    types:
+      - auto_merge_enabled
 
 permissions:
   checks: write
@@ -20,9 +22,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest # 실행 환경 지정
-
+  setup:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -31,6 +32,11 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
+  cache-dependencies:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - name: Caching Dependencies
         uses: actions/cache@v3
         with:
@@ -40,22 +46,33 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
-
+  
+  build:
+    needs: cache-dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
       - name: Build with Gradle
         run: ./gradlew build -x test
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - name: Test with Gradle
         run: ./gradlew test
 
+  report:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}
