@@ -24,14 +24,20 @@ permissions:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-dependencies.outputs.cache-key }}
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'corretto'
+
       - name: Caching Dependencies
+        id: cache-dependencies
         uses: actions/cache@v3
         with:
           path: |
@@ -40,6 +46,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - run: touch ./src/main/resources/application-secret.yml
+      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.yml
+      - run: cat ./src/main/resources/application-secret.yml
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -48,16 +62,16 @@ jobs:
   build:
     needs: setup
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build -x test
 
   test:
-    needs: build
+    needs: [setup,build]
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
       - name: Test with Gradle
@@ -66,7 +80,9 @@ jobs:
   report:
     needs: test
     runs-on: ubuntu-latest
+    
     steps:
+      - uses: actions/checkout@v4
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}
