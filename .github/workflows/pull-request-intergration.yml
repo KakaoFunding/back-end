@@ -65,22 +65,32 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'corretto'
       - name: Build with Gradle
         run: ./gradlew build -x test
 
   test:
-    needs: [setup,build]
+    needs: [ setup, build ]
     runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'corretto'
       - name: Test with Gradle
         run: ./gradlew test
 
   report:
     needs: test
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
       - name: Report Test Results
