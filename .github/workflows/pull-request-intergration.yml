@@ -67,7 +67,7 @@ jobs:
           java-version: 17
           distribution: 'corretto'
       - run: touch ./src/main/resources/application-secret.properties
-      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.properties
+      - run: echo "${{ secrets.APPLICATION_SECRET }}" > ./src/main/resources/application-secret.properties
       - run: cat ./src/main/resources/application-secret.properties
       - name: Build with Gradle
         run: ./gradlew build -x test
@@ -84,7 +84,7 @@ jobs:
           java-version: 17
           distribution: 'corretto'
       - run: touch ./src/main/resources/application-secret.properties
-      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.properties
+      - run: echo "${{ secrets.APPLICATION_SECRET }}" > ./src/main/resources/application-secret.properties
       - run: cat ./src/main/resources/application-secret.properties
       - name: Test with Gradle
         run: ./gradlew test
