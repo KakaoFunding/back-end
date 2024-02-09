@@ -14,7 +14,7 @@ public class JasyptConfig {
     public static final String BASE_64 = "base64";
     public static final String ITERATIONS = "1000";
     public static final String RANDOM_SALT_GENERATOR = "org.jasypt.salt.RandomSaltGenerator";
-    public static final String POOL_SIZE = "1";
+    public static final String POOL_SIZE = "2";
 
     @Value("${jasypt.encryptor.password}")
     private String encryptKey;
