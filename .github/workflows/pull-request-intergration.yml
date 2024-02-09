@@ -70,9 +70,12 @@ jobs:
         with:
           java-version: 17
           distribution: 'corretto'
+      - run: touch ./src/main/resources/application-secret.yml
+      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.yml
+      - run: cat ./src/main/resources/application-secret.yml
       - name: Build with Gradle
         run: ./gradlew build -x test
-
+  
   test:
     needs: [ setup, build ]
     runs-on: ubuntu-latest
@@ -84,6 +87,9 @@ jobs:
         with:
           java-version: 17
           distribution: 'corretto'
+      - run: touch ./src/main/resources/application-secret.yml
+      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.yml
+      - run: cat ./src/main/resources/application-secret.yml
       - name: Test with Gradle
         run: ./gradlew test
 
