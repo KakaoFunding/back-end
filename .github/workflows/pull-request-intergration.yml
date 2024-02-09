@@ -56,7 +56,8 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Test with Gradle
-        run: ./gradlew test
+        run: ./gradlew test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+
 
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
