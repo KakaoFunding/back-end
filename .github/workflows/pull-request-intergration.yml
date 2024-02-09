@@ -52,14 +52,13 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Create application-secret.properties
+      - name: Create application-secret.yml
         run: |
-          touch ./src/main/resources/application-secret.properties
-          echo "jasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}" > ./src/main/resources/application-secret.properties
-          cat ./src/main/resources/application-secret.properties
+          echo "jasypt:" > ./src/main/resources/application-secret.yml
+          echo "  encryptor:" >> ./src/main/resources/application-secret.yml
+          echo "    password: '${{ secrets.APPLICATION_SECRET }}'" >> ./src/main/resources/application-secret.yml
+          cat ./src/main/resources/application-secret.yml
 
-      - name: Set Spring Profile to CI
-        run: echo "spring.profiles.active=ci" >> ./src/main/resources/application.yml
 
       - name: Build with Gradle
         run: ./gradlew build -x test
