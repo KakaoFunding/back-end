@@ -54,11 +54,11 @@ jobs:
 
       - name: Create application-secret.yml
         run: |
+          touch ./src/main/resources/application-secret.yml
           echo "jasypt:" > ./src/main/resources/application-secret.yml
           echo "  encryptor:" >> ./src/main/resources/application-secret.yml
           echo "    password: '${{ secrets.APPLICATION_SECRET }}'" >> ./src/main/resources/application-secret.yml
-          cat ./src/main/resources/application-secret.yml
-
+    
 
       - name: Build with Gradle
         run: ./gradlew build -x test
