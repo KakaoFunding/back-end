@@ -47,10 +47,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - run: touch ./src/main/resources/application-secret.properties
-      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.properties
-      - run: cat ./src/main/resources/application-secret.properties
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -70,9 +66,9 @@ jobs:
         with:
           java-version: 17
           distribution: 'corretto'
-      - run: touch ./src/main/resources/application-secret.yml
-      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.yml
-      - run: cat ./src/main/resources/application-secret.yml
+      - run: touch ./src/main/resources/application-secret.properties
+      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.properties
+      - run: cat ./src/main/resources/application-secret.properties
       - name: Build with Gradle
         run: ./gradlew build -x test
   
@@ -87,9 +83,9 @@ jobs:
         with:
           java-version: 17
           distribution: 'corretto'
-      - run: touch ./src/main/resources/application-secret.yml
-      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.yml
-      - run: cat ./src/main/resources/application-secret.yml
+      - run: touch ./src/main/resources/application-secret.properties
+      - run: echo "${{ secrets.SECRET_KEY }}" > ./src/main/resources/application-secret.properties
+      - run: cat ./src/main/resources/application-secret.properties
       - name: Test with Gradle
         run: ./gradlew test
 
