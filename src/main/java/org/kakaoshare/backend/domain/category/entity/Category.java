@@ -1,21 +1,19 @@
 package org.kakaoshare.backend.domain.category.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.util.List;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
+
+import java.util.List;
 
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(staticName = "of")
 public class Category extends BaseTimeEntity {
 
     @Id
@@ -24,12 +22,15 @@ public class Category extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String name;
+    
+    @Column(nullable = false,updatable = false)
+    private Integer level;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    private List<Category> Categories;
+    private List<Category> children;
 
 }
