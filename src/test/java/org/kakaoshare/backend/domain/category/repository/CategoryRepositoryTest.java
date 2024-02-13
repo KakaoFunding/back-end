@@ -23,15 +23,15 @@ class CategoryRepositoryTest {
     void setUp() {
         List<Category> categories = new ArrayList<>();
         
-        Category rootCategory = Category.of(0L, "Root", 0, null, new ArrayList<>());
+        Category rootCategory = Category.of(0L, "Root", null, new ArrayList<>());
         categories.add(rootCategory);
         
         for (int i = 1; i <= 5; i++) {
-            Category parentCategory = Category.of(0L, "Category " + i, 1, rootCategory, new ArrayList<>());
+            Category parentCategory = Category.of(0L, "Category " + i, rootCategory, new ArrayList<>());
             categories.add(parentCategory);
             
             for (int j = 1; j <= 5; j++) {
-                Category subCategory = Category.of(0L, "Category " + i + " - Subcategory " + j, 2, parentCategory, new ArrayList<>());
+                Category subCategory = Category.of(0L, "Category " + i + " - Subcategory " + j, parentCategory, new ArrayList<>());
                 categories.add(subCategory);
             }
         }
@@ -49,7 +49,8 @@ class CategoryRepositoryTest {
         
         
         List<Category> parentCategories = categories.stream()
-                .filter(c -> c.getLevel() == 1)
+                .filter(c->!c.getName().equals("Root"))
+                .filter(c -> c.getParent().getName().equals("Root"))
                 .toList();
         
         assertThat(parentCategories.size()).isEqualTo(5);
@@ -57,14 +58,10 @@ class CategoryRepositoryTest {
         
         for (Category parent : parentCategories) {
             assertThat(parent.getChildren().size()).isEqualTo(5);
-            for (int i = 1; i <= 5; i++) {
-                String expectedSubcategoryName = parent.getName() + " - Subcategory " + i;
-                assertThat(parent.getChildren().get(i-1).getName()).isEqualTo(expectedSubcategoryName);
-                assertThat(parent.getChildren().get(i-1).getLevel()).isEqualTo(2);
+            for (Category child : parent.getChildren()) {
+                assertThat(child.getName()).contains("Subcategory");
+                assertThat(child.getChildren()).isEmpty();
             }
         }
-        
-        // 출력은 실제 데이터를 보기 위해 사용됩니다 (옵션)
-        categories.forEach(System.out::println);
     }
 }

@@ -48,14 +48,14 @@ class CategoryServiceTest {
     
     List<Category> createCategories() {
         List<Category> categories = new ArrayList<>();
-        Category rootCategory = Category.of(0L, "Root", 0, null, new ArrayList<>());
+        Category rootCategory = Category.of(0L, "Root", null, new ArrayList<>());
         
         for (int i = 1; i <= 5; i++) {
-            Category parentCategory = Category.of(0L, "Category " + i, 1, rootCategory, new ArrayList<>());
+            Category parentCategory = Category.of(0L, "Category " + i, rootCategory, new ArrayList<>());
             categories.add(parentCategory);
             
             for (int j = 1; j <= 5; j++) {
-                Category subCategory = Category.of(0L, "Category " + i + " - Subcategory " + j, 2, parentCategory, new ArrayList<>());
+                Category subCategory = Category.of(0L, "Category " + i + " - Subcategory " + j, parentCategory, new ArrayList<>());
                 parentCategory.getChildren().add(subCategory);
                 categories.add(subCategory);
             }
