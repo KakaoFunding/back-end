@@ -19,7 +19,6 @@ public class CategoryService {
     public static final String ROOT_CATEGORY_NAME = "Root";
     private final CategoryRepository categoryRepository;
     
-    //TODO 2024 02 13 14:02:23 : 모든 카테고리 목록 조회
     
     public CategoryDto createCategoryRoot() {
         Map<Long, List<CategoryDto>> groupingByParentId = categoryRepository.findAllWithChildren()
@@ -27,14 +26,16 @@ public class CategoryService {
                 .map(CategoryDto::of)
                 .collect(groupingBy(CategoryDto::getCategoryId));
         
-        CategoryDto rootCategoryDto = new CategoryDto(0L, ROOT_CATEGORY_NAME, 0, null);
-        addSubCategories(rootCategoryDto, groupingByParentId,0);
+        CategoryDto rootCategoryDto = new CategoryDto(0L, ROOT_CATEGORY_NAME, null);
+        rootCategoryDto.setLevel(0);
+        addSubCategories(rootCategoryDto, groupingByParentId);
         
         return rootCategoryDto;
     }
     
-    private void addSubCategories(CategoryDto parent, Map<Long, List<CategoryDto>> categoryGroup,Integer level) {
-        if(level>= MAX_LEVEL)
+    private void addSubCategories(CategoryDto parent, Map<Long, List<CategoryDto>> categoryGroup) {
+        int level = parent.getLevel();
+        if(level >= MAX_LEVEL)
             return;
         List<CategoryDto> subCategories = categoryGroup.get(parent.getCategoryId());
         
@@ -42,6 +43,9 @@ public class CategoryService {
             return;
         parent.setSubCategories(subCategories);
         
-        subCategories.forEach(s -> addSubCategories(s, categoryGroup,level+1));
+        subCategories.forEach(s -> {
+            s.setLevel(level+1);
+            addSubCategories(s, categoryGroup);
+        });
     }
 }

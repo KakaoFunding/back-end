@@ -22,9 +22,6 @@ public class Category extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String name;
-    
-    @Column(nullable = false,updatable = false)
-    private Integer level;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")

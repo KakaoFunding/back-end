@@ -19,10 +19,9 @@ public class CategoryDto {
     private List<CategoryDto> subCategories;
     private TabType defaultTab;
     
-    public CategoryDto(Long categoryId, String categoryName, int level, List<CategoryDto> subCategories) {
+    public CategoryDto(Long categoryId, String categoryName, List<CategoryDto> subCategories) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
-        this.level = level;
         this.subCategories = subCategories;
         this.defaultTab = TabType.BRAND;//브랜드를 조회하는것이 화면 로딩과정에서 쿼리를 최소화 가능해보임
     }
@@ -31,7 +30,6 @@ public class CategoryDto {
         return new CategoryDto(
                 category.getCategoryId(),
                 category.getName(),
-                category.getLevel(),
                 category.getChildren().stream().map(CategoryDto::of).collect(Collectors.toList()));
     }
     
