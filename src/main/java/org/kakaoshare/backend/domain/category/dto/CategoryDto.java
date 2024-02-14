@@ -7,7 +7,6 @@ import org.kakaoshare.backend.domain.brand.dto.TabType;
 import org.kakaoshare.backend.domain.category.entity.Category;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 public class CategoryDto {
     private Long categoryId;
     private String categoryName;
-    private int level;
     private List<CategoryDto> subCategories;
     private TabType defaultTab;
     
@@ -30,7 +28,7 @@ public class CategoryDto {
         return new CategoryDto(
                 category.getCategoryId(),
                 category.getName(),
-                category.getChildren().stream().map(CategoryDto::of).collect(Collectors.toList()));
+                category.getChildren().stream()
+                        .map(CategoryDto::of).toList());
     }
-    
 }
