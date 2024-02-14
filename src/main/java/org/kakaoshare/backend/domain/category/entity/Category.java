@@ -41,7 +41,7 @@ public class Category extends BaseTimeEntity {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children;
     
-    public Category(String name, Category parent, List<Category> children) {
+    private Category(String name, Category parent, List<Category> children) {
         this.name = name;
         this.parent = parent;
         this.children = children;
