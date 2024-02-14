@@ -1,68 +1,72 @@
 package org.kakaoshare.backend.domain.category.service;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.kakaoshare.backend.domain.brand.dto.TabType;
 import org.kakaoshare.backend.domain.category.dto.CategoryDto;
 import org.kakaoshare.backend.domain.category.entity.Category;
 import org.kakaoshare.backend.domain.category.repository.CategoryRepository;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
-
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class CategoryServiceTest {
-    @InjectMocks
+    
+    @Autowired
     private CategoryService categoryService;
     
-    @Mock
+    @Autowired
     private CategoryRepository categoryRepository;
     
-    @Test
-    @DisplayName(value = "카테고리 계층적 구조화 테스트")
-    void testCreateCategoryHierarchy() {
-        // given
-        List<Category> categories = createCategories();
-        given(categoryRepository.findAllWithChildren())
-                .willReturn(categories);
-        
-        // when
-        Category root = categories.stream()
-                .filter(category -> category.getName().equals("Root"))
-                .findFirst().orElseThrow();
-        
-        CategoryDto rootDto = categoryService.createCategoryRoot();
-        
-        // then
-        assertThat(rootDto.getCategoryId()).isEqualTo(CategoryDto.of(root).getCategoryId());
-        assertThat(rootDto.getLevel()).isEqualTo(0);
-        assertThat(rootDto.getCategoryName()).isEqualTo("Root");
+    @BeforeEach
+    @Transactional
+    void setUp() {
+        List<Category> categories = createTestCategories();
+        categoryRepository.saveAll(categories);
     }
     
-    List<Category> createCategories() {
-        List<Category> categories = new ArrayList<>();
-        Category rootCategory = Category.of(0L, "Root", null, new ArrayList<>());
+    @AfterEach
+    void tearDown() {
+        categoryRepository.deleteAll();
+    }
+    
+    @Test
+    @DisplayName("카테고리는 계층간 연관이 명확해야한다.")
+    void testCreateCategoryHierarchy() {
+        CategoryDto root = categoryService.createCategoryRoot();
         
+        assertThat(root.getSubCategories()).isNotNull().hasSize(5);
+        root.getSubCategories().forEach(parent -> {
+            assertCategoryDetails(parent, root.getCategoryId(), 5);
+            parent.getSubCategories().forEach(child -> assertCategoryDetails(child, parent.getCategoryId(), 0));
+        });
+    }
+    
+    private List<Category> createTestCategories() {
+        List<Category> categories = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            Category parentCategory = Category.of(0L, "Category " + i, rootCategory, new ArrayList<>());
-            categories.add(parentCategory);
-            
+            Category parentCategory = Category.of("Category " + i, null, new ArrayList<>());
             for (int j = 1; j <= 5; j++) {
-                Category subCategory = Category.of(0L, "Category " + i + " - Subcategory " + j, parentCategory, new ArrayList<>());
+                Category subCategory = Category.of("Category " + i + " - Subcategory " + j, parentCategory, null);
                 parentCategory.getChildren().add(subCategory);
                 categories.add(subCategory);
             }
-            rootCategory.getChildren().add(parentCategory);
             categories.add(parentCategory);
         }
-        categories.add(rootCategory);
         return categories;
+    }
+    
+    private void assertCategoryDetails(CategoryDto category, Long parentCategoryId, int expectedSubCategorySize) {
+        assertThat(category.getCategoryId()).isNotEqualTo(parentCategoryId);
+        assertThat(category.getSubCategories()).hasSize(expectedSubCategorySize);
+        assertThat(category.getDefaultTab()).isEqualTo(TabType.BRAND);
     }
 }
