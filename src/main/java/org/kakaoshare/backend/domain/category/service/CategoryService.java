@@ -17,28 +17,16 @@ import static java.util.stream.Collectors.groupingBy;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryService {
-    private static final String ROOT_CATEGORY_NAME = "Root";
+    private static final CategoryDto ROOT_CATEGORY_DTO = new CategoryDto(-1L, "Root", null);
     private final CategoryRepository categoryRepository;
     
     
     public CategoryDto createCategoryRoot() {
         List<Category> categories = categoryRepository.findAllWithChildren();
-        CategoryDto rootCategoryDto = new CategoryDto(0L, ROOT_CATEGORY_NAME, 0L);
         
-        Map<Long, List<CategoryDto>> parentGroup = categories
-                .stream()
-                .filter(category -> Objects.isNull(category.getParent()))
-                .map(category -> new CategoryDto(
-                        category.getCategoryId(),
-                        category.getName(),
-                        rootCategoryDto.getCategoryId()))//부모 ID를 Root로 임의 지정(DB에는 존재하지 않기 때문)
-                .collect(groupingBy(CategoryDto::getParentId));
+        Map<Long, List<CategoryDto>> parentGroup = groupParentCategories(categories);
         
-        Map<Long, List<CategoryDto>> childGroup = categories
-                .stream()
-                .filter(category -> Objects.nonNull(category.getParent()))
-                .map(CategoryDto::from)
-                .collect(groupingBy(CategoryDto::getParentId));
+        Map<Long, List<CategoryDto>> childGroup = groupChildCategories(categories);
         
         childGroup.forEach((parentId, subCategories) ->
                 parentGroup.merge(parentId, subCategories, (existingSubCategories, newSubCategories) -> {
@@ -46,9 +34,30 @@ public class CategoryService {
                     return existingSubCategories;
                 }));
         
-        addSubCategories(rootCategoryDto, parentGroup);
+        addSubCategories(ROOT_CATEGORY_DTO, parentGroup);
         
-        return rootCategoryDto;
+        return ROOT_CATEGORY_DTO;
+    }
+    
+
+    private static Map<Long, List<CategoryDto>> groupParentCategories(final List<Category> categories) {
+        return categories
+                .stream()
+                .filter(category -> Objects.isNull(category.getParent()))
+                .map(category -> new CategoryDto(
+                        category.getCategoryId(),
+                        category.getName(),
+                        CategoryService.ROOT_CATEGORY_DTO.getCategoryId()))//부모 ID를 Root로 임의 지정(DB에는 존재하지 않기 때문)
+                .collect(groupingBy(CategoryDto::getParentId));
+    }
+    
+
+    private static Map<Long, List<CategoryDto>> groupChildCategories(final List<Category> categories) {
+        return categories
+                .stream()
+                .filter(category -> Objects.nonNull(category.getParent()))
+                .map(CategoryDto::from)
+                .collect(groupingBy(CategoryDto::getParentId));
     }
     
     private void addSubCategories(CategoryDto parent, Map<Long, List<CategoryDto>> categoryGroup) {
