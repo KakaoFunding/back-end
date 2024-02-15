@@ -59,7 +59,7 @@ public class CategoryService {
             return;
         }
         
-        parent.setSubCategories(subCategories);
+        parent.getSubCategories().addAll(subCategories);
         
         subCategories.forEach(s -> addSubCategories(s, categoryGroup));
     }
