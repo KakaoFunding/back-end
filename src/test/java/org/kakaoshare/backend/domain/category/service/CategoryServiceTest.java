@@ -53,9 +53,17 @@ class CategoryServiceTest {
     private List<Category> createTestCategories() {
         List<Category> categories = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            Category parentCategory = Category.of("Category " + i, null, new ArrayList<>());
+            Category parentCategory = Category.builder()
+                    .name("Category " + i)
+                    .parent(null)
+                    .children(new ArrayList<>())
+                    .build();
             for (int j = 1; j <= 5; j++) {
-                Category subCategory = Category.of("Category " + i + " - Subcategory " + j, parentCategory, null);
+                Category subCategory = Category.builder()
+                        .name("Category " + i + " - Subcategory " + j)
+                        .parent(parentCategory)
+                        .children(new ArrayList<>())
+                        .build();
                 parentCategory.getChildren().add(subCategory);
                 categories.add(subCategory);
             }

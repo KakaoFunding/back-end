@@ -26,19 +26,25 @@ class CategoryRepositoryTest {
     void setUp() {
         List<Category> categories = new ArrayList<>();
         
-        Category rootCategory = Category.of(ROOT_NAME, null, new ArrayList<>());
+        Category rootCategory = Category.builder()
+                .name(ROOT_NAME)
+                .parent(null)
+                .children(new ArrayList<>())
+                .build();
         
         for (int i = 1; i <= 5; i++) {
-            Category parentCategory = Category.of(
-                    "Category " + i,
-                    rootCategory,
-                    new ArrayList<>());
+            Category parentCategory = Category.builder()
+                    .name("Category " + i)
+                    .parent(rootCategory)
+                    .children(new ArrayList<>())
+                    .build();
             
             for (int j = 1; j <= 5; j++) {
-                Category subCategory = Category.of(
-                        "Category " + i + " - Subcategory " + j,
-                        parentCategory
-                        , new ArrayList<>());
+                Category subCategory = Category.builder()
+                        .name("Category " + i + " - Subcategory " + j)
+                        .parent(parentCategory)
+                        .children(new ArrayList<>())
+                        .build();
                 parentCategory.getChildren().add(subCategory);
                 categories.add(subCategory);
             }
