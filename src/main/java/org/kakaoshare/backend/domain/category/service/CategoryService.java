@@ -40,14 +40,13 @@ public class CategoryService {
                 .map(CategoryDto::of)
                 .collect(groupingBy(CategoryDto::getParentId));
         
-        childGroup.forEach((parentId, subCategories) -> {
-            parentGroup.merge(parentId, subCategories, (existingSubCategories, newSubCategories) -> {
-                existingSubCategories.addAll(newSubCategories);
-                return existingSubCategories;
-            });
-        });
+        childGroup.forEach((parentId, subCategories) ->
+                parentGroup.merge(parentId, subCategories, (existingSubCategories, newSubCategories) -> {
+                    existingSubCategories.addAll(newSubCategories);
+                    return existingSubCategories;
+                }));
         
-        addSubCategories(rootCategoryDto,parentGroup);
+        addSubCategories(rootCategoryDto, parentGroup);
         
         return rootCategoryDto;
     }
