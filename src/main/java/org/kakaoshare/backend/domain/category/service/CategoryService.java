@@ -37,7 +37,7 @@ public class CategoryService {
         Map<Long, List<CategoryDto>> childGroup = categories
                 .stream()
                 .filter(category -> Objects.nonNull(category.getParent()))
-                .map(CategoryDto::of)
+                .map(CategoryDto::from)
                 .collect(groupingBy(CategoryDto::getParentId));
         
         childGroup.forEach((parentId, subCategories) ->
