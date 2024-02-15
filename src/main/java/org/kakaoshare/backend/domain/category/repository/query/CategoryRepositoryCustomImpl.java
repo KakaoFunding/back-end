@@ -8,7 +8,7 @@ import org.kakaoshare.backend.domain.category.entity.QCategory;
 import java.util.List;
 @RequiredArgsConstructor
 public class CategoryRepositoryCustomImpl implements CategoryRepositoryCustom {
-    private final JPAQueryFactory query;
+    private final JPAQueryFactory queryFactory;
 
 
     @Override
@@ -16,7 +16,7 @@ public class CategoryRepositoryCustomImpl implements CategoryRepositoryCustom {
         QCategory category = QCategory.category;
         QCategory child = new QCategory("child");
 
-        return query.selectFrom(category)
+        return queryFactory.selectFrom(category)
                 .leftJoin(category.children, child)
                 .fetchJoin()
                 .distinct()
