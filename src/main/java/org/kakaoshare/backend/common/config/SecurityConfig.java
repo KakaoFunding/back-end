@@ -5,10 +5,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
+    private static final String ORIGIN_PATTERN = "*";
+    private static final String CORS_CONFIGURATION_PATTERN = "/**";
+
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http.httpBasic().disable()
@@ -22,5 +28,19 @@ public class SecurityConfig {
                 .cors();
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOriginPattern(ORIGIN_PATTERN);
+        configuration.addAllowedHeader(ORIGIN_PATTERN);
+        configuration.addAllowedMethod(ORIGIN_PATTERN);
+        configuration.setAllowCredentials(true);
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration(CORS_CONFIGURATION_PATTERN, configuration);
+
+        return source;
     }
 }
