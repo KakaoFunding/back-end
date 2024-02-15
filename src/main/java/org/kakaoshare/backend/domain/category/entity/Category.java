@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Category extends BaseTimeEntity {
@@ -40,16 +42,6 @@ public class Category extends BaseTimeEntity {
     
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children;
-    
-    private Category(String name, Category parent, List<Category> children) {
-        this.name = name;
-        this.parent = parent;
-        this.children = children;
-    }
-    
-    public static Category of(String name, Category parent, List<Category> children) {
-        return new Category(name, parent, children);
-    }
     
     @Override
     public String toString() {
