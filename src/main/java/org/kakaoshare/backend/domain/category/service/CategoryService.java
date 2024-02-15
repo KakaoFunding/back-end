@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -24,9 +26,10 @@ public class CategoryService {
     public CategoryDto createCategoryRoot() {
         List<Category> categories = categoryRepository.findAllWithChildren();
         
-        Map<Long, List<CategoryDto>> parentGroup = groupParentCategories(categories);
-        
-        Map<Long, List<CategoryDto>> childGroup = groupChildCategories(categories);
+        Map<Long, List<CategoryDto>> parentGroup
+                = groupCategories(categories, category -> !hasParent(category), this::mapToParentCategoryDto);
+        Map<Long, List<CategoryDto>> childGroup
+                = groupCategories(categories, category -> hasParent(category), CategoryDto::from);
         
         childGroup.forEach((parentId, subCategories) ->
                 parentGroup.merge(parentId, subCategories, (existingSubCategories, newSubCategories) -> {
@@ -39,24 +42,20 @@ public class CategoryService {
         return ROOT_CATEGORY_DTO;
     }
     
-
-    private static Map<Long, List<CategoryDto>> groupParentCategories(final List<Category> categories) {
-        return categories
-                .stream()
-                .filter(category -> Objects.isNull(category.getParent()))
-                .map(category -> new CategoryDto(
-                        category.getCategoryId(),
-                        category.getName(),
-                        CategoryService.ROOT_CATEGORY_DTO.getCategoryId()))//부모 ID를 Root로 임의 지정(DB에는 존재하지 않기 때문)
-                .collect(groupingBy(CategoryDto::getParentId));
+    private static boolean hasParent(Category category) {
+        return Objects.nonNull(category.getParent());
     }
     
-
-    private static Map<Long, List<CategoryDto>> groupChildCategories(final List<Category> categories) {
-        return categories
-                .stream()
-                .filter(category -> Objects.nonNull(category.getParent()))
-                .map(CategoryDto::from)
+    private CategoryDto mapToParentCategoryDto(Category category) {
+        return new CategoryDto(category.getCategoryId(), category.getName(), ROOT_CATEGORY_DTO.getCategoryId());
+    }
+    
+    private Map<Long, List<CategoryDto>> groupCategories(List<Category> categories,
+                                                         Predicate<Category> filter,
+                                                         Function<Category, CategoryDto> mapper) {
+        return categories.stream()
+                .filter(filter)
+                .map(mapper)
                 .collect(groupingBy(CategoryDto::getParentId));
     }
     
