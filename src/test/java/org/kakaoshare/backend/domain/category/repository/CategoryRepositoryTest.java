@@ -97,6 +97,7 @@ class CategoryRepositoryTest {
     }
     
     @Test
+    @Transactional
     @DisplayName("단일 ID를 통해 조회한 카테고리들은 부모 카테고리다")
     void testFindByCategoryId() {
         // given
@@ -104,7 +105,7 @@ class CategoryRepositoryTest {
         
         for (Category parentCategory : parentCategories) {
             Long categoryId = parentCategory.getCategoryId();
-            Category parent = categoryRepository.findByCategoryIdWithChildren(categoryId).orElseThrow();
+            Category parent = categoryRepository.findById(categoryId).orElseThrow();
             
             assertThat(parentCategory.getCategoryId()).isEqualTo(parent.getCategoryId());
             assertThat(parent.getName()).doesNotContain(SUBCATEGORY);
@@ -122,7 +123,7 @@ class CategoryRepositoryTest {
             // when
             Long categoryId = childCategory.getParent().getCategoryId();
             Category category
-                    = categoryRepository.findByCategoryIdWithChildren(categoryId).orElseThrow();
+                    = categoryRepository.findById(categoryId).orElseThrow();
             
             // then
             assertThat(category.getParent()).isNotNull();
