@@ -51,7 +51,4 @@ public class ProductDetail extends BaseTimeEntity {
     @OneToMany(mappedBy = "productDetail")
     private List<Product> products;
 
-    @OneToMany(mappedBy = "productDetail")
-    private List<Wish> wishes;
-
 }
