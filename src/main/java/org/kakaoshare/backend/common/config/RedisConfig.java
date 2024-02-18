@@ -25,7 +25,7 @@ import static org.springframework.data.redis.serializer.RedisSerializationContex
 
 @Configuration
 public class RedisConfig {
-    private static final long CACHE_DURATION = 1L;
+    private static final long DEFAULT_CACHE_DURATION = 1L;
 
     private final String host;
     private final int port;
@@ -64,7 +64,7 @@ public class RedisConfig {
     private RedisCacheConfiguration getRedisCacheConfiguration(final ObjectMapper objectMapper) {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues() // value null 허용 X
-                .entryTtl(Duration.ofHours(CACHE_DURATION)) // TTL
+                .entryTtl(Duration.ofHours(DEFAULT_CACHE_DURATION)) // TTL
                 .computePrefixWith(CacheKeyPrefix.simple()) // name::key 처럼 key앞에 '::'를 삽입(redis-cli에서 get "name::key" 로 조회.)
                 .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)));
