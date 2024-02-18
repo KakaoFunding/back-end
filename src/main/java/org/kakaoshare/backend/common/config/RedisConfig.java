@@ -30,7 +30,7 @@ public class RedisConfig {
     private final String host;
     private final int port;
 
-    public RedisConfig(@Value("${spring.data.redis.port}") final String host,
+    public RedisConfig(@Value("${spring.data.redis.host}") final String host,
                        @Value("${spring.data.redis.port}") final int port) {
         this.host = host;
         this.port = port;
