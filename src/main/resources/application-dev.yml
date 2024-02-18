@@ -4,8 +4,12 @@ spring:
       enabled: true
       settings:
         web-allow-others: true
-
-
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  jwt:
+    secret: 0f4aeeb70d87e0cd8e6b224c31f56911134c713ea35d2cdf8209fe31047b9c1dc2f11086ed708fc2a605f8b2f019121c8f471e68d0061bce30a2139c0b60a383
   jpa:
     hibernate:
       ddl-auto: create
@@ -13,3 +17,23 @@ spring:
     username: ENC(2SkZyC/z/C0Um0i4IOtuAA==)
     password:
     driver-class-name: org.h2.Driver
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: XXX
+            client-secret: XXX
+            client-authentication-method: POST
+            client-name: kakao
+            redirect-uri: http://localhost:3000/oauth/kakao
+            authorization-grant-type: authorization_code
+            scope:
+              - account_email
+              - profile_nickname
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
