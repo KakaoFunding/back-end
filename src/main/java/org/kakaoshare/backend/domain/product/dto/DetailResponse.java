@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 
 @Getter
 @Builder
@@ -11,9 +13,34 @@ public class DetailResponse {
     private Long productId;
     private String name;
     private BigDecimal price;
-    private String photo;
     private String type;
     private String description;
-    private List<String> additionalPhotos;
+    private List<ProductDescriptionPhoto> descriptionPhotos;
+    private Boolean hasPhoto;
+    private String productName;
+    private String origin;
+    private String manufacturer;
+    private String tel;
+    private String deliverDescription;
+    private String billingNotice;
+    private String caution;
 
+    public static DetailResponse from(final Product product) {
+        return DetailResponse.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .type(product.getType())
+                .description(product.getProductDetail().getDescription())
+                .descriptionPhotos(product.getProductDescriptionPhotos())
+                .hasPhoto(product.getProductDetail().getHasPhoto())
+                .productName(product.getProductDetail().getProductName())
+                .origin(product.getProductDetail().getOrigin())
+                .manufacturer(product.getProductDetail().getManufacturer())
+                .tel(product.getProductDetail().getTel())
+                .deliverDescription(product.getProductDetail().getDeliverDescription())
+                .billingNotice(product.getProductDetail().getBillingNotice())
+                .caution(product.getProductDetail().getCaution())
+                .build();
+    }
 }
