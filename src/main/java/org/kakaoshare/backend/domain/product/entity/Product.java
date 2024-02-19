@@ -37,9 +37,6 @@ public class Product extends BaseTimeEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
-    @Column
-    private String photo;
-
     @Column(nullable = false, length = 50)
     private String type;
 
