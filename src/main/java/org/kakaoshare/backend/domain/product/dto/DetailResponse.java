@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 
@@ -24,6 +26,8 @@ public class DetailResponse {
     private String deliverDescription;
     private String billingNotice;
     private String caution;
+    private List<Option> options;
+    private Brand brand;
 
     public static DetailResponse from(final Product product) {
         return DetailResponse.builder()
@@ -41,6 +45,8 @@ public class DetailResponse {
                 .deliverDescription(product.getProductDetail().getDeliverDescription())
                 .billingNotice(product.getProductDetail().getBillingNotice())
                 .caution(product.getProductDetail().getCaution())
+                .options(product.getOptions())
+                .brand(product.getBrand())
                 .build();
     }
 }
