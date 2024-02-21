@@ -2,15 +2,18 @@ package org.kakaoshare.backend.domain.member.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import java.util.List;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.order.entity.Order;
+
+import java.util.List;
 
 
 @Entity
@@ -24,14 +27,18 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Column(nullable = false)
+    private String name;
+
     @Column(nullable = false, length = 20)
     private String phoneNumber;
 
-    @Column
-    private String kakaoId;
-
-    @Column
-    private String kakaoUuid;
+    @Column(nullable = false)
+    private String providerId;
 
     @OneToMany(mappedBy = "member")
     private List<Order> orders;
