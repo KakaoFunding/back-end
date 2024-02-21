@@ -77,8 +77,7 @@ CREATE TABLE `member`
     `gender`       VARCHAR(255) NOT NULL,
     `name`         VARCHAR(255) NOT NULL,
     `phone_number` VARCHAR(255) NOT NULL,
-    `kakao_id`     VARCHAR(255),
-    `kakao_uuid`   VARCHAR(255),
+    `provider_id`     VARCHAR(255),
     PRIMARY KEY (`member_id`)
 );
 
