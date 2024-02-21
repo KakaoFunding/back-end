@@ -69,4 +69,13 @@ public class ProductServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getProductId()).isEqualTo(existingProductId);
     }
+
+    @Test
+    @DisplayName("존재하지 않는 상품 ID로 조회 시 예외 발생")
+    void getProductDetail_WhenProductNotFound_ThenThrowException() {
+
+        assertThatThrownBy(() -> productService.getProductDetail(nonExistingProductId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("Product not found with id: " + nonExistingProductId);
+    }
 }
