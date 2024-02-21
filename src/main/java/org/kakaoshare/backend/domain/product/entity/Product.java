@@ -11,7 +11,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.hashtag.entity.ProductHashtag;
 import org.kakaoshare.backend.domain.theme.entity.Theme;
@@ -25,6 +27,8 @@ import org.kakaoshare.backend.domain.order.entity.Order;
 
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product extends BaseTimeEntity {
 
     @Id
