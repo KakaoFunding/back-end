@@ -18,7 +18,6 @@ public class ProductQueryRepository {
         QProductDetail qProductDetail = QProductDetail.productDetail;
         QProductDescriptionPhoto qProductDescriptionPhoto = QProductDescriptionPhoto.productDescriptionPhoto;
 
-
         return queryFactory
                 .selectFrom(qProduct)
                 .leftJoin(qProduct.productDetail, qProductDetail).fetchJoin()
