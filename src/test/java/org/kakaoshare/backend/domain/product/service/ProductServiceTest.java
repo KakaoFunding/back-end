@@ -31,12 +31,13 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    private final Long existingProductId = 1L;
     private final Long nonExistingProductId = 2L;
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    @DisplayName("상품 상세 조회 성공")
+    void getProductDetail_Success() {
         Product mockProduct = mock(Product.class);
+        Long existingProductId = 1L;
         when(mockProduct.getProductId()).thenReturn(existingProductId);
         when(mockProduct.getName()).thenReturn("Test Product");
         when(mockProduct.getPrice()).thenReturn(new BigDecimal("999.99"));
@@ -59,11 +60,6 @@ public class ProductServiceTest {
         when(mockProduct.getBrand()).thenReturn(mock(Brand.class));
 
         when(productQueryRepository.findProductWithDetailsAndPhotos(existingProductId)).thenReturn(mockProduct);
-    }
-
-    @Test
-    @DisplayName("상품 상세 조회 성공")
-    void getProductDetail_Success() {
         DetailResponse result = productService.getProductDetail(existingProductId);
 
         assertThat(result).isNotNull();
@@ -73,6 +69,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("존재하지 않는 상품 ID로 조회 시 예외 발생")
     void getProductDetail_WhenProductNotFound_ThenThrowException() {
+        when(productQueryRepository.findProductWithDetailsAndPhotos(nonExistingProductId)).thenReturn(null);
 
         assertThatThrownBy(() -> productService.getProductDetail(nonExistingProductId))
                 .isInstanceOf(EntityNotFoundException.class)
