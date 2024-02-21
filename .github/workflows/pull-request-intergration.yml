@@ -1,41 +1,29 @@
-name: Build
+name: Integrate Pull Request with Test
 
 on:
   push:
-    branches:
-      - 'feature/*'
-  pull_request:
+	@@ -8,13 +8,20 @@ on:
     branches:
       - 'develop'
       - 'main'
+    paths:
+      - "feature/*"
+    types:
+      - auto_merge_enabled
 
 permissions:
+  checks: write
   contents: write
+  pages: write
   deployments: write
+  pull-requests: write
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: 'corretto'
-
-      - name: Caching Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
+	@@ -39,17 +46,18 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -45,4 +33,12 @@ jobs:
           python-version: 3.8
 
       - name: Build with Gradle
-        run: ./gradlew build -x test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+        run: ./gradlew build -x test
+
+      - name: Test with Gradle
+        run: ./gradlew test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+
+
+      - name: Report Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
