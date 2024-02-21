@@ -37,11 +37,8 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     private String phoneNumber;
 
-    @Column
-    private String kakaoId;
-
-    @Column
-    private String kakaoUuid;
+    @Column(nullable = false)
+    private String providerId;
 
     @OneToMany(mappedBy = "member")
     private List<Order> orders;
