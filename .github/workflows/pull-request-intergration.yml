@@ -50,11 +50,10 @@ jobs:
           python-version: 3.8
 
       - name: Build with Gradle
-        run: ./gradlew build -x test
-
+        run: ./gradlew build -x test -Dspring.profiles.active=test
+      
       - name: Test with Gradle
-        run: ./gradlew test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
-
+        run: ./gradlew test -Dspring.profiles.active=test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
