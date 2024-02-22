@@ -12,22 +12,22 @@ import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 @Getter
 @Builder
 public class DetailResponse {
-    private Long productId;
-    private String name;
-    private BigDecimal price;
-    private String type;
-    private String description;
-    private List<ProductDescriptionPhoto> descriptionPhotos;
-    private Boolean hasPhoto;
-    private String productName;
-    private String origin;
-    private String manufacturer;
-    private String tel;
-    private String deliverDescription;
-    private String billingNotice;
-    private String caution;
-    private List<Option> options;
-    private Brand brand;
+    private final Long productId;
+    private final String name;
+    private final BigDecimal price;
+    private final String type;
+    private final String description;
+    private final List<ProductDescriptionPhoto> descriptionPhotos;
+    private final Boolean hasPhoto;
+    private final String productName;
+    private final String origin;
+    private final String manufacturer;
+    private final String tel;
+    private final String deliverDescription;
+    private final String billingNotice;
+    private final String caution;
+    private final List<Option> options;
+    private final Brand brand;
 
     public static DetailResponse from(final Product product) {
         return DetailResponse.builder()
