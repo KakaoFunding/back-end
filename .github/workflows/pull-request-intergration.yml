@@ -1,4 +1,4 @@
-name: Build
+name: Integrate Pull Request with Test
 
 on:
   push:
@@ -8,13 +8,20 @@ on:
     branches:
       - 'develop'
       - 'main'
+    paths:
+      - "feature/*"
+    types:
+      - auto_merge_enabled
 
 permissions:
+  checks: write
   contents: write
+  pages: write
   deployments: write
+  pull-requests: write
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,4 +52,14 @@ jobs:
           python-version: 3.8
 
       - name: Build with Gradle
-        run: ./gradlew build -x test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+        run: ./gradlew build -x test
+
+      - name: Test with Gradle
+        run: ./gradlew test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+
+
+      - name: Report Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/**/*.xml
