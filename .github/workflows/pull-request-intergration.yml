@@ -8,8 +8,6 @@ on:
     branches:
       - 'develop'
       - 'main'
-    paths:
-      - "feature/*"
     types:
       - auto_merge_enabled
 
