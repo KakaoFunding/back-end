@@ -8,7 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.order.entity.Order;
@@ -18,6 +21,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
     @Id
@@ -46,4 +50,13 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Funding> funding;
 
+    @Builder
+    public Member(final Long memberId, final String email, final Gender gender, final String name, final String phoneNumber, final String providerId) {
+        this.memberId = memberId;
+        this.email = email;
+        this.gender = gender;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.providerId = providerId;
+    }
 }
