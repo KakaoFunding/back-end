@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.product.repository;
+package org.kakaoshare.backend.domain.product.repository.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
