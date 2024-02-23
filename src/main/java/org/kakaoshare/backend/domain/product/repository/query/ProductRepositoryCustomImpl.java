@@ -15,17 +15,13 @@ public class ProductRepositoryCustomImpl {
     private final JPAQueryFactory queryFactory;
 
     public Product findProductWithDetailsAndPhotos(Long productId) {
-        QProduct qProduct = QProduct.product;
-        QProductDetail qProductDetail = QProductDetail.productDetail;
-        QProductDescriptionPhoto qProductDescriptionPhoto = QProductDescriptionPhoto.productDescriptionPhoto;
-        QOption qOption = QOption.option;
-
         return queryFactory
-                .selectFrom(qProduct)
-                .leftJoin(qProduct.productDetail, qProductDetail).fetchJoin()
-                .leftJoin(qProduct.productDescriptionPhotos, qProductDescriptionPhoto).fetchJoin()
-                .leftJoin(qProduct.options, qOption).fetchJoin()
-                .where(qProduct.productId.eq(productId))
+                .selectFrom(QProduct.product)
+                .leftJoin(QProduct.product.productDetail, QProductDetail.productDetail).fetchJoin()
+                .leftJoin(QProduct.product.productDescriptionPhotos, QProductDescriptionPhoto.productDescriptionPhoto)
+                .fetchJoin()
+                .leftJoin(QProduct.product.options, QOption.option).fetchJoin()
+                .where(QProduct.product.productId.eq(productId))
                 .fetchOne();
     }
 }
