@@ -16,7 +16,7 @@ import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDetail;
-import org.kakaoshare.backend.domain.product.repository.query.ProductQueryRepository;
+import org.kakaoshare.backend.domain.product.repository.query.ProductRepositoryCustomImpl;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
     @Mock
-    private ProductQueryRepository productQueryRepository;
+    private ProductRepositoryCustomImpl productRepositoryCustomImpl;
 
     @InjectMocks
     private ProductService productService;
@@ -57,7 +57,7 @@ public class ProductServiceTest {
         when(mockProduct.getOptions()).thenReturn(new ArrayList<>());
         when(mockProduct.getBrand()).thenReturn(mock(Brand.class));
 
-        when(productQueryRepository.findProductWithDetailsAndPhotos(existingProductId)).thenReturn(mockProduct);
+        when(productRepositoryCustomImpl.findProductWithDetailsAndPhotos(existingProductId)).thenReturn(mockProduct);
         DetailResponse result = productService.getProductDetail(existingProductId);
 
         assertThat(result).isNotNull();
@@ -67,7 +67,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("존재하지 않는 상품 ID로 조회 시 예외 발생")
     void getProductDetail_WhenProductNotFound_ThenThrowException() {
-        when(productQueryRepository.findProductWithDetailsAndPhotos(nonExistingProductId)).thenReturn(null);
+        when(productRepositoryCustomImpl.findProductWithDetailsAndPhotos(nonExistingProductId)).thenReturn(null);
 
         assertThatThrownBy(() -> productService.getProductDetail(nonExistingProductId))
                 .isInstanceOf(EntityNotFoundException.class)
