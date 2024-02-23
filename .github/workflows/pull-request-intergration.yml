@@ -3,14 +3,11 @@ name: Integrate Pull Request with Test
 on:
   push:
     branches:
-      - 'develop'
-      - 'main'
+      - 'feature/*'
   pull_request:
     branches:
       - 'develop'
       - 'main'
-    paths:
-      - "feature/*"
     types:
       - auto_merge_enabled
 
@@ -56,7 +53,7 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Test with Gradle
-        run: ./gradlew test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+        run: ./gradlew test -i -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
 
       - name: Report Test Results
