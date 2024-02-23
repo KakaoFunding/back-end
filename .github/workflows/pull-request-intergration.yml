@@ -44,17 +44,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-
       - name: Build with Gradle
         run: ./gradlew build -x test -Djasypt.encryptor.password=${{secrets.APPLICATION_SECRET}}
 
       - name: Test with Gradle
-        run: ./gradlew test -Dtest.profile=test -Djasypt.encryptor.password=${{secrets.APPLICATION_SECRET}} -i
+        run: ./gradlew test -i -Djasypt.encryptor.password=${{secrets.APPLICATION_SECRET}} 
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
 
       - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
