@@ -50,10 +50,10 @@ jobs:
           python-version: 3.8
 
       - name: Build with Gradle
-        run: ./gradlew build -x test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+        run: ./gradlew build -x test -Djasypt.encryptor.password=${{secrets.APPLICATION_SECRET}}
 
       - name: Test with Gradle
-        run: ./gradlew test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }} -i
+        run: ./gradlew test -Dspring.profiles.active=test -Djasypt.encryptor.password=${{secrets.APPLICATION_SECRET}} -i
 
 
       - name: Report Test Results
