@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductRepositoryCustomImpl {
+public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     public Product findProductWithDetailsAndPhotos(Long productId) {
