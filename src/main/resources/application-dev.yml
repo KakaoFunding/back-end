@@ -15,7 +15,7 @@ spring:
       ddl-auto: create
   datasource:
     username: sa
-    password: qal,1
+    password:
     driver-class-name: org.h2.Driver
   flyway:
     enabled: true
