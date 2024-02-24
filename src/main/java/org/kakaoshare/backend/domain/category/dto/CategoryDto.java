@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.category.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.kakaoshare.backend.domain.brand.dto.TabType;
 import org.kakaoshare.backend.domain.category.entity.Category;
 
 import java.util.ArrayList;
@@ -10,14 +11,12 @@ import java.util.Objects;
 
 @Getter
 public class CategoryDto {
-    public static final long PARENT_ID = -1L;
+    public static final long ROOT_ID = -1L;
     private final Long categoryId;
     private final String categoryName;
     private final Long parentId;
     private final List<CategoryDto> subCategories = new ArrayList<>();
     private final TabType defaultTab;
-    private int level;
-    
     
     @Builder
     public CategoryDto(Long categoryId, String categoryName, Long parentId) {
@@ -28,21 +27,25 @@ public class CategoryDto {
     }
     
     public static CategoryDto from(final Category category) {
-        Long parentId = PARENT_ID;
-        if (Objects.nonNull(category.getParent())) {
-            parentId = category.getParent().getCategoryId();
+        if (Objects.isNull(category.getParent())) {
+            CategoryDto rootDto = CategoryDto.builder()
+                    .categoryId(category.getCategoryId())
+                    .categoryName(category.getName())
+                    .parentId(ROOT_ID)
+                    .build();
+            rootDto.getSubCategories().addAll(getChildrenDtos(category));
+            return rootDto;
         }
         
         CategoryDto nonRootDto = CategoryDto.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getName())
-                .parentId(parentId)
+                .parentId(category.getParent().getCategoryId())
                 .build();
-        nonRootDto.level = 2;
+        
         if (!category.getChildren().isEmpty()) {
             List<CategoryDto> childrenDtos = getChildrenDtos(category);
             nonRootDto.getSubCategories().addAll(childrenDtos);
-            nonRootDto.level = 1;
         }
         
         return nonRootDto;
@@ -53,6 +56,7 @@ public class CategoryDto {
                 .map(CategoryDto::from)
                 .toList();
     }
+    
     
     @Override
     public String toString() {
