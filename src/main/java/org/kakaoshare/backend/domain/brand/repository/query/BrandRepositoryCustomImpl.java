@@ -2,8 +2,7 @@ package org.kakaoshare.backend.domain.brand.repository.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.brand.entity.query.QSimpleBrandDto;
-import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
+import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,32 +17,12 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom {
     
     
     @Override
-    public List<SimpleBrandDto> findAllSimpleBrandByChildCategoryId(Long categoryId) {
+    public List<Brand> findAllByCategoryId(Long categoryId) {
         return queryFactory
-                .select(new QSimpleBrandDto(
-                        brand.brandId,
-                        brand.name,
-                        brand.iconPhoto))
-                .from(brand)
-                .where(brand.category.categoryId.eq(categoryId))
-                .fetch();
-    }
-    
-    @Override
-    public List<SimpleBrandDto> findAllSimpleBrandByParentCategoryId(final Long categoryId) {
-        List<Long> childCategoryIds = queryFactory
-                .select(category.categoryId)
-                .from(category)
-                .where(category.parent.categoryId.eq(categoryId))
-                .fetch();
-        
-        return queryFactory
-                .select(new QSimpleBrandDto(
-                        brand.brandId,
-                        brand.name,
-                        brand.iconPhoto))
-                .from(brand)
-                .where(brand.category.categoryId.in(childCategoryIds))
+                .selectFrom(brand)
+                .join(brand.category, category)
+                .fetchJoin()
+                .where(category.categoryId.eq(categoryId))
                 .fetch();
     }
 }
