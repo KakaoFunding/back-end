@@ -4,3 +4,29 @@ spring:
     username: ENC(2SkZyC/z/C0Um0i4IOtuAA==)
     password:
     driver-class-name: org.h2.Driver
+
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:testdata/initial_category_brand_product.sql
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+    defer-datasource-initialization: true
+
+
+
+
+
+logging:
+  level:
+    org.org.hibernate.SQL: debug
+    org.hibernate.type: trace
+
+
