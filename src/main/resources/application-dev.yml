@@ -14,8 +14,8 @@ spring:
     hibernate:
       ddl-auto: create
   datasource:
-    username: ENC(2SkZyC/z/C0Um0i4IOtuAA==)
-    password:
+    username: sa
+    password: qal,1
     driver-class-name: org.h2.Driver
   flyway:
     enabled: true
