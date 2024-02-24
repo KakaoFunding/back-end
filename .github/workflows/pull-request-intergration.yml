@@ -50,10 +50,10 @@ jobs:
           python-version: 3.8
 
       - name: Build with Gradle
-        run: ./gradlew build -Pjasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }} -x test
+        run: ./gradlew build -x test
 
       - name: Test with Gradle
-        run: ./gradlew test -i -Pjasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+        run: ./gradlew test -i -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
 
       - name: Report Test Results
