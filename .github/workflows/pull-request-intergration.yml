@@ -52,7 +52,7 @@ jobs:
         run: ./gradlew build -x test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
       - name: Test with Gradle
-        run: ./gradlew test -Dspring.flyway.enabled=false -Dspring.flyway.baseline-on-migrate=false -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+        run: ./gradlew test -i -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
 
       - name: Report Test Results
