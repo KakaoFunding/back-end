@@ -1,6 +1,5 @@
 package org.kakaoshare.backend.domain.category.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.brand.dto.TabType;
@@ -8,10 +7,11 @@ import org.kakaoshare.backend.domain.category.entity.Category;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
-@AllArgsConstructor
 public class CategoryDto {
+    public static final long ROOT_ID = -1L;
     private final Long categoryId;
     private final String categoryName;
     private final Long parentId;
@@ -27,12 +27,36 @@ public class CategoryDto {
     }
     
     public static CategoryDto from(final Category category) {
-        return CategoryDto.builder()
+        if (Objects.isNull(category.getParent())) {
+            CategoryDto rootDto = CategoryDto.builder()
+                    .categoryId(category.getCategoryId())
+                    .categoryName(category.getName())
+                    .parentId(ROOT_ID)
+                    .build();
+            rootDto.getSubCategories().addAll(getChildrenDtos(category));
+            return rootDto;
+        }
+        
+        CategoryDto nonRootDto = CategoryDto.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getName())
                 .parentId(category.getParent().getCategoryId())
                 .build();
+        
+        if (!category.getChildren().isEmpty()) {
+            List<CategoryDto> childrenDtos = getChildrenDtos(category);
+            nonRootDto.getSubCategories().addAll(childrenDtos);
+        }
+        
+        return nonRootDto;
     }
+    
+    private static List<CategoryDto> getChildrenDtos(final Category category) {
+        return category.getChildren().stream()
+                .map(CategoryDto::from)
+                .toList();
+    }
+    
     
     @Override
     public String toString() {

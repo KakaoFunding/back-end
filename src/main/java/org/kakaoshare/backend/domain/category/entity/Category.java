@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -48,11 +49,11 @@ public class Category extends BaseTimeEntity {
         return "Category{" + '\n' +
                 "categoryId=" + categoryId + '\n' +
                 ", name='" + name + '\n' +
-                ", parent id=" + parent.getCategoryId() + '\n' +
-                ", children id=" +
-                children.stream()
-                        .map(Category::getCategoryId)
-                        .toList() +
                 '}';
+    }
+    
+    public void adjustChildrenCategory(List<Category> children) {
+        this.children = new ArrayList<>(children);
+        children.forEach(child -> child.parent = this);
     }
 }
