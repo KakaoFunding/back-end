@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.member.entity;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,12 +10,9 @@ import java.util.List;
 
 import static org.kakaoshare.backend.domain.member.entity.Role.USER;
 
+@RequiredArgsConstructor
 public class MemberDetails implements UserDetails {
     private final Member member;
-
-    public MemberDetails(final Member member) {
-        this.member = member;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

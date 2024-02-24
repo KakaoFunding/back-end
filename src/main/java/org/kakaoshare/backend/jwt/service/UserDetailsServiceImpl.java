@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.jwt.service;
 
+import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,14 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final MemberRepository memberRepository;
-
-    public UserDetailsServiceImpl(final MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
