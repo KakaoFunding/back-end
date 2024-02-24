@@ -3,19 +3,15 @@ package org.kakaoshare.backend.domain.brand.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.Test;
 import org.kakaoshare.backend.common.CustomDataJpaTest;
-import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
+import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @CustomDataJpaTest
-@Transactional(readOnly = true)
 class BrandRepositoryTest {
-    public static final long PARENT_ID = 1L;
-    public static final long CHILD_ID = 6L;
     @Autowired
     private BrandRepository brandRepository;
     
@@ -24,15 +20,20 @@ class BrandRepositoryTest {
     
     
     @Test
-    void findAllSimpleBrandByChildCategoryId() {
-        List<SimpleBrandDto> brands = brandRepository.findAllSimpleBrandByChildCategoryId(CHILD_ID);
-        assertThat(brands.size()).isEqualTo(5);
+    @Transactional(readOnly = true)
+    void testDsl() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("spring data jpa");
+        List<Brand> byCategoryCategoryId = brandRepository.findByCategory_CategoryId(1L);
+        stopWatch.stop();
+
+        stopWatch.start("querydsl fetch join");
+        List<Brand> brands = brandRepository.findAllByCategoryId(1L);
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
+
+        System.out.println(brands.size());
+        System.out.println(byCategoryCategoryId.size());
     }
     
-    
-    @Test
-    void findAllSimpleBrandByParentCategoryId() {
-        List<SimpleBrandDto> brands = brandRepository.findAllSimpleBrandByParentCategoryId(PARENT_ID);
-        assertThat(brands.size()).isEqualTo(25);
-    }
 }
