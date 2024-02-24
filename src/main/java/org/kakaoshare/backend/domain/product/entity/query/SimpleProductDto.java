@@ -25,15 +25,12 @@ public class SimpleProductDto {
         this.brandName = brandName;
         this.wishCount = wishCount;
     }
-    
-    @Override
-    public String toString() {
-        return "SimpleProductDto{" +
-                "name='" + name + '\'' +
-                ", photo='" + photo + '\'' +
-                ", price=" + price +
-                ", brandName='" + brandName + '\'' +
-                ", wishCount=" + wishCount +
-                '}';
-    }
+    //    @QueryProjection
+//    public SimpleProductDto(Product product) {
+//        this.name = product.getName();
+//        this.photo = product.getPhoto();
+//        this.price = product.getPrice();
+//        this.brandName = product.getBrand().getName();
+//        this.wishCount = (long) product.getWishes().size();
+//    }
 }
