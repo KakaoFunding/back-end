@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.jwt.filter;
+package org.kakaoshare.backend.common.filter;
 
 import com.querydsl.core.util.StringUtils;
 import jakarta.servlet.FilterChain;
