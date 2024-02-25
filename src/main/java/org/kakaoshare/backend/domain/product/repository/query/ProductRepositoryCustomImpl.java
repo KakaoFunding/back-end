@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     @Override
     public Page<SimpleProductDto> findAllByCategoryId(final Long categoryId,
-                                                      final Pageable pageable) {
+                                                      @Nullable Pageable pageable) {
         
         List<SimpleProductDto> fetch = queryFactory
                 .select(new QSimpleProductDto(
@@ -52,6 +53,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 }
             }
         }
-        return null;
+        return new OrderSpecifier<>(Order.ASC, product.name);//기본 정렬은 이름으로
     }
 }
