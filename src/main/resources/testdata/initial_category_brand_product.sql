@@ -1840,3 +1840,7 @@ INSERT INTO Product (name, price, type, brand_id) VALUES
 ('Product 125-8', 1000, 'type', 125),
 ('Product 125-9', 1000, 'type', 125),
 ('Product 125-10', 1000, 'type', 125);
+
+UPDATE Product
+SET price = (FLOOR(RANDOM() * (2000 - 100 + 1)) + 100) * 10;
+
