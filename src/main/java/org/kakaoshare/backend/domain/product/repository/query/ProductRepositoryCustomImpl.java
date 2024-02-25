@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     @Override
     public Page<SimpleProductDto> findAllByCategoryId(final Long categoryId,
-                                                      @Nullable Pageable pageable) {
+                                                      final Pageable pageable) {
         
         List<SimpleProductDto> fetch = queryFactory
                 .select(new QSimpleProductDto(
