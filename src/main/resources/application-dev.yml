@@ -25,15 +25,22 @@ spring:
       client:
         registration:
           kakao:
-            client-id: XXX
-            client-secret: XXX
+            client-id: 92e3a72f071fe2c4cc18146bb33652d1
+            client-secret: QH0n8i9qoDE4TkeVl9p9aFPRQVcIgXHC
             client-authentication-method: POST
             client-name: kakao
             redirect-uri: http://localhost:3000/oauth/kakao
             authorization-grant-type: authorization_code
             scope:
-              - account_email
               - profile_nickname
+              - profile_image
+              - name
+              - gender
+              - age_range
+              - birthday
+              - birthyear
+              - phone_number
+              - friends
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
