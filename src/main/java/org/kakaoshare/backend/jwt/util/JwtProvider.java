@@ -4,14 +4,19 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.LocalTime;
+import java.util.Collection;
+import java.util.Date;
 
 @Component
 public class JwtProvider {
@@ -42,6 +47,23 @@ public class JwtProvider {
                 .parseClaimsJws(accessToken)
                 .getBody()
                 .getSubject();
+    }
+
+    public String createAccessToken(final String username,
+                                    final Collection<? extends GrantedAuthority> authorities) {
+        return Jwts.builder()
+                .setHeaderParam("alg", SignatureAlgorithm.HS256.getValue())
+                .setHeaderParam("typ", "JWT")
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(getExpiration())
+                .claim("auth", authorities)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    private Date getExpiration() {
+        return new Date(LocalTime.now().getHour() + 1000L * 60 * 60 * 24);
     }
 
     private JwtParser getJwtParser() {
