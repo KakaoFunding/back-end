@@ -11,6 +11,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.StopWatch;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -27,31 +29,29 @@ class CategoryServiceTest {
         StopWatch stopWatch=new StopWatch();
         stopWatch.start("find root");
         
-        CategoryDto rootCategory = categoryService.getRootCategory();
+        List<CategoryDto> categoryDtos = categoryService.getParentCategory();
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
         
-        assertThat(rootCategory).isNotNull();
-        assertThat(rootCategory.getCategoryName()).isNotNull();
-        assertThat(rootCategory.getParentId()).isEqualTo(-1);
-        assertThat(rootCategory.getSubCategories()).isNotEmpty().hasSize(5);
-        rootCategory.getSubCategories().forEach(parent -> {
-            assertThat(parent.getParentId()).isEqualTo(rootCategory.getCategoryId());
-            assertCategoryDetails(parent, rootCategory.getCategoryId(), 5);
-            parent.getSubCategories().forEach(child -> {
-                assertThat(child.getParentId()).isEqualTo(parent.getCategoryId());
-                assertCategoryDetails(child, parent.getCategoryId(), 0);
+        for (CategoryDto parentDto : categoryDtos) {
+            assertThat(parentDto).isNotNull();
+            assertThat(parentDto.getCategoryName()).isNotNull();
+            assertThat(parentDto.getParentId()).isEqualTo(-1);
+            assertThat(parentDto.getSubCategories()).isNotEmpty().hasSize(5);
+            parentDto.getSubCategories().forEach(childDto -> {
+                assertThat(childDto.getParentId()).isEqualTo(parentDto.getCategoryId());
+                assertCategoryDetails(childDto, parentDto.getCategoryId(), 0);
             });
-        });
+        }
     }
     
-    @ValueSource(longs = {1L,2L,7L})
+    @ValueSource(longs = {2L,7L})
     @ParameterizedTest
     @DisplayName("카테고리 단일조회")
     void testSpecificCategory(long id) {
         CategoryDto category = categoryService.getSpecificCategory(id);
         assertThat(category).isNotNull();
-        if(id!= CategoryDto.ROOT_ID){
+        if(id!= CategoryDto.PARENT_ID){
             assertThat(category.getParentId()).isNotNull();
         }
         else {
