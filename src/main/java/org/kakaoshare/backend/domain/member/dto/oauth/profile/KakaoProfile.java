@@ -8,11 +8,6 @@ public class KakaoProfile extends OAuthProfile {
     }
 
     @Override
-    public String getEmail() {
-        return (String) getProfile().get("email");
-    }
-
-    @Override
     public String getGender() {
         return (String) getAccount().get("gender");
     }

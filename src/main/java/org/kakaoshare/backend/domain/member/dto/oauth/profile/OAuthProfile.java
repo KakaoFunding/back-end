@@ -9,7 +9,6 @@ public abstract class OAuthProfile {
         this.attributes = attributes;
     }
 
-    public abstract String getEmail();
     public abstract String getGender();
     public abstract String getName();
     public abstract String getPhoneNumber();
