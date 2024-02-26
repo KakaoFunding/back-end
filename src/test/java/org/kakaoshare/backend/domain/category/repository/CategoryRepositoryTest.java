@@ -14,8 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @CustomDataJpaTest
 class CategoryRepositoryTest {
-    public static final String ROOT_NAME = "Root";
     public static final String SUBCATEGORY = "Subcategory";
+    public static final long PARENT_ID = 1L;
+    public static final long CHILD_ID = 7L;
     
     StopWatch stopWatch=new StopWatch();
     @Autowired
@@ -38,9 +39,7 @@ class CategoryRepositoryTest {
         
         // parent
         parentCategories
-                .forEach(parent -> {
-                    assertParentCategory(parent);
-                });
+                .forEach(CategoryRepositoryTest::assertParentCategory);
         
         // child
         childCategories
@@ -83,23 +82,10 @@ class CategoryRepositoryTest {
     }
     
     @Test
-    @DisplayName("루트 카테고리는 부모 카테고리는 없지만 자식 카테고리가 있다")
-    void testRoot() {
-        stopWatch.start("root");
-        Category root = categoryRepository.findParentCategoryWithChildren(1L).orElseThrow();
-        stopWatch.stop();
-        assertThat(root).isNotNull();
-        assertThat(root.getParent()).isNull();
-        assertThat(root.getChildren()).isNotEmpty();
-        assertThat(root.getChildren().size()).isEqualTo(5);
-        System.out.println(stopWatch.prettyPrint());
-    }
-    
-    @Test
     @DisplayName("루트 카테고리의 자식 카테고리는 부모 카테고리와 자식 카테고리가 있다")
     void testFirstGen() {
         stopWatch.start("first gen");
-        Category parent = categoryRepository.findParentCategoryWithChildren(2L).orElseThrow();
+        Category parent = categoryRepository.findParentCategoryWithChildren(PARENT_ID).orElseThrow();
         stopWatch.stop();
         assertThat(parent).isNotNull();
         assertThat(parent.getParent()).isNull();
@@ -112,7 +98,7 @@ class CategoryRepositoryTest {
     @DisplayName("말단 카테고리는 부모 카테고리는 있지만 자식 카테고리는 없다")
     void testSecondGen() {
         stopWatch.start("second gen");
-        Category root = categoryRepository.findParentCategoryWithChildren(7L).orElseThrow();
+        Category root = categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID).orElseThrow();
         stopWatch.stop();
         assertThat(root).isNotNull();
         assertThat(root.getParent()).isNotNull();
@@ -122,22 +108,14 @@ class CategoryRepositoryTest {
     
     private List<Category> getParentCategories() {// 부모 카테고리만 반환
         return categoryRepository.findAll().stream()
-                .filter(this::haveNoParent)
-                .toList()
-                .stream()
-                .filter(category -> category.getParent().getName().equals(ROOT_NAME))
+                .filter(category ->Objects.isNull(category.getParent()))
                 .toList();
     }
     
     private List<Category> getChildCategories() {// 자식 카테고리만 반환
         return categoryRepository.findAll().stream()
-                .filter(category -> List.of(category.getChildren()).isEmpty())
+                .filter(category -> category.getChildren().isEmpty())
                 .toList();
-    }
-    
-    
-    private boolean haveNoParent(Category category) {
-        return Objects.nonNull(category.getParent());
     }
     
     
