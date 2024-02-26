@@ -2,7 +2,6 @@ package org.kakaoshare.backend.domain.category.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.kakaoshare.backend.domain.brand.dto.TabType;
 import org.kakaoshare.backend.domain.category.entity.Category;
 
 import java.util.ArrayList;
