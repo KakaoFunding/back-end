@@ -7,7 +7,9 @@ import java.util.Optional;
 
 public interface CategoryRepositoryCustom {
     
-    Optional<Category> findByCategoryIdWithParentAndChildren(Long categoryId);
+    Optional<Category> findParentCategoryWithChildren(Long categoryId);
+    
+    Optional<Category> findChildCategoryWithParentCheck(final Long categoryId, final Long subcategoryId);
     
     
     List<Category> findAllParentCategories();

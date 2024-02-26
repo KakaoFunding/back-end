@@ -16,9 +16,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -41,6 +41,7 @@ public class Category extends BaseTimeEntity {
     @JoinColumn(name = "parent_id", referencedColumnName = "category_id")
     private Category parent;
     
+    @BatchSize(size=100)//TODO 2024 02 26 21:15:10 : 추후 부모 카테고리당 자식 카테고리 수에 따라 결정하여 최적화
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children;
     
@@ -50,10 +51,5 @@ public class Category extends BaseTimeEntity {
                 "categoryId=" + categoryId + '\n' +
                 ", name='" + name + '\n' +
                 '}';
-    }
-    
-    public void adjustChildrenCategory(List<Category> children) {
-        this.children = new ArrayList<>(children);
-        children.forEach(child -> child.parent = this);
     }
 }
