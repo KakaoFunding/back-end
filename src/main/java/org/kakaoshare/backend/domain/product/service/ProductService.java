@@ -2,8 +2,8 @@ package org.kakaoshare.backend.domain.product.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.product.dto.DetailDescriptionResponse;
-import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
+import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.repository.query.ProductRepositoryCustomImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +15,20 @@ public class ProductService {
     private final ProductRepositoryCustomImpl productRepositoryCustomImpl;
 
 
-    public DetailDescriptionResponse getProductDetail(Long productId) {
-        DetailDescriptionResponse detailDescriptionResponse = productRepositoryCustomImpl.findProductWithDetailsAndPhotos(productId);
-        if (detailDescriptionResponse == null) {
+    public DescriptionResponse getProductDescription(Long productId) {
+        DescriptionResponse descriptionResponse = productRepositoryCustomImpl.findProductWithDetailsAndPhotos(
+                productId);
+        if (descriptionResponse == null) {
             throw new EntityNotFoundException("Product not found with id: " + productId);
         }
-        return detailDescriptionResponse;
+        return descriptionResponse;
     }
 
+    public DetailResponse getProductDetail(Long productId) {
+        DetailResponse detailResponse = productRepositoryCustomImpl.findProductDetail(productId);
+        if (detailResponse == null) {
+            throw new EntityNotFoundException("Product not found with id: " + productId);
+        }
+        return detailResponse;
+    }
 }
