@@ -3,20 +3,20 @@ package org.kakaoshare.backend.fixture;
 import org.kakaoshare.backend.domain.member.entity.Member;
 
 public enum MemberFixture {
-    KAKAO("kakao@kakao.com", "카카오");
+    KAKAO("카카오", "123");
 
-    private final String email;
     private final String name;
+    private final String providerId;
 
-    MemberFixture(final String email, final String name) {
-        this.email = email;
+    MemberFixture(final String name, final String providerId) {
         this.name = name;
+        this.providerId = providerId;
     }
 
     public Member 생성() {
         return Member.builder()
-                .email(email)
                 .name(name)
+                .providerId(providerId)
                 .build();
     }
 }
