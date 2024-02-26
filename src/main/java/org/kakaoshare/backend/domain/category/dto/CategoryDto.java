@@ -11,12 +11,14 @@ import java.util.Objects;
 
 @Getter
 public class CategoryDto {
-    public static final long ROOT_ID = -1L;
+    public static final long PARENT_ID = -1L;
     private final Long categoryId;
     private final String categoryName;
     private final Long parentId;
     private final List<CategoryDto> subCategories = new ArrayList<>();
     private final TabType defaultTab;
+    private int level;
+    
     
     @Builder
     public CategoryDto(Long categoryId, String categoryName, Long parentId) {
@@ -24,28 +26,25 @@ public class CategoryDto {
         this.categoryName = categoryName;
         this.parentId = parentId;
         this.defaultTab = TabType.BRAND;//브랜드를 조회하는것이 화면 로딩과정에서 쿼리를 최소화 가능해보임
+        this.level=2;
     }
     
     public static CategoryDto from(final Category category) {
-        if (Objects.isNull(category.getParent())) {
-            CategoryDto rootDto = CategoryDto.builder()
-                    .categoryId(category.getCategoryId())
-                    .categoryName(category.getName())
-                    .parentId(ROOT_ID)
-                    .build();
-            rootDto.getSubCategories().addAll(getChildrenDtos(category));
-            return rootDto;
+        Long parentId = PARENT_ID;
+        if (Objects.nonNull(category.getParent())) {
+            parentId = category.getParent().getCategoryId();
         }
         
         CategoryDto nonRootDto = CategoryDto.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getName())
-                .parentId(category.getParent().getCategoryId())
+                .parentId(parentId)
                 .build();
         
         if (!category.getChildren().isEmpty()) {
             List<CategoryDto> childrenDtos = getChildrenDtos(category);
             nonRootDto.getSubCategories().addAll(childrenDtos);
+            nonRootDto.setLevel(1);
         }
         
         return nonRootDto;
@@ -57,6 +56,9 @@ public class CategoryDto {
                 .toList();
     }
     
+    private void setLevel(final int level) {
+        this.level = level;
+    }
     
     @Override
     public String toString() {

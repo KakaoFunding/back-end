@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.category.entity.Category;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
@@ -27,15 +28,25 @@ public class CategoryRepositoryCustomImpl implements CategoryRepositoryCustom {
                         .fetchOne());
     }
     
+//    @Override
+//    public Optional<Category> findRoot() {
+//        Category root = queryFactory
+//                .selectFrom(category)
+//                .innerJoin(category.children)
+//                .fetchJoin()
+//                .where(category.parent.isNull())
+//                .fetchOne();
+//
+//        return Optional.ofNullable(root);
+//    }
+    
     @Override
-    public Optional<Category> findRoot() {
-        Category root = queryFactory
+    public List<Category> findAllParentCategories() {
+        return queryFactory
                 .selectFrom(category)
                 .innerJoin(category.children)
                 .fetchJoin()
                 .where(category.parent.isNull())
-                .fetchOne();
-
-        return Optional.ofNullable(root);
+                .fetch();
     }
 }
