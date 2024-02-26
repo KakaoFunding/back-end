@@ -10,7 +10,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Getter
 @Builder
-public class DetailInformationResponse {
+public class DetailResponse {
     private final Long productId;
     private final String name;
     private final BigDecimal price;
@@ -25,8 +25,8 @@ public class DetailInformationResponse {
     private final String deliverDescription;
     private final String billingNotice;
     private final String caution;
-    public static DetailInformationResponse from(final Product product) {
-        return DetailInformationResponse.builder()
+    public static DetailResponse from(final Product product) {
+        return DetailResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
