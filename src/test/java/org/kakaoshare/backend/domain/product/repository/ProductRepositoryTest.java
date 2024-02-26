@@ -19,6 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @CustomDataJpaTest
 class ProductRepositoryTest {
+    private static final int PAGE_SIZE = 20;
+    public static final long CATEGORY_ID = 8L;
+    
     @Autowired
     ProductRepository productRepository;
     @Autowired
@@ -28,15 +31,15 @@ class ProductRepositoryTest {
     @DisplayName("상품 목록 조회는 가격과 위시를 기준으로 정렬되어 페이징 가능하다")
     void testProductPagination(String order) {
         
-        Pageable first=PageRequest.of(0,5, Sort.by(Sort.Order.by(order)));
-        Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(8L, first);
+        Pageable first=PageRequest.of(0, PAGE_SIZE, Sort.by(Sort.Order.by(order)));
+        Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
         System.out.println(firstPage.getContent());
         
         Pageable next = first.next();
-        Page<SimpleProductDto> nextPage = productRepository.findAllByCategoryId(8L, next);
+        Page<SimpleProductDto> nextPage = productRepository.findAllByCategoryId(CATEGORY_ID, next);
         System.out.println(nextPage.getContent());
         
-        assertThat(firstPage.getSize()).isEqualTo(5);
+        assertThat(firstPage.getSize()).isEqualTo(PAGE_SIZE);
         if(order.equals("price")){
             assertThat(firstPage.getContent())
                     .isSortedAccordingTo(Comparator.comparing(SimpleProductDto::getPrice));
@@ -44,13 +47,14 @@ class ProductRepositoryTest {
             assertThat(firstPage.getContent())
                     .isSortedAccordingTo(Comparator.comparing(SimpleProductDto::getWishCount));
         }
-        assertThat(nextPage.getSize()).isEqualTo(5);
+        assertThat(nextPage.getSize()).isEqualTo(PAGE_SIZE);
     }
     
     @Test
+    @DisplayName("정렬은 기본적으로 상품명을 기준으로 정렬된다")
     void testDefaultPagination() {
-        PageRequest first = PageRequest.of(0, 5);
-        Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(8L, first);
+        PageRequest first = PageRequest.of(0, PAGE_SIZE);
+        Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
         assertThat(firstPage.getContent().stream().map(SimpleProductDto::getName).toList())
                 .isSortedAccordingTo(String::compareTo);
     }
