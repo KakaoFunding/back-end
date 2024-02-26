@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.product.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.product.dto.DetailDescriptionResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.query.ProductRepositoryCustomImpl;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,12 @@ public class ProductService {
     private final ProductRepositoryCustomImpl productRepositoryCustomImpl;
 
 
-    public DetailResponse getProductDetail(Long productId) {
-        Product product = productRepositoryCustomImpl.findProductWithDetailsAndPhotos(productId);
-        if (product == null) {
+    public DetailDescriptionResponse getProductDetail(Long productId) {
+        DetailDescriptionResponse detailDescriptionResponse = productRepositoryCustomImpl.findProductWithDetailsAndPhotos(productId);
+        if (detailDescriptionResponse == null) {
             throw new EntityNotFoundException("Product not found with id: " + productId);
         }
-        return DetailResponse.from(product);
+        return detailDescriptionResponse;
     }
+
 }

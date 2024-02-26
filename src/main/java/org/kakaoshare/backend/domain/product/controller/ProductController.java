@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.product.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kakaoshare.backend.domain.product.dto.DetailDescriptionResponse;
 import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
     private final ProductService productService;
     @GetMapping("/{productId}")
-    public ResponseEntity<DetailResponse> getProductDetail(@PathVariable Long productId) {
-        DetailResponse detailResponse = productService.getProductDetail(productId);
-        return ResponseEntity.ok(detailResponse);
+    public ResponseEntity<DetailDescriptionResponse> getProductDetail(@PathVariable Long productId) {
+        DetailDescriptionResponse response = productService.getProductDetail(productId);
+        return ResponseEntity.ok(response);
     }
 }
