@@ -29,9 +29,6 @@ public class Member extends BaseTimeEntity {
     private Long memberId;
 
     @Column(nullable = false)
-    private String email;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
@@ -51,9 +48,8 @@ public class Member extends BaseTimeEntity {
     private List<Funding> funding;
 
     @Builder
-    public Member(final Long memberId, final String email, final Gender gender, final String name, final String phoneNumber, final String providerId) {
+    public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId) {
         this.memberId = memberId;
-        this.email = email;
         this.gender = gender;
         this.name = name;
         this.phoneNumber = phoneNumber;
