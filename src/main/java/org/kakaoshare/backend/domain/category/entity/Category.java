@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -52,10 +51,5 @@ public class Category extends BaseTimeEntity {
                 "categoryId=" + categoryId + '\n' +
                 ", name='" + name + '\n' +
                 '}';
-    }
-    
-    public void adjustChildrenCategory(List<Category> children) {
-        this.children = new ArrayList<>(children);
-        children.forEach(child -> child.parent = this);
     }
 }

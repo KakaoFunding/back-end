@@ -15,30 +15,26 @@ public class CategoryRepositoryCustomImpl implements CategoryRepositoryCustom {
     
     
     @Override
-    public Optional<Category> findByCategoryIdWithParentAndChildren(final Long categoryId) {
+    public Optional<Category> findParentCategoryWithChildren(final Long categoryId) {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(category)
                         .distinct()
-                        .leftJoin(category.parent)
-                        .fetchJoin()
                         .leftJoin(category.children)
                         .fetchJoin()
-                        .where(category.categoryId.eq(categoryId))
+                        .where(category.categoryId.eq(categoryId)
+                                .and(category.parent.isNull()))
                         .fetchOne());
     }
     
-//    @Override
-//    public Optional<Category> findRoot() {
-//        Category root = queryFactory
-//                .selectFrom(category)
-//                .innerJoin(category.children)
-//                .fetchJoin()
-//                .where(category.parent.isNull())
-//                .fetchOne();
-//
-//        return Optional.ofNullable(root);
-//    }
+    public Optional<Category> findChildCategoryWithParentCheck(final Long categoryId, final Long subcategoryId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(category)
+                        .where(category.categoryId.eq(subcategoryId)
+                                .and(category.parent.categoryId.eq(categoryId)))
+                        .fetchOne());
+    }
     
     @Override
     public List<Category> findAllParentCategories() {
