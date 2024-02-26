@@ -27,27 +27,19 @@ class CategoryRepositoryTest {
         // given
         List<Category> categories = categoryRepository.findAll();
         
-        Category rootCategory = categories.stream()
-                .filter(category -> Objects.isNull(category.getParent()))
-                .findFirst()
-                .orElseThrow();
-        
         List<Category> parentCategories = categories.stream()
-                .filter(category -> !Objects.isNull(category.getParent()))
+                .filter(category -> Objects.isNull(category.getParent()))
                 .filter(category -> category.getChildren().size() == 5)
                 .toList();
         
         List<Category> childCategories = categories.stream()
                 .filter(category -> category.getChildren().isEmpty())
                 .toList();
-        // root
-        assertThat(rootCategory.getParent()).isNull();
-        assertThat(rootCategory.getName()).isEqualTo(ROOT_NAME);
         
         // parent
         parentCategories
                 .forEach(parent -> {
-                    assertParentCategory(parent, rootCategory);
+                    assertParentCategory(parent);
                 });
         
         // child
@@ -107,12 +99,12 @@ class CategoryRepositoryTest {
     @DisplayName("루트 카테고리의 자식 카테고리는 부모 카테고리와 자식 카테고리가 있다")
     void testFirstGen() {
         stopWatch.start("first gen");
-        Category root = categoryRepository.findByCategoryIdWithParentAndChildren(2L).orElseThrow();
+        Category parent = categoryRepository.findByCategoryIdWithParentAndChildren(2L).orElseThrow();
         stopWatch.stop();
-        assertThat(root).isNotNull();
-        assertThat(root.getParent()).isNotNull();
-        assertThat(root.getChildren()).isNotEmpty();
-        assertThat(root.getChildren().size()).isEqualTo(5);
+        assertThat(parent).isNotNull();
+        assertThat(parent.getParent()).isNull();
+        assertThat(parent.getChildren()).isNotEmpty();
+        assertThat(parent.getChildren().size()).isEqualTo(5);
         System.out.println(stopWatch.prettyPrint());
     }
     
@@ -149,9 +141,8 @@ class CategoryRepositoryTest {
     }
     
     
-    private static void assertParentCategory(Category parent, Category rootCategory) {
-        assertThat(parent.getParent()).isNotNull();
-        assertThat(parent.getParent()).isEqualTo(rootCategory);
+    private static void assertParentCategory(Category parent) {
+        assertThat(parent.getParent()).isNull();
         assertThat(parent.getChildren().size()).isEqualTo(5);
     }
     
