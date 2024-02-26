@@ -26,7 +26,6 @@ public class CategoryDto {
         this.categoryName = categoryName;
         this.parentId = parentId;
         this.defaultTab = TabType.BRAND;//브랜드를 조회하는것이 화면 로딩과정에서 쿼리를 최소화 가능해보임
-        this.level=2;
     }
     
     public static CategoryDto from(final Category category) {
@@ -40,11 +39,11 @@ public class CategoryDto {
                 .categoryName(category.getName())
                 .parentId(parentId)
                 .build();
-        
+        nonRootDto.level = 2;
         if (!category.getChildren().isEmpty()) {
             List<CategoryDto> childrenDtos = getChildrenDtos(category);
             nonRootDto.getSubCategories().addAll(childrenDtos);
-            nonRootDto.setLevel(1);
+            nonRootDto.level = 1;
         }
         
         return nonRootDto;
@@ -54,10 +53,6 @@ public class CategoryDto {
         return category.getChildren().stream()
                 .map(CategoryDto::from)
                 .toList();
-    }
-    
-    private void setLevel(final int level) {
-        this.level = level;
     }
     
     @Override
