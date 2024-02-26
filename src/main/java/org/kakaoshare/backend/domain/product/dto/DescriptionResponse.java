@@ -11,7 +11,7 @@ import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 
 @Getter
 @Builder
-public class DetailDescriptionResponse {
+public class DescriptionResponse {
     private final Long productId;
     private final String name;
     private final BigDecimal price;
@@ -23,8 +23,8 @@ public class DetailDescriptionResponse {
     private final List<Option> options;
     private final Brand brand;
 
-    public static DetailDescriptionResponse from(final Product product) {
-        return DetailDescriptionResponse.builder()
+    public static DescriptionResponse from(final Product product) {
+        return DescriptionResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
