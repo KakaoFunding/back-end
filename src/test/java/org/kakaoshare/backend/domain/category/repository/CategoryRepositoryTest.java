@@ -86,7 +86,7 @@ class CategoryRepositoryTest {
     @DisplayName("루트 카테고리는 부모 카테고리는 없지만 자식 카테고리가 있다")
     void testRoot() {
         stopWatch.start("root");
-        Category root = categoryRepository.findByCategoryIdWithParentAndChildren(1L).orElseThrow();
+        Category root = categoryRepository.findParentCategoryWithChildren(1L).orElseThrow();
         stopWatch.stop();
         assertThat(root).isNotNull();
         assertThat(root.getParent()).isNull();
@@ -99,7 +99,7 @@ class CategoryRepositoryTest {
     @DisplayName("루트 카테고리의 자식 카테고리는 부모 카테고리와 자식 카테고리가 있다")
     void testFirstGen() {
         stopWatch.start("first gen");
-        Category parent = categoryRepository.findByCategoryIdWithParentAndChildren(2L).orElseThrow();
+        Category parent = categoryRepository.findParentCategoryWithChildren(2L).orElseThrow();
         stopWatch.stop();
         assertThat(parent).isNotNull();
         assertThat(parent.getParent()).isNull();
@@ -112,7 +112,7 @@ class CategoryRepositoryTest {
     @DisplayName("말단 카테고리는 부모 카테고리는 있지만 자식 카테고리는 없다")
     void testSecondGen() {
         stopWatch.start("second gen");
-        Category root = categoryRepository.findByCategoryIdWithParentAndChildren(7L).orElseThrow();
+        Category root = categoryRepository.findParentCategoryWithChildren(7L).orElseThrow();
         stopWatch.stop();
         assertThat(root).isNotNull();
         assertThat(root.getParent()).isNotNull();
