@@ -3,14 +3,11 @@ name: Integrate Pull Request with Test
 on:
   push:
     branches:
-      - 'develop'
-      - 'main'
+      - 'feature/*'
   pull_request:
     branches:
       - 'develop'
       - 'main'
-    paths:
-      - "feature/*"
     types:
       - auto_merge_enabled
 
@@ -43,7 +40,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -53,10 +49,10 @@ jobs:
           python-version: 3.8
 
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew build -x test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
       - name: Test with Gradle
-        run: ./gradlew test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
+        run: ./gradlew test -i -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
 
       - name: Report Test Results
