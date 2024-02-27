@@ -25,14 +25,14 @@ class BrandRepositoryTest {
     
     @Test
     void findAllSimpleBrandByChildCategoryId() {
-        List<SimpleBrandDto> brands = brandRepository.findAllSimpleBrandByChildCategoryId(CHILD_ID);
+        List<SimpleBrandDto> brands = brandRepository.findAllSimpleBrandByChildId(CHILD_ID);
         assertThat(brands.size()).isEqualTo(5);
     }
     
     
     @Test
     void findAllSimpleBrandByParentCategoryId() {
-        List<SimpleBrandDto> brands = brandRepository.findAllSimpleBrandByParentCategoryId(PARENT_ID);
+        List<SimpleBrandDto> brands = brandRepository.findAllSimpleBrandByParentId(PARENT_ID);
         assertThat(brands.size()).isEqualTo(25);
     }
 }

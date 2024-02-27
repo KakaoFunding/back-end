@@ -5,7 +5,7 @@ import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
 import java.util.List;
 
 public interface BrandRepositoryCustom {
-    List<SimpleBrandDto> findAllSimpleBrandByChildCategoryId(Long categoryId);
+    List<SimpleBrandDto> findAllSimpleBrandByChildId(Long categoryId);
     
-    List<SimpleBrandDto> findAllSimpleBrandByParentCategoryId(Long categoryId);
+    List<SimpleBrandDto> findAllSimpleBrandByParentId(Long categoryId);
 }

@@ -18,7 +18,7 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom {
     
     
     @Override
-    public List<SimpleBrandDto> findAllSimpleBrandByChildCategoryId(Long categoryId) {
+    public List<SimpleBrandDto> findAllSimpleBrandByChildId(Long categoryId) {
         return queryFactory
                 .select(new QSimpleBrandDto(
                         brand.brandId,
@@ -30,7 +30,7 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom {
     }
     
     @Override
-    public List<SimpleBrandDto> findAllSimpleBrandByParentCategoryId(final Long categoryId) {
+    public List<SimpleBrandDto> findAllSimpleBrandByParentId(final Long categoryId) {
         List<Long> childCategoryIds = queryFactory
                 .select(category.categoryId)
                 .from(category)
