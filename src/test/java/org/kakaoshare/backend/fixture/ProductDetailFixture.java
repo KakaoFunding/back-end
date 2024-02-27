@@ -4,15 +4,15 @@ import org.kakaoshare.backend.domain.product.entity.ProductDetail;
 
 public enum ProductDetailFixture {
     TEST_PRODUCT_DETAIL("상세정보");
-    private final String description;
+    private final String deliverDescription;
 
-    ProductDetailFixture(String description) {
-        this.description = description;
+    ProductDetailFixture(String deliverDescription) {
+        this.deliverDescription = deliverDescription;
     }
 
     public ProductDetail 생성() {
         return ProductDetail.builder()
-                .description(description)
+                .deliverDescription(deliverDescription)
                 .build();
     }
 }

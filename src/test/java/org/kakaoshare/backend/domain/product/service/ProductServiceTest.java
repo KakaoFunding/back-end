@@ -2,8 +2,10 @@ package org.kakaoshare.backend.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -13,9 +15,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDetail;
 import org.kakaoshare.backend.domain.product.repository.query.ProductRepositoryCustomImpl;
+import org.kakaoshare.backend.fixture.ProductDetailFixture;
+import org.kakaoshare.backend.fixture.ProductFixture;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,34 +38,21 @@ public class ProductServiceTest {
     @Test
     @DisplayName("상품 상세 조회 성공")
     void getProductDetail_Success() {
-        Product mockProduct = mock(Product.class);
-        Long existingProductId = 1L;
-        when(mockProduct.getProductId()).thenReturn(existingProductId);
-        when(mockProduct.getName()).thenReturn("Test Product");
-        when(mockProduct.getPrice()).thenReturn(new BigDecimal("999.99"));
-        when(mockProduct.getType()).thenReturn("Test Type");
+        final Product product = ProductFixture.TEST_PRODUCT.생성();
+        final Long productId = product.getProductId();
 
-        ProductDetail mockProductDetail = mock(ProductDetail.class);
-        when(mockProductDetail.getDescription()).thenReturn("Test Description");
-        when(mockProductDetail.getHasPhoto()).thenReturn(true);
-        when(mockProductDetail.getProductName()).thenReturn("Test Product Name");
-        when(mockProductDetail.getOrigin()).thenReturn("Test Origin");
-        when(mockProductDetail.getManufacturer()).thenReturn("Test Manufacturer");
-        when(mockProductDetail.getTel()).thenReturn("Test Tel");
-        when(mockProductDetail.getDeliverDescription()).thenReturn("Test Deliver Description");
-        when(mockProductDetail.getBillingNotice()).thenReturn("Test Billing Notice");
-        when(mockProductDetail.getCaution()).thenReturn("Test Caution");
+        // DetailResponse 객체를 빌더 패턴으로 생성
+        DetailResponse expectedDetailResponse = DetailResponse.builder()
+                .deliverDescription("배송 설명")
+                .build();
 
-        when(mockProduct.getProductDetail()).thenReturn(mockProductDetail);
-        when(mockProduct.getProductDescriptionPhotos()).thenReturn(new ArrayList<>());
-        when(mockProduct.getOptions()).thenReturn(new ArrayList<>());
-        when(mockProduct.getBrand()).thenReturn(mock(Brand.class));
+        doReturn(expectedDetailResponse)
+                .when(productRepositoryCustomImpl)
+                .findProductDetail(productId);
 
-        when(productRepositoryCustomImpl.findProductWithDetailsAndPhotos(existingProductId)).thenReturn(mockProduct);
-        DetailResponse result = productService.getProductDetail(existingProductId);
+        final DetailResponse actual = productService.getProductDetail(productId);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getProductId()).isEqualTo(existingProductId);
+        assertEquals(expectedDetailResponse.getDeliverDescription(), actual.getDeliverDescription());
     }
 
     @Test
