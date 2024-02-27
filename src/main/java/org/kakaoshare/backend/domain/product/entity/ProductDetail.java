@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
@@ -19,6 +20,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ProductDetail extends BaseTimeEntity {
 
     @Id
