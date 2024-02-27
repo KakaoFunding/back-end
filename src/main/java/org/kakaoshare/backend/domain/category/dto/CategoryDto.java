@@ -39,7 +39,7 @@ public class CategoryDto {
                 .parentId(parentId)
                 .build();
         nonRootDto.level = 2;
-        if (!category.getChildren().isEmpty()) {
+        if (!category.isChildEmpty()) {
             List<CategoryDto> childrenDtos = getChildrenDtos(category);
             nonRootDto.getSubCategories().addAll(childrenDtos);
             nonRootDto.level = 1;

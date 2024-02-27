@@ -45,6 +45,8 @@ public class Category extends BaseTimeEntity {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children;
     
+    public boolean isChildEmpty() { return children.isEmpty(); }
+    
     @Override
     public String toString() {
         return "Category{" + '\n' +
