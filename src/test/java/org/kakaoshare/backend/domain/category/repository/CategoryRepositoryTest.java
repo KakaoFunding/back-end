@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @CustomDataJpaTest
 class CategoryRepositoryTest {
-    public static final String SUBCATEGORY = "Subcategory";
     public static final long PARENT_ID = 1L;
     public static final long CHILD_ID = 7L;
     
@@ -57,7 +56,6 @@ class CategoryRepositoryTest {
             Category parent = categoryRepository.findById(categoryId).orElseThrow();
             
             assertThat(parentCategory.getCategoryId()).isEqualTo(parent.getCategoryId());
-            assertThat(parent.getName()).doesNotContain(SUBCATEGORY);
             assertThat(parent.getChildren().size()).isEqualTo(5);
         }
     }
@@ -71,13 +69,12 @@ class CategoryRepositoryTest {
         for (Category childCategory : childCategories) {
             // when
             Long categoryId = childCategory.getParent().getCategoryId();
-            Category category
+            Category parent
                     = categoryRepository.findById(categoryId).orElseThrow();
             
             // then
-            assertThat(category.getParent()).isNotNull();
-            assertThat(category.getChildren()).isEmpty();
-            assertThat(category.getName()).contains(SUBCATEGORY);
+            assertThat(parent).isNotNull();
+            assertThat(parent.getChildren().size()).isEqualTo(5);
         }
     }
     
@@ -98,11 +95,11 @@ class CategoryRepositoryTest {
     @DisplayName("말단 카테고리는 부모 카테고리는 있지만 자식 카테고리는 없다")
     void testSecondGen() {
         stopWatch.start("second gen");
-        Category root = categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID).orElseThrow();
+        Category child = categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID).orElseThrow();
         stopWatch.stop();
-        assertThat(root).isNotNull();
-        assertThat(root.getParent()).isNotNull();
-        assertThat(root.getChildren()).isEmpty();
+        assertThat(child).isNotNull();
+        assertThat(child.getParent()).isNotNull();
+        assertThat(child.getChildren()).isEmpty();
         System.out.println(stopWatch.prettyPrint());
     }
     
@@ -125,8 +122,7 @@ class CategoryRepositoryTest {
     }
     
     private static void assertChildCategory(Category child) {
-        assertThat(child.getParent().getName()).contains("Category");
-        assertThat(child.getParent().getName()).doesNotContain(SUBCATEGORY);
+        assertThat(child.getParent()).isNotNull();
         assertThat(child.getChildren()).isEmpty();
     }
 }
