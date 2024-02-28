@@ -1,27 +1,19 @@
 package org.kakaoshare.backend.domain.product.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
-import org.kakaoshare.backend.domain.product.entity.ProductDetail;
 import org.kakaoshare.backend.domain.product.repository.query.ProductRepositoryCustomImpl;
-import org.kakaoshare.backend.fixture.ProductDetailFixture;
 import org.kakaoshare.backend.fixture.ProductFixture;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
