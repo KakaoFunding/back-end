@@ -1,11 +1,11 @@
 package org.kakaoshare.backend.domain.product.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDetail;
@@ -36,12 +37,11 @@ public class ProductServiceTest {
     private final Long nonExistingProductId = 2L;
 
     @Test
-    @DisplayName("상품 상세 조회 성공")
+    @DisplayName("상품 상세정보 조회 성공")
     void getProductDetail_Success() {
         final Product product = ProductFixture.TEST_PRODUCT.생성();
         final Long productId = product.getProductId();
 
-        // DetailResponse 객체를 빌더 패턴으로 생성
         DetailResponse expectedDetailResponse = DetailResponse.builder()
                 .deliverDescription("배송 설명")
                 .build();
@@ -53,6 +53,24 @@ public class ProductServiceTest {
         final DetailResponse actual = productService.getProductDetail(productId);
 
         assertEquals(expectedDetailResponse.getDeliverDescription(), actual.getDeliverDescription());
+    }
+
+    @Test
+    @DisplayName("상품 상세설명 조회 성공")
+    void getProductDescription_Success() {
+        final Long productId = 1L;
+        DescriptionResponse expectedDescriptionResponse = DescriptionResponse.builder()
+                .description("설명")
+                .build();
+
+        doReturn(expectedDescriptionResponse)
+                .when(productRepositoryCustomImpl)
+                .findProductWithDetailsAndPhotos(productId);
+
+        DescriptionResponse actualDescriptionResponse = productService.getProductDescription(productId);
+
+        assertEquals(expectedDescriptionResponse, actualDescriptionResponse);
+        verify(productRepositoryCustomImpl).findProductWithDetailsAndPhotos(productId);
     }
 
     @Test
