@@ -44,7 +44,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom , So
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
         return Stream.concat(
-                Stream.of(SortUtil.sortBy(pageable)),
+                Stream.of(SortUtil.from(pageable)),
                 Stream.of(product.name.asc()) // 기본 정렬 조건
         ).toArray(OrderSpecifier[]::new);
     }

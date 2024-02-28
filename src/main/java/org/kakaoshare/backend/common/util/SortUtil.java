@@ -11,10 +11,10 @@ import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.springframework.data.domain.Sort.Order;
 
 /**
- * {@link SortableRepository#getOrderSpecifiers(Pageable)}를 구현할 때 기본조건을 제외한 정렬 조건을 {@link #sortBy(Pageable)}로 지정해준다
+ * {@link SortableRepository#getOrderSpecifiers(Pageable)}를 구현할 때 기본조건을 제외한 정렬 조건을 {@link #from(Pageable)}로 지정해준다
  * 필요한 정렬 조건을 열거체에 추가하여 사용하시면 됩니다
  * 기본 정렬 조건은 각각의 Repository에서 따로 추가하도록 {@link OrderByNull}을 사용하였고,
- * {@link #sortBy(Pageable)} 뒤에 기본 정렬 조건을 {@link #sortBy(Pageable)}와 합쳐 반환해 {@link com.querydsl.core.support.QueryBase#orderBy(OrderSpecifier)}에 주입하시면 됩니다
+ * {@link #from(Pageable)} 뒤에 기본 정렬 조건을 {@link #from(Pageable)}와 합쳐 반환해 {@link com.querydsl.core.support.QueryBase#orderBy(OrderSpecifier)}에 주입하시면 됩니다
  * 기본 정렬 조건이 가장 마지막에 들어가야합니다
  * @author sin-yechan
  * @see org.kakaoshare.backend.common.util.SortableRepository
@@ -35,9 +35,11 @@ public enum SortUtil {
      * @param  pageable {@link Pageable}
      * @return 정렬 조건이 담긴 {@link OrderSpecifier} 배열
      */
-    public static OrderSpecifier<?>[] sortBy(Pageable pageable) {
+    public static OrderSpecifier<?>[] from(Pageable pageable) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
-
+        if(pageable.getSort().isEmpty()){
+            return new OrderByNull[]{OrderByNull.getDefault()};
+        }
         pageable.getSort().forEach(order -> {
             String property = order.getProperty().toUpperCase();
             try {
@@ -48,12 +50,14 @@ public enum SortUtil {
             }
         });
         
-        orderSpecifiers.add(OrderByNull.getDefault());// 최종 정렬 조건을 OrderByNull로 주입
+
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
     }
     
     private OrderSpecifier<?> getOrderSpecifiers(final Order order) {
-        return order.getDirection().isAscending()
-                ? expression.asc() : expression.desc();
+        if (order.getDirection().isAscending()) {
+            return expression.asc();
+        }
+        return expression.desc();
     }
 }
