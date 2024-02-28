@@ -1,27 +1,28 @@
 package org.kakaoshare.backend.domain.product.repository.query;
 
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.util.SortUtil;
+import org.kakaoshare.backend.common.util.SortableRepository;
 import org.kakaoshare.backend.domain.product.entity.query.QSimpleProductDto;
 import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 
 @RequiredArgsConstructor
-public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
+public class ProductRepositoryCustomImpl implements ProductRepositoryCustom , SortableRepository {
     private final JPAQueryFactory queryFactory;
+    
     @Override
     public Page<SimpleProductDto> findAllByCategoryId(final Long categoryId,
                                                       final Pageable pageable) {
-        
         List<SimpleProductDto> fetch = queryFactory
                 .select(new QSimpleProductDto(
                         product.name,
@@ -31,8 +32,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         product.wishes.size().longValue().as("wishCount")
                 ))
                 .from(product)
-                .where(product.brand.category.categoryId.eq(8L))
-                .orderBy(productSort(pageable))
+                .where(product.brand.category.categoryId.eq(categoryId))
+                .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -40,18 +41,11 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
         return new PageImpl<>(fetch, pageable, fetch.size());
     }
     
-    private OrderSpecifier<?> productSort(final Pageable pageable) {
-        if (!pageable.getSort().isEmpty()) {
-            for (Sort.Order order : pageable.getSort()) {
-                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-                switch (order.getProperty()){
-                    case "price":
-                        return new OrderSpecifier<>(direction, product.price);
-                    case "wish" :
-                        return new OrderSpecifier<>(Order.DESC, product.wishes.size());//위시는 많은 순서로만 정렬
-                }
-            }
-        }
-        return new OrderSpecifier<>(Order.ASC, product.name);//기본 정렬은 이름으로
+    @Override
+    public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
+        return Stream.concat(
+                Stream.of(SortUtil.sortBy(pageable)),
+                Stream.of(product.name.asc()) // 기본 정렬 조건
+        ).toArray(OrderSpecifier[]::new);
     }
 }
