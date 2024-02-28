@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.product.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -76,10 +77,13 @@ public class ProductServiceTest {
     @Test
     @DisplayName("존재하지 않는 상품 ID로 조회 시 예외 발생")
     void getProductDetail_WhenProductNotFound_ThenThrowException() {
+        final Long nonExistingProductId = 999L;
+
         when(productRepositoryCustomImpl.findProductWithDetailsAndPhotos(nonExistingProductId)).thenReturn(null);
 
-        assertThatThrownBy(() -> productService.getProductDetail(nonExistingProductId))
+        assertThatThrownBy(() -> productService.getProductDescription(nonExistingProductId))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("Product not found with id: " + nonExistingProductId);
     }
+
 }
