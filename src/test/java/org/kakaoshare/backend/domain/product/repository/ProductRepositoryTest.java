@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.RepositoryTest;
+import org.kakaoshare.backend.common.util.SortUtil;
 import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,25 +14,32 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.data.domain.Sort.Direction;
 
 @RepositoryTest
 class ProductRepositoryTest {
     private static final int PAGE_SIZE = 20;
     public static final long CATEGORY_ID = 8L;
+    public static final String PRICE ="PRICE";
+    public static final String WISH_COUNT = "WISH_COUNT";
     
     @Autowired
     ProductRepository productRepository;
     @Autowired
     JPAQueryFactory queryFactory;
-    @ValueSource(strings = {"price","wish"})
+    @ValueSource(strings = {PRICE, WISH_COUNT})
     @ParameterizedTest
     @DisplayName("상품 목록 조회는 가격과 위시를 기준으로 정렬되어 페이징 가능하다")
     void testProductPagination(String order) {
-        
-        Pageable first=PageRequest.of(0, PAGE_SIZE, Sort.by(Sort.Order.by(order)));
+        PageRequest first =  PageRequest.of(0, PAGE_SIZE,
+                Direction.ASC, order);
         Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
         System.out.println(firstPage.getContent());
         
@@ -40,10 +48,10 @@ class ProductRepositoryTest {
         System.out.println(nextPage.getContent());
         
         assertThat(firstPage.getSize()).isEqualTo(PAGE_SIZE);
-        if(order.equals("price")){
+        if(order.equals(PRICE)){
             assertThat(firstPage.getContent())
                     .isSortedAccordingTo(Comparator.comparing(SimpleProductDto::getPrice));
-        }else if (order.equals("wish")){
+        }else if (order.equals(WISH_COUNT)){
             assertThat(firstPage.getContent())
                     .isSortedAccordingTo(Comparator.comparing(SimpleProductDto::getWishCount));
         }
@@ -53,9 +61,31 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("정렬은 기본적으로 상품명을 기준으로 정렬된다")
     void testDefaultPagination() {
-        PageRequest first = PageRequest.of(0, PAGE_SIZE);
+        PageRequest first =  PageRequest.of(0, PAGE_SIZE);
         Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
         assertThat(firstPage.getContent().stream().map(SimpleProductDto::getName).toList())
                 .isSortedAccordingTo(String::compareTo);
+    }
+    
+    @Test
+    @DisplayName("정렬 조건은 두가지 이상 가능하다")
+    void testMultipleCondition() {
+        Sort sort = Sort.by(Sort.Order.asc(SortUtil.PRICE.name()), Sort.Order.desc(SortUtil.PRODUCT_NAME.name()));
+        PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE, sort);
+        Page<SimpleProductDto> page = productRepository.findAllByCategoryId(CATEGORY_ID, pageRequest);
+        page.forEach(System.out::println);
+        
+        assertThat(page.getContent().stream().map(SimpleProductDto::getPrice).toList())
+                .isSortedAccordingTo(BigDecimal::compareTo);
+        
+        Map<BigDecimal, List<SimpleProductDto>> groupedByPrice = page.getContent().stream()
+                .collect(Collectors.groupingBy(SimpleProductDto::getPrice));
+        
+        groupedByPrice.forEach((price, productsWithSamePrice) -> {
+            if (productsWithSamePrice.size() > 1) {
+                assertThat(productsWithSamePrice.stream().map(SimpleProductDto::getName).toList())
+                        .isSortedAccordingTo(Comparator.reverseOrder());
+            }
+        });
     }
 }
