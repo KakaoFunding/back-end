@@ -2,7 +2,7 @@ package org.kakaoshare.backend.domain.category.repository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.kakaoshare.backend.common.CustomDataJpaTest;
+import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.domain.category.entity.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
@@ -12,7 +12,7 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CustomDataJpaTest
+@RepositoryTest
 class CategoryRepositoryTest {
     public static final long PARENT_ID = 1L;
     public static final long CHILD_ID = 7L;

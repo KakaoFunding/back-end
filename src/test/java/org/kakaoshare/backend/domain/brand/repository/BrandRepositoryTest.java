@@ -2,7 +2,7 @@ package org.kakaoshare.backend.domain.brand.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.Test;
-import org.kakaoshare.backend.common.CustomDataJpaTest;
+import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CustomDataJpaTest
+@RepositoryTest
 @Transactional(readOnly = true)
 class BrandRepositoryTest {
     public static final long PARENT_ID = 1L;

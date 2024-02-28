@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.kakaoshare.backend.common.CustomDataJpaTest;
+import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,7 @@ import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CustomDataJpaTest
+@RepositoryTest
 class ProductRepositoryTest {
     private static final int PAGE_SIZE = 20;
     public static final long CATEGORY_ID = 8L;

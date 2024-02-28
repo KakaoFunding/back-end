@@ -20,5 +20,5 @@ import java.lang.annotation.Target;
 @Import(value = {TestQueryDslConfig.class})
 @ActiveProfiles("test")
 @PropertySource("classpath:/application-test.yml")
-public @interface CustomDataJpaTest {
+public @interface RepositoryTest {
 }
