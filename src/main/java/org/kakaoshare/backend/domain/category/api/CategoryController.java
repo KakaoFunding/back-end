@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class CategoryApi {
+public class CategoryController {
     private final CategoryService categoryService;
     
     @GetMapping("/categories")
