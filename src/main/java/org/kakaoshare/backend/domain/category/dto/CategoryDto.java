@@ -6,7 +6,7 @@ import org.kakaoshare.backend.domain.category.entity.Category;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @Getter
 public class CategoryDto {
@@ -26,26 +26,23 @@ public class CategoryDto {
         this.parentId = parentId;
         this.defaultTab = TabType.BRAND;//브랜드를 조회하는것이 화면 로딩과정에서 쿼리를 최소화 가능해보임
     }
-    
+
     public static CategoryDto from(final Category category) {
-        Long parentId = PARENT_ID;
-        if (Objects.nonNull(category.getParent())) {
-            parentId = category.getParent().getCategoryId();
-        }
-        
-        CategoryDto nonRootDto = CategoryDto.builder()
-                .categoryId(category.getCategoryId())
-                .categoryName(category.getName())
-                .parentId(parentId)
+        CategoryDto categoryDto = CategoryDto
+                .getCategoryDtoBuilder(category)
                 .build();
-        nonRootDto.level = 2;
+
+        giveLevelAndSubCategories(categoryDto, category);
+
+        return categoryDto;
+    }
+
+    private static void giveLevelAndSubCategories(CategoryDto dto, Category category) {
+        dto.level=2;
         if (!category.isChildEmpty()) {
-            List<CategoryDto> childrenDtos = getChildrenDtos(category);
-            nonRootDto.getSubCategories().addAll(childrenDtos);
-            nonRootDto.level = 1;
+            dto.level = 1;
+            dto.getSubCategories().addAll(getChildrenDtos(category));
         }
-        
-        return nonRootDto;
     }
     
     private static List<CategoryDto> getChildrenDtos(final Category category) {
@@ -65,5 +62,17 @@ public class CategoryDto {
                         .toList() +
                 ", defaultTab=" + defaultTab +
                 '}';
+    }
+
+    private static CategoryDtoBuilder getCategoryDtoBuilder(final Category category) {
+        Long parentId = Optional
+                .ofNullable(category.getParent())
+                .map(Category::getCategoryId)
+                .orElse(PARENT_ID);
+
+        return CategoryDto.builder()
+                .categoryId(category.getCategoryId())
+                .categoryName(category.getName())
+                .parentId(parentId);
     }
 }
