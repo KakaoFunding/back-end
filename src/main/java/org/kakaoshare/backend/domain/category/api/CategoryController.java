@@ -16,18 +16,18 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
     
-    @GetMapping("/categories")
+    @GetMapping
     public ResponseEntity<?> getAllCategories() {
         List<CategoryDto> categories = categoryService.getParentCategories();
         return ResponseEntity.ok(categories);
     }
     
-    @GetMapping("/categories/{categoryId}")
+    @GetMapping("/{categoryId}")
     public ResponseEntity<?> getCategory(@PathVariable Long categoryId) {
         try {
             CategoryDto categoryDto = categoryService.getParentCategory(categoryId);
@@ -37,7 +37,7 @@ public class CategoryController {
         }
     }
     
-    @GetMapping("/categories/{categoryId}/subcategories/{subcategoryId}")
+    @GetMapping("/{categoryId}/subcategories/{subcategoryId}")
     public ResponseEntity<?> getSubCategory(@PathVariable(name = "categoryId") Long categoryId,
                                             @PathVariable(name = "subcategoryId") Long subcategoryId) {
         try {
