@@ -34,12 +34,12 @@ CREATE TABLE `hashtag`
     PRIMARY KEY (`hashtag_id`)
 );
 
-CREATE TABLE `option`
+CREATE TABLE `options`
 (
-    `option_id`  BIGINT       NOT NULL,
+    `options_id` BIGINT       NOT NULL,
     `name`       VARCHAR(255) NOT NULL,
     `product_id` BIGINT       NOT NULL,
-    PRIMARY KEY (`option_id`)
+    PRIMARY KEY (`options_id`)
 );
 
 CREATE TABLE `option_detail`
@@ -49,7 +49,7 @@ CREATE TABLE `option_detail`
     `stock_quantity`   BIGINT         NOT NULL,
     `additional_price` DECIMAL(10, 2) NOT NULL,
     `photo`            VARCHAR(255)   NOT NULL,
-    `option_id`        BIGINT         NOT NULL,
+    `options_id`       BIGINT         NOT NULL,
     PRIMARY KEY (`option_detail_id`)
 );
 
@@ -72,12 +72,14 @@ CREATE TABLE `wish`
 
 CREATE TABLE `member`
 (
-    `member_id`    BIGINT       NOT NULL,
-    `email`        VARCHAR(255) NOT NULL,
+    `member_id`    BIGINT       NOT NULL AUTO_INCREMENT,
     `gender`       VARCHAR(255) NOT NULL,
     `name`         VARCHAR(255) NOT NULL,
     `phone_number` VARCHAR(255) NOT NULL,
-    `provider_id`     VARCHAR(255),
+    `provider_id`  VARCHAR(255) NOT NULL,
+    `role`         VARCHAR(255) NOT NULL,
+    `created_at`   DATETIME     NOT NULL,
+    `updated_at`   DATETIME,
     PRIMARY KEY (`member_id`)
 );
 
