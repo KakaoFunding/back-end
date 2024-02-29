@@ -9,6 +9,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import org.kakaoshare.backend.jwt.exception.JwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,8 @@ import java.security.Key;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Date;
+
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.*;
 
 @Component
 public class JwtProvider {
@@ -32,13 +35,13 @@ public class JwtProvider {
             getJwtParser().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new JwtException(INVALID);
         } catch (ExpiredJwtException e) {
-            throw new IllegalArgumentException("만료된 토큰입니다.");
+            throw new JwtException(EXPIRED);
         } catch (UnsupportedJwtException e) {
-            throw new IllegalArgumentException("JWT를 지원하지 않습니다.");
+            throw new JwtException(UNSUPPORTED);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("토큰을 찾을 수 없습니다.");
+            throw new JwtException(NOT_FOUND);
         }
     }
 
