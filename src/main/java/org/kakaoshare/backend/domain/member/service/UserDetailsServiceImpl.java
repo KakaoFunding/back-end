@@ -1,7 +1,6 @@
-package org.kakaoshare.backend.jwt.service;
+package org.kakaoshare.backend.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
