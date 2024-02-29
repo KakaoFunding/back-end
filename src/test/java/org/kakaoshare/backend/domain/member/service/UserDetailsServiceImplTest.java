@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.common.service;
+package org.kakaoshare.backend.domain.member.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
