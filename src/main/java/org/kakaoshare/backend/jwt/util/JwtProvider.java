@@ -23,6 +23,12 @@ import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.*;
 
 @Component
 public class JwtProvider {
+    private static final String ALGORITHM_HEADER_KEY = "alg";
+    private static final String TYPE_HEADER_KEY = "typ";
+    private static final String TYPE_HEADER_VALUE = "JWT";
+    private static final String CLAIM_AUTH_KEY = "auth";
+    private static final long EXPIRATION = LocalTime.now().getHour() + 1000L * 60 * 60 * 24;
+
     private final Key key;
 
     public JwtProvider(@Value("${spring.jwt.secret}") final String secret) {
@@ -52,21 +58,20 @@ public class JwtProvider {
                 .getSubject();
     }
 
-    public String createAccessToken(final String username,
-                                    final Collection<? extends GrantedAuthority> authorities) {
+    public String createAccessToken(final String username, final Collection<? extends GrantedAuthority> authorities) {
         return Jwts.builder()
-                .setHeaderParam("alg", SignatureAlgorithm.HS256.getValue())
-                .setHeaderParam("typ", "JWT")
+                .setHeaderParam(ALGORITHM_HEADER_KEY, SignatureAlgorithm.HS256.getValue())
+                .setHeaderParam(TYPE_HEADER_KEY, TYPE_HEADER_VALUE)
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(getExpiration())
-                .claim("auth", authorities)
+                .claim(CLAIM_AUTH_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     private Date getExpiration() {
-        return new Date(LocalTime.now().getHour() + 1000L * 60 * 60 * 24);
+        return new Date(EXPIRATION);
     }
 
     private JwtParser getJwtParser() {
