@@ -16,8 +16,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        return memberRepository.findByProviderId(username)
-                .map(MemberDetails::new)
+        return memberRepository.findDetailsByProviderId(username)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 이메일 입니다."));
     }
 }
