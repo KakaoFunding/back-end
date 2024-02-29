@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.member.service;
+package org.kakaoshare.backend.domain.member.service.oauth;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenRequest;
