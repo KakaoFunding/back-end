@@ -1,5 +1,7 @@
 package org.kakaoshare.backend.domain.member.dto.oauth.profile;
 
+import org.kakaoshare.backend.domain.member.dto.oauth.profile.detail.KakaoProfile;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
