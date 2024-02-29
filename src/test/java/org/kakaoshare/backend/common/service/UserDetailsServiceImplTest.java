@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
-import org.kakaoshare.backend.jwt.service.UserDetailsServiceImpl;
+import org.kakaoshare.backend.domain.member.service.UserDetailsServiceImpl;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,11 +39,11 @@ class UserDetailsServiceImplTest {
     @DisplayName("이메일을 통해 알맞는 UserDetails 객체 조회")
     void loadByUsername() throws Exception {
         final String providerId = member.getProviderId();
-        doReturn(Optional.of(member))
+        final UserDetails expect = MemberDetails.from(member);
+        doReturn(Optional.of(expect))
                 .when(memberRepository)
-                .findByProviderId(providerId);
+                .findDetailsByProviderId(expect.getUsername());
 
-        final UserDetails expect = new MemberDetails(member);
         final UserDetails actual = userDetailsService.loadUserByUsername(providerId);
         assertThat(expect)
                 .usingRecursiveComparison()
@@ -56,7 +56,7 @@ class UserDetailsServiceImplTest {
         final String providerId = member.getProviderId();
         doReturn(Optional.empty())
                 .when(memberRepository)
-                .findByProviderId(providerId);
+                .findDetailsByProviderId(providerId);
 
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername(providerId))
                 .isInstanceOf(IllegalArgumentException.class)
