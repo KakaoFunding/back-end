@@ -19,4 +19,13 @@ public abstract class OAuthProfile {
     public abstract String getPhoneNumber();
     public abstract String getProvider();
     public abstract String getProviderId();
+
+    public Member toEntity() {
+        return Member.builder()
+                .name(getName())
+                .gender(Gender.from(getGender()))
+                .phoneNumber(getPhoneNumber())
+                .providerId(getProviderId())
+                .build();
+    }
 }
