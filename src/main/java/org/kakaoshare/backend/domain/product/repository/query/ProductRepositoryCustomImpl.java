@@ -1,12 +1,13 @@
 package org.kakaoshare.backend.domain.product.repository.query;
 
+import static org.kakaoshare.backend.domain.product.entity.QProduct.*;
+import static org.kakaoshare.backend.domain.product.entity.QProductDetail.*;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.entity.QProduct;
-import org.kakaoshare.backend.domain.product.entity.QProductDetail;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,44 +18,44 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
         return queryFactory
                 .select(Projections.bean(DescriptionResponse.class,
-                        QProduct.product.name,
-                        QProduct.product.price,
-                        QProduct.product.type,
-                        QProduct.product.photo,
-                        QProduct.product.productDetail.description.as("description"),
-                        QProduct.product.productDescriptionPhotos.as("descriptionPhotos"),
-                        QProduct.product.productDetail.as("hasPhoto"),
-                        QProduct.product.productDetail.productName.as("productName"),
-                        QProduct.product.options,
-                        QProduct.product.brand))
-                .from(QProduct.product)
-                .leftJoin(QProduct.product.productDetail).fetchJoin()
-                .leftJoin(QProduct.product.productDescriptionPhotos).fetchJoin()
-                .leftJoin(QProduct.product.options).fetchJoin()
-                .where(QProduct.product.productId.eq(productId))
+                        product.name,
+                        product.price,
+                        product.type,
+                        product.photo,
+                        product.productDetail.description.as("description"),
+                        product.productDescriptionPhotos.as("descriptionPhotos"),
+                        product.productDetail.as("hasPhoto"),
+                        product.productDetail.productName.as("productName"),
+                        product.options,
+                        product.brand))
+                .from(product)
+                .leftJoin(product.productDetail).fetchJoin()
+                .leftJoin(product.productDescriptionPhotos).fetchJoin()
+                .leftJoin(product.options).fetchJoin()
+                .where(product.productId.eq(productId))
                 .fetchOne();
     }
 
     public DetailResponse findProductDetail(Long productId) {
         return queryFactory
                 .select(Projections.constructor(DetailResponse.class,
-                        QProduct.product.productId,
-                        QProduct.product.name,
-                        QProduct.product.price,
-                        QProduct.product.type,
-                        QProduct.product.productDetail.hasPhoto,
-                        QProduct.product.productDetail.productName,
-                        QProduct.product.productDetail.origin,
-                        QProduct.product.productDetail.manufacturer,
-                        QProduct.product.productDetail.tel,
-                        QProduct.product.productDetail.deliverDescription,
-                        QProduct.product.productDetail.billingNotice,
-                        QProduct.product.productDetail.caution,
-                        QProduct.product.options.any(),
-                        QProduct.product.brand))
-                .from(QProduct.product)
-                .leftJoin(QProduct.product.productDetail, QProductDetail.productDetail)
-                .where(QProduct.product.productId.eq(productId))
+                        product.productId,
+                        product.name,
+                        product.price,
+                        product.type,
+                        product.productDetail.hasPhoto,
+                        product.productDetail.productName,
+                        product.productDetail.origin,
+                        product.productDetail.manufacturer,
+                        product.productDetail.tel,
+                        product.productDetail.deliverDescription,
+                        product.productDetail.billingNotice,
+                        product.productDetail.caution,
+                        product.options.any(),
+                        product.brand))
+                .from(product)
+                .leftJoin(product.productDetail, productDetail)
+                .where(product.productId.eq(productId))
                 .fetchOne();
     }
 }
