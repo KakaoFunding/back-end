@@ -17,14 +17,13 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
         return queryFactory
                 .select(Projections.bean(DescriptionResponse.class,
-                        QProduct.product.productId.as("productId"),
                         QProduct.product.name,
                         QProduct.product.price,
                         QProduct.product.type,
                         QProduct.product.photo,
                         QProduct.product.productDetail.description.as("description"),
                         QProduct.product.productDescriptionPhotos.as("descriptionPhotos"),
-                        QProduct.product.productDetail.hasPhoto.as("hasPhoto"),
+                        QProduct.product.productDetail.as("hasPhoto"),
                         QProduct.product.productDetail.productName.as("productName"),
                         QProduct.product.options,
                         QProduct.product.brand))
@@ -37,28 +36,25 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
     }
 
     public DetailResponse findProductDetail(Long productId) {
-        QProduct qProduct = QProduct.product;
-        QProductDetail qProductDetail = QProductDetail.productDetail;
-
         return queryFactory
                 .select(Projections.constructor(DetailResponse.class,
-                        qProduct.productId,
-                        qProduct.name,
-                        qProduct.price,
-                        qProduct.type,
-                        qProductDetail.hasPhoto,
-                        qProductDetail.productName,
-                        qProductDetail.origin,
-                        qProductDetail.manufacturer,
-                        qProductDetail.tel,
-                        qProductDetail.deliverDescription,
-                        qProductDetail.billingNotice,
-                        qProductDetail.caution,
-                        qProduct.options.any(),
-                        qProduct.brand))
-                .from(qProduct)
-                .leftJoin(qProduct.productDetail, qProductDetail)
-                .where(qProduct.productId.eq(productId))
+                        QProduct.product.productId,
+                        QProduct.product.name,
+                        QProduct.product.price,
+                        QProduct.product.type,
+                        QProduct.product.productDetail.hasPhoto,
+                        QProduct.product.productDetail.productName,
+                        QProduct.product.productDetail.origin,
+                        QProduct.product.productDetail.manufacturer,
+                        QProduct.product.productDetail.tel,
+                        QProduct.product.productDetail.deliverDescription,
+                        QProduct.product.productDetail.billingNotice,
+                        QProduct.product.productDetail.caution,
+                        QProduct.product.options.any(),
+                        QProduct.product.brand))
+                .from(QProduct.product)
+                .leftJoin(QProduct.product.productDetail, QProductDetail.productDetail)
+                .where(QProduct.product.productId.eq(productId))
                 .fetchOne();
     }
 }
