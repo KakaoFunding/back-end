@@ -11,7 +11,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.hashtag.entity.ProductHashtag;
 import org.kakaoshare.backend.domain.theme.entity.Theme;
@@ -25,6 +29,9 @@ import org.kakaoshare.backend.domain.order.entity.Order;
 
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class Product extends BaseTimeEntity {
 
     @Id
@@ -37,12 +44,10 @@ public class Product extends BaseTimeEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
-    @Column
-    private String photo;
-
     @Column(nullable = false, length = 50)
     private String type;
-
+    @Column
+    private String photo;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
