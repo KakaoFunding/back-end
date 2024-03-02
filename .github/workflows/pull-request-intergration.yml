@@ -19,7 +19,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  build-and-test:
+  check-application:
     runs-on: ubuntu-latest
 
     steps:
@@ -55,8 +55,10 @@ jobs:
         run: ./gradlew test -i -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
 
-      - name: Report Test Results
+      - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: build/test-results/**/*.xml
+          # set comment_mode to "always" for pull_request event, set to "off" for all other event types
+          comment_mode: ${{ (github.event.workflow_run.event == 'pull_request' || github.event_name == 'pull_request') && 'always' || 'off' }}
+          files: "test-results/**/*.xml"
