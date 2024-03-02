@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
+import org.kakaoshare.backend.domain.brand.entity.Brand;
 
 import java.util.List;
 
@@ -44,6 +45,9 @@ public class Category extends BaseTimeEntity {
     @BatchSize(size=100)//TODO 2024 02 26 21:15:10 : 추후 부모 카테고리당 자식 카테고리 수에 따라 결정하여 최적화
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children;
+    
+    @OneToMany(mappedBy ="category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Brand> brands;
     
     public boolean isChildEmpty() { return children.isEmpty(); }
     
