@@ -1,5 +1,7 @@
 package org.kakaoshare.backend.domain.category.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.category.entity.Category;
@@ -9,11 +11,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Getter
+@JsonSerialize
 public class CategoryDto {
     public static final long PARENT_ID = -1L;
     private final Long categoryId;
     private final String categoryName;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long parentId;
+    
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final List<CategoryDto> subCategories = new ArrayList<>();
     private final TabType defaultTab;
     private int level;
@@ -68,7 +75,7 @@ public class CategoryDto {
         Long parentId = Optional
                 .ofNullable(category.getParent())
                 .map(Category::getCategoryId)
-                .orElse(PARENT_ID);
+                .orElse(null);
 
         return CategoryDto.builder()
                 .categoryId(category.getCategoryId())
