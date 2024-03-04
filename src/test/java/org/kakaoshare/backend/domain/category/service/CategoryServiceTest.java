@@ -64,7 +64,7 @@ class CategoryServiceTest {
         
         CategoryDto category = categoryService.getParentCategory(PARENT_ID);
         assertThat(category).isNotNull();
-        assertThat(category.getParentId()).isNotNull();
+        assertThat(category.getParentId()).isNull();
         assertThat(category.getLevel()).isEqualTo(1);
     }
     
