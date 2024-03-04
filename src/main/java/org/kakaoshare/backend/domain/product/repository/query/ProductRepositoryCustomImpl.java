@@ -2,6 +2,8 @@ package org.kakaoshare.backend.domain.product.repository.query;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.SortUtil;
@@ -17,11 +19,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.kakaoshare.backend.domain.product.entity.QProductDetail.productDetail;
 
 @RequiredArgsConstructor
-public class ProductRepositoryCustomImpl implements ProductRepositoryCustom , SortableRepository {
+public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
     
     @Override
@@ -36,7 +39,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom , So
                         product.wishes.size().longValue().as("wishCount")
                 ))
                 .from(product)
-                .where(product.brand.category.categoryId.eq(categoryId))
+                .where(categoryIdEqualTo(categoryId))
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -53,6 +56,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom , So
         ).toArray(OrderSpecifier[]::new);
     }
     
+    @Override
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
         return queryFactory
                 .select(Projections.bean(DescriptionResponse.class,
@@ -74,6 +78,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom , So
                 .fetchOne();
     }
     
+    @Override
     public DetailResponse findProductDetail(Long productId) {
         return queryFactory
                 .select(Projections.constructor(DetailResponse.class,
@@ -95,5 +100,17 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom , So
                 .leftJoin(product.productDetail, productDetail)
                 .where(product.productId.eq(productId))
                 .fetchOne();
+    }
+    
+    private BooleanExpression categoryIdEqualTo(final Long categoryId) {
+        BooleanExpression isParentCategory = product.brand.category
+                .in(JPAExpressions
+                        .select(category)
+                        .from(category)
+                        .where(category.parent.categoryId.eq(categoryId)));
+        
+        BooleanExpression isChildCategory = product.brand.category.categoryId.eq(categoryId);
+        
+        return isChildCategory.or(isParentCategory);
     }
 }
