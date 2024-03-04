@@ -2,7 +2,7 @@ package org.kakaoshare.backend.domain.member.service.oauth;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthAuthenticateRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthAuthenticateResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
@@ -29,10 +29,10 @@ public class OAuthService {
     private final OAuthWebClientService webClientService;
 
     @Transactional
-    public OAuthAuthenticateResponse login(final OAuthAuthenticateRequest request) {
+    public OAuthLoginResponse login(final OAuthAuthenticateRequest request) {
         final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(request.provider());
         final OAuthProfile oAuthProfile = getProfile(request, registration);
-        return getAuthentication(oAuthProfile);
+        return getLoginResponse(oAuthProfile);
     }
 
     private OAuthProfile getProfile(final OAuthAuthenticateRequest request, final ClientRegistration registration) {
@@ -45,10 +45,10 @@ public class OAuthService {
         return webClientService.getSocialProfile(registration, tokenResponse.access_token());
     }
 
-    private OAuthAuthenticateResponse getAuthentication(final OAuthProfile oAuthProfile) {
+    private OAuthLoginResponse getLoginResponse(final OAuthProfile oAuthProfile) {
         final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
         final String accessToken = jwtProvider.createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
-        return OAuthAuthenticateResponse.of(TOKEN_PREFIX, accessToken);
+        return OAuthLoginResponse.of(TOKEN_PREFIX, accessToken);
     }
 
     private UserDetails addOrFindByProfile(final OAuthProfile oAuthProfile) {

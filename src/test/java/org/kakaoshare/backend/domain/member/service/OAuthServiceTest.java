@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthAuthenticateRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthAuthenticateResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
@@ -82,8 +82,8 @@ class OAuthServiceTest {
         doReturn(member).when(memberRepository).save(any());
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
 
-        final OAuthAuthenticateResponse expect = OAuthAuthenticateResponse.of(grantType, accessToken);
-        final OAuthAuthenticateResponse actual = oAuthService.login(request);
+        final OAuthLoginResponse expect = OAuthLoginResponse.of(grantType, accessToken);
+        final OAuthLoginResponse actual = oAuthService.login(request);
         assertThat(expect).usingRecursiveComparison()
                 .isEqualTo(actual);
     }
@@ -102,8 +102,8 @@ class OAuthServiceTest {
         doReturn(Optional.of(userDetails)).when(memberRepository).findDetailsByProviderId(providerId);
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
 
-        final OAuthAuthenticateResponse expect = OAuthAuthenticateResponse.of(grantType, accessToken);
-        final OAuthAuthenticateResponse actual = oAuthService.login(request);
+        final OAuthLoginResponse expect = OAuthLoginResponse.of(grantType, accessToken);
+        final OAuthLoginResponse actual = oAuthService.login(request);
         assertThat(expect).usingRecursiveComparison()
                 .isEqualTo(actual);
     }
