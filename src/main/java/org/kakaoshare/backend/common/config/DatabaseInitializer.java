@@ -55,7 +55,7 @@ public class DatabaseInitializer {
         for (int i = 0; i < count; i++) {
             Brand brand = Brand
                     .builder()
-                    .name("Brand " + (i + 1))
+                    .name(category.getName()+" Brand " + (i + 1))
                     .category(category)
                     .products(new ArrayList<>())
                     .build();
@@ -69,7 +69,7 @@ public class DatabaseInitializer {
         for (int i = 0; i < count; i++) {
             int price = 1000 + (random.nextInt(200) * 100);
             Product product = Product.builder()
-                    .name("Product " + (i + 1))
+                    .name(brand.getName()+" Product " + (i + 1))
                     .price(BigDecimal.valueOf(price))
                     .brand(brand)
                     .wishes(new ArrayList<>())
