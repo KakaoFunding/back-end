@@ -3,7 +3,7 @@ package org.kakaoshare.backend.domain.member.repository.query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.kakaoshare.backend.DatabaseCleanUp;
+import org.kakaoshare.backend.util.DatabaseCleanUp;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;

@@ -1,4 +1,4 @@
-package org.kakaoshare.backend;
+package org.kakaoshare.backend.util;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;

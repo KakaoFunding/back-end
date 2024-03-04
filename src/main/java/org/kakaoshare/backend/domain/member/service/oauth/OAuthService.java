@@ -52,6 +52,6 @@ public class OAuthService {
 
     private UserDetails addOrFindByProfile(final OAuthProfile oAuthProfile) {
         return memberRepository.findDetailsByProviderId(oAuthProfile.getProviderId())
-                .orElse(MemberDetails.from(memberRepository.save(oAuthProfile.toEntity())));
+                .orElseGet(() -> MemberDetails.from(memberRepository.save(oAuthProfile.toEntity())));
     }
 }
