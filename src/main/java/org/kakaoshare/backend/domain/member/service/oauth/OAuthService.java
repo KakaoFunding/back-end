@@ -28,6 +28,7 @@ public class OAuthService {
     private final MemberRepository memberRepository;
     private final OAuthWebClientService webClientService;
 
+    @Transactional
     public OAuthAuthenticateResponse authenticate(final OAuthAuthenticateRequest request) {
         final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(request.provider());
         final OAuthProfile oAuthProfile = getProfile(request, registration);
