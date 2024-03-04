@@ -1,7 +1,7 @@
 package org.kakaoshare.backend.domain.member.service.oauth;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthAuthenticateRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
@@ -29,18 +29,18 @@ public class OAuthService {
     private final OAuthWebClientService webClientService;
 
     @Transactional
-    public OAuthLoginResponse login(final OAuthAuthenticateRequest request) {
+    public OAuthLoginResponse login(final OAuthLoginRequest request) {
         final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(request.provider());
         final OAuthProfile oAuthProfile = getProfile(request, registration);
         return getLoginResponse(oAuthProfile);
     }
 
-    private OAuthProfile getProfile(final OAuthAuthenticateRequest request, final ClientRegistration registration) {
-        final Map<String, Object> attributes = getAttributes(request, registration);
+    private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {
+        final Map<String, Object> attributes = webClientService.getSocialProfile(registration, request.code());
         return OAuthProfileFactory.of(attributes, request.provider());
     }
 
-    private Map<String, Object> getAttributes(final OAuthAuthenticateRequest request, final ClientRegistration registration) {
+    private Map<String, Object> getAttributes(final OAuthLoginRequest request, final ClientRegistration registration) {
         final OAuthTokenResponse tokenResponse = webClientService.getSocialToken(registration, request.code());
         return webClientService.getSocialProfile(registration, tokenResponse.access_token());
     }

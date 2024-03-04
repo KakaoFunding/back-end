@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthAuthenticateRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -73,7 +73,7 @@ class OAuthServiceTest {
         final String registrationId = "kakao";
         final ClientRegistration registration = getClientRegistration(registrationId);
         final Map<String, Object> attributes = kakaoAttributes();
-        final OAuthAuthenticateRequest request = new OAuthAuthenticateRequest(registrationId, code);
+        final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, code);
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
         doReturn(oAuthTokenResponse).when(webClientService).getSocialToken(registration, request.code());
@@ -94,7 +94,7 @@ class OAuthServiceTest {
         final String registrationId = "kakao";
         final ClientRegistration registration = getClientRegistration(registrationId);
         final Map<String, Object> attributes = kakaoAttributes();
-        final OAuthAuthenticateRequest request = new OAuthAuthenticateRequest(registrationId, code);
+        final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, code);
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
         doReturn(oAuthTokenResponse).when(webClientService).getSocialToken(registration, request.code());
