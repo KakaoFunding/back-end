@@ -17,6 +17,6 @@ public class OAuthController {
 
     @PostMapping("/login")
     public OAuthAuthenticateResponse login(@ModelAttribute final OAuthAuthenticateRequest oAuthAuthenticateRequest) {
-        return oAuthService.authenticate(oAuthAuthenticateRequest);
+        return oAuthService.login(oAuthAuthenticateRequest);
     }
 }

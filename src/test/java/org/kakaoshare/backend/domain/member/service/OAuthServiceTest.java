@@ -83,7 +83,7 @@ class OAuthServiceTest {
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
 
         final OAuthAuthenticateResponse expect = OAuthAuthenticateResponse.of(grantType, accessToken);
-        final OAuthAuthenticateResponse actual = oAuthService.authenticate(request);
+        final OAuthAuthenticateResponse actual = oAuthService.login(request);
         assertThat(expect).usingRecursiveComparison()
                 .isEqualTo(actual);
     }
@@ -103,7 +103,7 @@ class OAuthServiceTest {
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
 
         final OAuthAuthenticateResponse expect = OAuthAuthenticateResponse.of(grantType, accessToken);
-        final OAuthAuthenticateResponse actual = oAuthService.authenticate(request);
+        final OAuthAuthenticateResponse actual = oAuthService.login(request);
         assertThat(expect).usingRecursiveComparison()
                 .isEqualTo(actual);
     }
