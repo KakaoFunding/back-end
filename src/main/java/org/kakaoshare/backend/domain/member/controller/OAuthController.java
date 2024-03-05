@@ -8,10 +8,14 @@ import org.kakaoshare.backend.domain.member.service.oauth.OAuthService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.kakaoshare.backend.domain.member.controller.RefreshTokenCookieProvider.REFRESH_TOKEN;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/oauth")
@@ -29,5 +33,13 @@ public class OAuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(OAuthLoginResponse.from(loginResult));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(value = REFRESH_TOKEN) final String refreshToken) {
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieProvider.createLogoutCookie().toString())
+                .build();
     }
 }
