@@ -10,7 +10,7 @@ public class EnumValidator implements ConstraintValidator<EnumValue, String> {
 
     @Override
     public void initialize(final EnumValue constraintAnnotation) {
-        this.enumValue = enumValue;
+        this.enumValue = constraintAnnotation;
     }
 
     @Override
