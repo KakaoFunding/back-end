@@ -71,7 +71,8 @@ public class JwtProvider {
     }
 
     private Date getExpiration() {
-        return new Date(EXPIRATION);
+        final Date now = new Date();
+        return new Date(now.getTime() + EXPIRATION);
     }
 
     private JwtParser getJwtParser() {
