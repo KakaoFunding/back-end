@@ -50,7 +50,6 @@ class OAuthServiceTest {
 
     private String accessToken;
     private String providerId;
-    private OAuthTokenResponse oAuthTokenResponse;
     private Member member;
     private UserDetails userDetails;
     private String code;
@@ -61,7 +60,6 @@ class OAuthServiceTest {
         code = "code";
         grantType = "Bearer ";
         accessToken = "accessToken";
-        oAuthTokenResponse = getOAuthTokenResponse();
         member = KAKAO.생성();
         providerId = member.getProviderId();
         userDetails = MemberDetails.from(member);
@@ -76,8 +74,7 @@ class OAuthServiceTest {
         final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, code);
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
-        doReturn(oAuthTokenResponse).when(webClientService).getSocialToken(registration, request.code());
-        doReturn(attributes).when(webClientService).getSocialProfile(registration, oAuthTokenResponse.access_token());
+        doReturn(attributes).when(webClientService).getSocialProfile(registration, code);
         doReturn(Optional.empty()).when(memberRepository).findDetailsByProviderId(providerId);
         doReturn(member).when(memberRepository).save(any());
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
@@ -97,8 +94,7 @@ class OAuthServiceTest {
         final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, code);
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
-        doReturn(oAuthTokenResponse).when(webClientService).getSocialToken(registration, request.code());
-        doReturn(attributes).when(webClientService).getSocialProfile(registration, oAuthTokenResponse.access_token());
+        doReturn(attributes).when(webClientService).getSocialProfile(registration, code);
         doReturn(Optional.of(userDetails)).when(memberRepository).findDetailsByProviderId(providerId);
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
 
@@ -131,7 +127,7 @@ class OAuthServiceTest {
 
     private Map<String, Object> kakaoAttributes() {
         final Map<String, Object> profile = new HashMap<>();
-        profile.put("nickname", "테스터");
+        profile.put("name", "테스터");
 
         final Map<String, Object> account = new HashMap<>();
         account.put("profile", profile);
