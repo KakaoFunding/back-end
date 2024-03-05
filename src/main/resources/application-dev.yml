@@ -47,3 +47,9 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+security:
+  token:
+    access:
+      expire-time: 3600
+    refresh:
+      expire-time: 3600
