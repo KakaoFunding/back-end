@@ -6,6 +6,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.EntityType;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wiremock.com.google.common.base.CaseFormat;
@@ -13,6 +14,7 @@ import wiremock.com.google.common.base.CaseFormat;
 import java.util.List;
 
 @Service
+@Profile("test")
 public class DatabaseCleanUp implements InitializingBean {
     @PersistenceContext
     private EntityManager entityManager;
