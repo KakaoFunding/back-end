@@ -5,7 +5,6 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
-import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.jwt.util.JwtProvider;
@@ -32,23 +31,14 @@ public class OAuthService {
     public OAuthLoginResponse login(final OAuthLoginRequest request) {
         final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(request.provider());
         final OAuthProfile oAuthProfile = getProfile(request, registration);
-        return getLoginResponse(oAuthProfile);
+        final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
+        final String accessToken = jwtProvider.createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
+        return OAuthLoginResponse.of(TOKEN_PREFIX, accessToken);
     }
 
     private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {
         final Map<String, Object> attributes = webClientService.getSocialProfile(registration, request.code());
         return OAuthProfileFactory.of(attributes, request.provider());
-    }
-
-    private Map<String, Object> getAttributes(final OAuthLoginRequest request, final ClientRegistration registration) {
-        final OAuthTokenResponse tokenResponse = webClientService.getSocialToken(registration, request.code());
-        return webClientService.getSocialProfile(registration, tokenResponse.access_token());
-    }
-
-    private OAuthLoginResponse getLoginResponse(final OAuthProfile oAuthProfile) {
-        final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
-        final String accessToken = jwtProvider.createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
-        return OAuthLoginResponse.of(TOKEN_PREFIX, accessToken);
     }
 
     private UserDetails addOrFindByProfile(final OAuthProfile oAuthProfile) {
