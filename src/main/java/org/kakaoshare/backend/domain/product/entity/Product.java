@@ -17,14 +17,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.hashtag.entity.ProductHashtag;
-import org.kakaoshare.backend.domain.theme.entity.Theme;
-import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
+import org.kakaoshare.backend.domain.hashtag.entity.ProductHashtag;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.order.entity.Order;
+import org.kakaoshare.backend.domain.theme.entity.Theme;
+import org.kakaoshare.backend.domain.wish.entity.Wish;
 
 
 @Entity
@@ -53,7 +53,7 @@ public class Product extends BaseTimeEntity {
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_detail_id", nullable = false)
+    @JoinColumn(name = "product_detail_id", nullable = true)//TODO 2024 02 17 19:45:17 : Detail 관련 로직 작성시 nullable=true 설정
     private ProductDetail productDetail;
 
     @OneToMany(fetch = FetchType.LAZY)
@@ -91,4 +91,5 @@ public class Product extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private List<ProductDescriptionPhoto> productDescriptionPhotos;
+    
 }

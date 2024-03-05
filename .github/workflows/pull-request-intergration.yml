@@ -21,7 +21,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  build-and-test:
+  check-application:
     runs-on: ubuntu-latest
 
     steps:
