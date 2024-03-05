@@ -1,11 +1,5 @@
 package org.kakaoshare.backend.domain.product.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,16 +7,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
-import org.kakaoshare.backend.domain.product.repository.query.ProductRepositoryCustomImpl;
+import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.fixture.ProductFixture;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
     @Mock
-    private ProductRepositoryCustomImpl productRepositoryCustomImpl;
+    private ProductRepository productRepository;
 
     @InjectMocks
     private ProductService productService;
@@ -40,7 +38,7 @@ public class ProductServiceTest {
                 .build();
 
         doReturn(expectedDetailResponse)
-                .when(productRepositoryCustomImpl)
+                .when(productRepository)
                 .findProductDetail(productId);
 
         final DetailResponse actual = productService.getProductDetail(productId);
@@ -57,13 +55,13 @@ public class ProductServiceTest {
                 .build();
 
         doReturn(expectedDescriptionResponse)
-                .when(productRepositoryCustomImpl)
+                .when(productRepository)
                 .findProductWithDetailsAndPhotos(productId);
 
         DescriptionResponse actualDescriptionResponse = productService.getProductDescription(productId);
 
         assertEquals(expectedDescriptionResponse, actualDescriptionResponse);
-        verify(productRepositoryCustomImpl).findProductWithDetailsAndPhotos(productId);
+        verify(productRepository).findProductWithDetailsAndPhotos(productId);
     }
 
     @Test
@@ -71,11 +69,10 @@ public class ProductServiceTest {
     void getProductDetail_WhenProductNotFound_ThenThrowException() {
         final Long nonExistingProductId = 999L;
 
-        when(productRepositoryCustomImpl.findProductWithDetailsAndPhotos(nonExistingProductId)).thenReturn(null);
+        when(productRepository.findProductWithDetailsAndPhotos(nonExistingProductId)).thenReturn(null);
 
         assertThatThrownBy(() -> productService.getProductDescription(nonExistingProductId))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("Product not found with id: " + nonExistingProductId);
     }
-
 }

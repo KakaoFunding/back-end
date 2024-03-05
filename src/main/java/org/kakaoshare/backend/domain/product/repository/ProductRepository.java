@@ -5,5 +5,5 @@ import org.kakaoshare.backend.domain.product.repository.query.ProductRepositoryC
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface ProductRepository extends JpaRepository<Product, Long> , ProductRepositoryCustom {
+public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
 }
