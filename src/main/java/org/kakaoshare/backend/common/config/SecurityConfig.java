@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
     private static final String ORIGIN_PATTERN = "*";
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
+
     public static final String API_V_1 = "/api/v1/";
 
     @Bean
