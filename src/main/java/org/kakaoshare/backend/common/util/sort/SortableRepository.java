@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.common.util;
+package org.kakaoshare.backend.common.util.sort;
 
 import com.querydsl.core.types.OrderSpecifier;
 import org.springframework.data.domain.Pageable;
