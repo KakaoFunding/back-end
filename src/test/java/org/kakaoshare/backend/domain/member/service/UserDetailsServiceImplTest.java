@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -59,7 +60,7 @@ class UserDetailsServiceImplTest {
                 .findDetailsByProviderId(providerId);
 
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername(providerId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(MemberException.class)
                 .hasMessageContaining(MemberErrorCode.NOT_FOUND.getMessage());
     }
 }
