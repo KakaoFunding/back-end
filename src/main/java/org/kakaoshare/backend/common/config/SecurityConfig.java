@@ -19,8 +19,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
     private static final String ORIGIN_PATTERN = "*";
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
+
     public static final String API_V_1 = "/api/v1/";
-    
+
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http.httpBasic().disable()
@@ -29,6 +30,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .requestMatchers(API_V_1 + "oauth/login").permitAll()
                 .requestMatchers(API_V_1 + "categories/**").permitAll()
                 .requestMatchers(API_V_1+"products/**").permitAll()
                 .requestMatchers(PathRequest.toH2Console()).permitAll()//TODO 2024 03 02 19:39:16 : 개발단계 이후 제거 요망

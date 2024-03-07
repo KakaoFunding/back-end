@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.common.service;
+package org.kakaoshare.backend.domain.member.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -6,8 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
+import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
-import org.kakaoshare.backend.jwt.service.UserDetailsServiceImpl;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,13 +39,13 @@ class UserDetailsServiceImplTest {
     @Test
     @DisplayName("이메일을 통해 알맞는 UserDetails 객체 조회")
     void loadByUsername() throws Exception {
-        final String email = member.getEmail();
-        doReturn(Optional.of(member))
+        final String providerId = member.getProviderId();
+        final UserDetails expect = MemberDetails.from(member);
+        doReturn(Optional.of(expect))
                 .when(memberRepository)
-                .findByEmail(email);
+                .findDetailsByProviderId(expect.getUsername());
 
-        final UserDetails expect = new MemberDetails(member);
-        final UserDetails actual = userDetailsService.loadUserByUsername(email);
+        final UserDetails actual = userDetailsService.loadUserByUsername(providerId);
         assertThat(expect)
                 .usingRecursiveComparison()
                 .isEqualTo(actual);
@@ -53,13 +54,13 @@ class UserDetailsServiceImplTest {
     @Test
     @DisplayName("유효하지 않은 이메일인 경우 예외 발생")
     public void loadByUsernameInvalidEmail() throws Exception {
-        final String email = member.getEmail();
+        final String providerId = member.getProviderId();
         doReturn(Optional.empty())
                 .when(memberRepository)
-                .findByEmail(email);
+                .findDetailsByProviderId(providerId);
 
-        assertThatThrownBy(() -> userDetailsService.loadUserByUsername(email))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("유효하지 않은 이메일 입니다.");
+        assertThatThrownBy(() -> userDetailsService.loadUserByUsername(providerId))
+                .isInstanceOf(MemberException.class)
+                .hasMessageContaining(MemberErrorCode.NOT_FOUND.getMessage());
     }
 }
