@@ -18,6 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
     private static final String ORIGIN_PATTERN = "*";
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
+    private static final String API_V_1 = "api/v1/";
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
@@ -27,7 +28,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .requestMatchers("/api/v1/oauth/login").permitAll()
+                .requestMatchers(API_V_1 + "oauth/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .cors();
