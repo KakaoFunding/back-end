@@ -8,12 +8,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 
 
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductDescriptionPhoto extends BaseTimeEntity {
 
     @Id

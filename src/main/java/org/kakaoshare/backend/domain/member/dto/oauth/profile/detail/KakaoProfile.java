@@ -11,17 +11,17 @@ public class KakaoProfile extends OAuthProfile {
 
     @Override
     public String getGender() {
-        return (String) getAccount().get("gender");
+        return String.valueOf(getAccount().get("gender"));
     }
 
     @Override
     public String getName() {
-        return (String) getAccount().get("nickname");
+        return String.valueOf(getAccount().get("name"));
     }
 
     @Override
     public String getPhoneNumber() {
-        return (String) getAccount().get("phone_number");
+        return String.valueOf(getAccount().get("phone_number"));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class KakaoProfile extends OAuthProfile {
 
     @Override
     public String getProviderId() {
-        return (String) attributes.get("id");
+        return String.valueOf(attributes.get("id"));
     }
 
     private Map<String, Object> getAccount() {

@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.member.service.oauth;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.util.MultiValueMapConverter;
 import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,32 +18,37 @@ import java.util.Map;
 public class OAuthWebClientService {
     private final WebClient webClient;
 
-    public OAuthTokenResponse getSocialToken(final ClientRegistration registration,
-                                             final String code) {
+    public Map<String, Object> getSocialProfile(final ClientRegistration registration,
+                                                final String code) {
+        return webClient.get()
+                .uri(getProfileRequestUri(registration))
+                .headers(header -> header.setBearerAuth(getAccessToken(registration, code)))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                })
+                .block();
+    }
+
+    private String getAccessToken(final ClientRegistration registration,
+                                  final String code) {
+        return getSocialToken(registration, code)
+                .access_token();
+    }
+
+    private OAuthTokenResponse getSocialToken(final ClientRegistration registration,
+                                              final String code) {
         return webClient.post()
                 .uri(getSocialTokenRequestUri(registration))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .bodyValue(OAuthTokenRequest.of(registration, code))
+                .bodyValue(MultiValueMapConverter.convert(OAuthTokenRequest.of(registration, code)))
                 .retrieve()
                 .bodyToMono(OAuthTokenResponse.class)
                 .block();
     }
 
-    public Map<String, Object> getSocialProfile(final ClientRegistration registration,
-                                                final String socialToken) {
-        return webClient.get()
-                .uri(getProfileRequestUri(registration))
-                .headers(header -> header.setBearerAuth(socialToken))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
-                })
-                .block();
-
-    }
-
     private String getSocialTokenRequestUri(final ClientRegistration registration) {
-        return registration.getAuthorizationGrantType()
-                .getValue();
+        return registration.getProviderDetails()
+                .getTokenUri();
     }
 
     private String getProfileRequestUri(final ClientRegistration registration) {
