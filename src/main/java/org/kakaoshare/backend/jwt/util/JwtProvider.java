@@ -15,7 +15,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -27,13 +26,15 @@ public class JwtProvider {
     private static final String TYPE_HEADER_KEY = "typ";
     private static final String TYPE_HEADER_VALUE = "JWT";
     private static final String CLAIM_AUTH_KEY = "auth";
-    private static final long EXPIRATION = LocalTime.now().getHour() + 1000L * 60 * 60 * 24;
 
+    private final long expireTime;
     private final Key key;
 
-    public JwtProvider(@Value("${spring.jwt.secret}") final String secret) {
+    public JwtProvider(@Value("${spring.jwt.secret}") final String secret,
+                       @Value("${security.token.access.expire-time}") final long expireTime) {
         final byte[] decodeSecret = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(decodeSecret);
+        this.expireTime = expireTime;
     }
 
     public boolean validateToken(final String token) {
@@ -72,7 +73,7 @@ public class JwtProvider {
 
     private Date getExpiration() {
         final Date now = new Date();
-        return new Date(now.getTime() + EXPIRATION);
+        return new Date(now.getTime() + expireTime);
     }
 
     private JwtParser getJwtParser() {

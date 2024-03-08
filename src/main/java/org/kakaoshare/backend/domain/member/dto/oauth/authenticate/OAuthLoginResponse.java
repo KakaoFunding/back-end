@@ -3,12 +3,11 @@ package org.kakaoshare.backend.domain.member.dto.oauth.authenticate;
 import lombok.Builder;
 
 @Builder
-public record OAuthLoginResponse(String grantType, String accessToken) {
-    public static OAuthLoginResponse of(final String grantType,
-                                        final String accessToken) {
+public record OAuthLoginResponse(String accessToken, OAuthLoginMemberResponse member) {
+    public static OAuthLoginResponse from(final OAuthLoginResult loginResult) {
         return OAuthLoginResponse.builder()
-                .grantType(grantType)
-                .accessToken(accessToken)
+                .accessToken(loginResult.accessToken())
+                .member(loginResult.loginMemberResponse())
                 .build();
     }
 }
