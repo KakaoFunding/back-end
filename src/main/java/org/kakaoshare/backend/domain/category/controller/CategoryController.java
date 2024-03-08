@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.category.api;
+package org.kakaoshare.backend.domain.category.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.category.dto.CategoryDto;
