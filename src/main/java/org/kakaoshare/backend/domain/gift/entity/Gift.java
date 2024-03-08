@@ -21,6 +21,7 @@ public class Gift extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long giftId;
+
     @Column(nullable = false, length = 50)
     private String status;
 
