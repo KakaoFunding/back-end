@@ -1,11 +1,12 @@
 package org.kakaoshare.backend.common.util.sort.error.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
 @Getter
-@RequiredArgsConstructor
-public class UnsupportedSortTypeException extends RuntimeException{
-    private final SortErrorCode errorCode;
+public class UnsupportedSortTypeException extends BusinessException {
+    public UnsupportedSortTypeException(final ErrorCode errorCode) {
+        super(errorCode);
+    }
 }

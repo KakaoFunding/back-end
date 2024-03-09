@@ -5,7 +5,6 @@ import org.kakaoshare.backend.common.error.ErrorCode;
 import org.kakaoshare.backend.common.error.GlobalErrorCode;
 import org.kakaoshare.backend.common.error.exception.BusinessException;
 import org.kakaoshare.backend.common.error.response.ErrorResponse;
-import org.kakaoshare.backend.common.util.sort.error.exception.UnsupportedSortTypeException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +35,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                           final HttpStatusCode status,
                                                                           final WebRequest request) {
         GlobalErrorCode errorCode = GlobalErrorCode.UNSUPPORTED_PARAMETER_NAME;
-        logException(e, errorCode);
-        return handleExceptionInternal(errorCode);
-    }
-    
-    @ExceptionHandler(UnsupportedSortTypeException.class)
-    protected ResponseEntity<?> handleUnsupportedSortTypeException(UnsupportedSortTypeException e) {
-        ErrorCode errorCode = e.getErrorCode();
         logException(e, errorCode);
         return handleExceptionInternal(errorCode);
     }
