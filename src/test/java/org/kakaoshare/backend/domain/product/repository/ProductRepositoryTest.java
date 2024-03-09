@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
-import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

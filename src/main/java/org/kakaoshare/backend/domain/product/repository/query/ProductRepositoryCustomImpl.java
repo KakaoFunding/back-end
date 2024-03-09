@@ -11,7 +11,7 @@ import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.query.QSimpleProductDto;
-import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
