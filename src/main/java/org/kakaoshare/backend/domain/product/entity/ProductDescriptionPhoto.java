@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.product.entity.Product;
 
 
 @Entity
@@ -27,8 +26,8 @@ public class ProductDescriptionPhoto extends BaseTimeEntity {
 
     @Column
     private String photoUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
-
 }

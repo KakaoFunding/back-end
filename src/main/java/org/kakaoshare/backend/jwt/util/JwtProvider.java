@@ -4,22 +4,37 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import org.kakaoshare.backend.jwt.exception.JwtException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Collection;
+import java.util.Date;
+
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.*;
 
 @Component
 public class JwtProvider {
+    private static final String ALGORITHM_HEADER_KEY = "alg";
+    private static final String TYPE_HEADER_KEY = "typ";
+    private static final String TYPE_HEADER_VALUE = "JWT";
+    private static final String CLAIM_AUTH_KEY = "auth";
+
+    private final long expireTime;
     private final Key key;
 
-    public JwtProvider(@Value("${spring.jwt.secret}") final String secret) {
+    public JwtProvider(@Value("${spring.jwt.secret}") final String secret,
+                       @Value("${security.token.access.expire-time}") final long expireTime) {
         final byte[] decodeSecret = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(decodeSecret);
+        this.expireTime = expireTime;
     }
 
     public boolean validateToken(final String token) {
@@ -27,13 +42,13 @@ public class JwtProvider {
             getJwtParser().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new JwtException(INVALID);
         } catch (ExpiredJwtException e) {
-            throw new IllegalArgumentException("만료된 토큰입니다.");
+            throw new JwtException(EXPIRED);
         } catch (UnsupportedJwtException e) {
-            throw new IllegalArgumentException("JWT를 지원하지 않습니다.");
+            throw new JwtException(UNSUPPORTED);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("토큰을 찾을 수 없습니다.");
+            throw new JwtException(NOT_FOUND);
         }
     }
 
@@ -42,6 +57,23 @@ public class JwtProvider {
                 .parseClaimsJws(accessToken)
                 .getBody()
                 .getSubject();
+    }
+
+    public String createAccessToken(final String username, final Collection<? extends GrantedAuthority> authorities) {
+        return Jwts.builder()
+                .setHeaderParam(ALGORITHM_HEADER_KEY, SignatureAlgorithm.HS256.getValue())
+                .setHeaderParam(TYPE_HEADER_KEY, TYPE_HEADER_VALUE)
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(getExpiration())
+                .claim(CLAIM_AUTH_KEY, authorities)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    private Date getExpiration() {
+        final Date now = new Date();
+        return new Date(now.getTime() + expireTime);
     }
 
     private JwtParser getJwtParser() {

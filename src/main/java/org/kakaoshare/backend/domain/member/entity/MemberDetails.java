@@ -8,15 +8,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-import static org.kakaoshare.backend.domain.member.entity.Role.USER;
-
 @RequiredArgsConstructor
 public class MemberDetails implements UserDetails {
-    private final Member member;
+    private final String providerId;
+    private final Role role;
+
+    public static UserDetails from(final Member member) {
+        final String providerId = member.getProviderId();
+        final Role role = member.getRole();
+        return new MemberDetails(providerId, role);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(USER.name()));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
@@ -26,7 +31,7 @@ public class MemberDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return member.getEmail();
+        return providerId;
     }
 
     @Override

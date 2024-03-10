@@ -9,19 +9,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.util.List;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
+import java.util.List;
+
 
 @Entity
 @Getter
+@Table(name = "options")
 public class Option extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long optionId;
+    private Long optionsId;
 
     @Column(nullable = false)
     private String name;
