@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers(API_V_1 + "oauth/logout").authenticated()
                 .requestMatchers(API_V_1 + "categories/**").permitAll()
                 .requestMatchers(API_V_1+"products/**").permitAll()
+                .requestMatchers(API_V_1+"brands/**").permitAll()
                 .requestMatchers(PathRequest.toH2Console()).permitAll()//TODO 2024 03 02 19:39:16 : 개발단계 이후 제거 요망
                 .anyRequest().authenticated()
                 .and()
