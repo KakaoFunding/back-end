@@ -9,7 +9,6 @@ import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,13 +38,8 @@ public class ProductController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getSimpleProductsInfo(@RequestParam("categoryId") Long categoryId,
-                                                   @PageableDefault(size = 20) Pageable pageable){
-        try {
-            Page<SimpleProductDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
-            return ResponseEntity.ok(simpleProductsPage);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<?> getSimpleProductsInfo(@RequestParam("categoryId") Long categoryId, @PageableDefault(size = 20) Pageable pageable) {
+        Page<SimpleProductDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
+        return ResponseEntity.ok(simpleProductsPage);
     }
 }
