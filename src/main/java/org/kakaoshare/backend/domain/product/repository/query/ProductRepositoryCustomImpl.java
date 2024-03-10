@@ -6,12 +6,12 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.common.util.SortUtil;
-import org.kakaoshare.backend.common.util.SortableRepository;
+import org.kakaoshare.backend.common.util.sort.SortUtil;
+import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.entity.query.QSimpleProductDto;
-import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.QSimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +32,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                                       final Pageable pageable) {
         List<SimpleProductDto> fetch = queryFactory
                 .select(new QSimpleProductDto(
+                        product.productId,
                         product.name,
                         product.photo,
                         product.price,

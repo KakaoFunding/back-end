@@ -24,40 +24,28 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
-
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.5.2.RELEASE'
 	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.6.8'
-
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:4.0.4")
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-	implementation 'org.flywaydb:flyway-core'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-
 	annotationProcessor 'org.projectlombok:lombok'
-
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

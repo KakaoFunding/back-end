@@ -18,9 +18,6 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
   security:
     oauth2:
       client:

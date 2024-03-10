@@ -2,9 +2,11 @@ package org.kakaoshare.backend.domain.product.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
+import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,8 +42,7 @@ public class ProductService {
     public Page<SimpleProductDto> getSimpleProductsPage(Long categoryId, Pageable pageable){
         Page<SimpleProductDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable);
         if (productDtos.isEmpty()){
-            //TODO 2024 03 04 16:09:34 : 에러 구체화
-            throw new IllegalArgumentException("빈 페이지 입니다.");
+            throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }
         return productDtos;
     }
