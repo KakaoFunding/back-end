@@ -32,6 +32,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                                       final Pageable pageable) {
         List<SimpleProductDto> fetch = queryFactory
                 .select(new QSimpleProductDto(
+                        product.productId,
                         product.name,
                         product.photo,
                         product.price,
