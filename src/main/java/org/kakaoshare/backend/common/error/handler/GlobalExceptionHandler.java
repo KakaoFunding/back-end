@@ -59,7 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
     }
     
-    private static void logException(final Exception e, final ErrorCode errorCode) {
+    private void logException(final Exception e, final ErrorCode errorCode) {
         log.error(LOG_FORMAT,
                 e.getClass(),
                 errorCode.getHttpStatus().value(),
