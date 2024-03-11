@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -21,6 +22,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Entity
 @Getter
+@Builder
 public class Funding extends BaseTimeEntity {
 
     @Id
