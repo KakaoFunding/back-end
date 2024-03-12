@@ -38,7 +38,7 @@ public class ProductController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getSimpleProductsInfo(@RequestParam("categoryId") Long categoryId, @PageableDefault(size = 20) Pageable pageable) {
+    public ResponseEntity<?> getSimpleProductsInPage(@RequestParam("categoryId") Long categoryId, @PageableDefault(size = 20) Pageable pageable) {
         Page<SimpleProductDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
         return ResponseEntity.ok(simpleProductsPage);
     }
