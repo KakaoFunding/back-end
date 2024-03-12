@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegistrationResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
@@ -28,5 +29,14 @@ public class FundingService {
         Funding funding = fundingRepository.save(request.toEntity(member, product));
 
         return RegistrationResponse.from(funding);
+    }
+
+    public ProgressResponse getFundingProgress(Long fundingId, String providerId) {
+        Member member = memberRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
+        Funding funding = fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
+
+        return ProgressResponse.from(funding);
     }
 }
