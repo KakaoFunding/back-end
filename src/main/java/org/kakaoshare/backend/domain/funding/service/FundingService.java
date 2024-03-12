@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.funding.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
@@ -26,7 +27,14 @@ public class FundingService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
         Member member = memberRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
-        Funding funding = fundingRepository.save(request.toEntity(member, product));
+
+        Optional<Funding> existingFunding = fundingRepository.findByIdAndMemberId(productId, member.getMemberId());
+        if (existingFunding.isPresent() && "Active".equals(existingFunding.get().getStatus())) {
+            throw new IllegalStateException("There is already an active funding for this product and user.");
+        }
+
+        Funding funding = request.toEntity(member, product);
+        funding = fundingRepository.save(funding);
 
         return RegistrationResponse.from(funding);
     }
