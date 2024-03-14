@@ -6,7 +6,8 @@ import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
 import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
+import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProductService {
     private final ProductRepository productRepository;
-
-
+    
+    
     public DescriptionResponse getProductDescription(Long productId) {
         DescriptionResponse descriptionResponse = productRepository.findProductWithDetailsAndPhotos(
                 productId);
@@ -30,7 +31,7 @@ public class ProductService {
         }
         return descriptionResponse;
     }
-
+    
     public DetailResponse getProductDetail(Long productId) {
         DetailResponse detailResponse = productRepository.findProductDetail(productId);
         if (detailResponse == null) {
@@ -39,9 +40,17 @@ public class ProductService {
         return detailResponse;
     }
     
-    public Page<SimpleProductDto> getSimpleProductsPage(Long categoryId, Pageable pageable){
-        Page<SimpleProductDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable);
-        if (productDtos.isEmpty()){
+    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable) {
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable);
+        if (productDtos.isEmpty()) {
+            throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
+        }
+        return productDtos;
+    }
+    
+    public Page<ProductDto> getSimpleProductsByBrandId(Long brandId, Pageable pageable) {
+        Page<ProductDto> productDtos = productRepository.findAllByBrandId(brandId, pageable);
+        if (productDtos.isEmpty()) {
             throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }
         return productDtos;
