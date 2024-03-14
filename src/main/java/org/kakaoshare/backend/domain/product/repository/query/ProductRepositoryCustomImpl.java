@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.kakaoshare.backend.domain.product.entity.QProductDetail.productDetail;
@@ -61,7 +62,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                         product.price)
                 )
                 .from(product)
-                .where(product.brand.brandId.eq(brandId))
+                .join(product.brand,brand)
+                .where(brand.brandId.eq(brandId))
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
