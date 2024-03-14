@@ -1,7 +1,7 @@
 package org.kakaoshare.backend.domain.brand.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
+import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.service.BrandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

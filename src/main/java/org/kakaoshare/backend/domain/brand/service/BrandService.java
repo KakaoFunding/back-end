@@ -3,7 +3,7 @@ package org.kakaoshare.backend.domain.brand.service;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
 import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
-import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
+import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.repository.BrandRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
