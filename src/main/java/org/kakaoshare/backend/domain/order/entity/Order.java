@@ -15,8 +15,6 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.payment.entity.Payment;
-import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -66,4 +64,16 @@ public class Order extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    protected Order() {
+    }
+
+    @Builder
+    public Order(final Integer stockQuantity, final String orderNumber, final Member member, final Product product, final Payment payment) {
+        this.stockQuantity = stockQuantity;
+        this.orderNumber = orderNumber;
+        this.member = member;
+        this.product = product;
+        this.payment = payment;
+    }
 }
