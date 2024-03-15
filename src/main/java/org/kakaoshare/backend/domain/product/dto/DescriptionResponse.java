@@ -8,6 +8,7 @@ import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
+import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 
 @Getter
 @Builder
@@ -18,9 +19,9 @@ public class DescriptionResponse {
     private final String type;
     private final String description;
     private final List<ProductDescriptionPhoto> descriptionPhotos;
-    private final Boolean hasPhoto;
     private final String productName;
     private final List<Option> options;
+    private final List<ProductThumbnail> productThumbnails;
     private final Brand brand;
 
     public static DescriptionResponse from(final Product product) {
@@ -31,7 +32,6 @@ public class DescriptionResponse {
                 .type(product.getType())
                 .description(product.getProductDetail().getDescription())
                 .descriptionPhotos(product.getProductDescriptionPhotos())
-                .hasPhoto(product.getProductDetail().getHasPhoto())
                 .productName(product.getProductDetail().getProductName())
                 .options(product.getOptions())
                 .brand(product.getBrand())
