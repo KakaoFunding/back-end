@@ -40,7 +40,7 @@ import static org.kakaoshare.backend.domain.product.entity.QProductDetail.produc
 @RequiredArgsConstructor
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
-    
+
     @Override
     public Page<SimpleProductDto> findAllByCategoryId(final Long categoryId,
                                                       final Pageable pageable) {
@@ -59,10 +59,10 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        
+
         return new PageImpl<>(fetch, pageable, fetch.size());
     }
-    
+
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
         return Stream.concat(
@@ -106,41 +106,51 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
 
-
-
     @Override
     public DetailResponse findProductDetail(Long productId) {
-        return queryFactory
-                .select(Projections.constructor(DetailResponse.class,
-                        product.productId,
-                        product.name,
-                        product.price,
-                        product.type,
-                        product.productDetail.hasPhoto,
-                        product.productDetail.productName,
-                        product.productDetail.origin,
-                        product.productDetail.manufacturer,
-                        product.productDetail.tel,
-                        product.productDetail.deliverDescription,
-                        product.productDetail.billingNotice,
-                        product.productDetail.caution,
-                        product.options.any(),
-                        product.brand))
-                .from(product)
-                .leftJoin(product.productDetail, productDetail)
-                .where(product.productId.eq(productId))
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
                 .fetchOne();
+
+        List<Option> options = queryFactory
+                .selectFrom(QOption.option)
+                .where(QOption.option.product.productId.eq(productId))
+                .fetch();
+
+        List<ProductThumbnail> thumbnails = queryFactory
+                .selectFrom(QProductThumbnail.productThumbnail)
+                .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
+                .fetch();
+
+        return DetailResponse.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .type(product.getType())
+                .productName(product.getProductDetail().getProductName())
+                .origin(product.getProductDetail().getOrigin())
+                .manufacturer(product.getProductDetail().getManufacturer())
+                .tel(product.getProductDetail().getTel())
+                .deliverDescription(product.getProductDetail().getDeliverDescription())
+                .billingNotice(product.getProductDetail().getBillingNotice())
+                .caution(product.getProductDetail().getCaution())
+                .productThumbnails(thumbnails)
+                .options(options)
+                .brandName(product.getBrand().getName())
+                .build();
     }
-    
+
+
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {
         BooleanExpression isParentCategory = product.brand.category
                 .in(JPAExpressions
                         .select(category)
                         .from(category)
                         .where(category.parent.categoryId.eq(categoryId)));
-        
+
         BooleanExpression isChildCategory = product.brand.category.categoryId.eq(categoryId);
-        
+
         return isChildCategory.or(isParentCategory);
     }
 }
