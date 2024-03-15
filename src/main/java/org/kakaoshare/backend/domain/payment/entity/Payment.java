@@ -35,8 +35,9 @@ public class Payment extends BaseTimeEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal purchasePrice;
 
+    @Builder.Default
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal deliveryPrice;
+    private BigDecimal deliveryPrice = BigDecimal.ZERO;
 
 
 }
