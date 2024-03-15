@@ -18,7 +18,7 @@ public class DetailResponse {
     private final String type;
     private final String productName;
     private final List<Option> options;
-    private final Brand brand;
+    private final String brandName;
     private final String origin;
     private final String manufacturer;
     private final String tel;
@@ -41,7 +41,7 @@ public class DetailResponse {
                 .caution(product.getProductDetail().getCaution())
                 .productThumbnails(product.getProductThumbnails())
                 .options(product.getOptions())
-                .brand(product.getBrand())
+                .brandName(product.getBrand().getName())
                 .build();
     }
 }
