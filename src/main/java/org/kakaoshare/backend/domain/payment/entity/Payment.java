@@ -2,17 +2,18 @@ package org.kakaoshare.backend.domain.payment.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.order.entity.Order;
 
 import java.math.BigDecimal;
+
+import static org.kakaoshare.backend.domain.payment.entity.PaymentMethod.KAKAO_PAY;
 
 
 @Entity
@@ -23,8 +24,10 @@ public class Payment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
 
+    @Builder.Default
     @Column(nullable = false, length = 50)
-    private String method;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod method = KAKAO_PAY;
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal totalPrice;
