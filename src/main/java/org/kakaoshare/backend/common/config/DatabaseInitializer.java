@@ -7,6 +7,7 @@ import org.kakaoshare.backend.domain.category.entity.Category;
 import org.kakaoshare.backend.domain.category.repository.CategoryRepository;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Random;
 
 @Component
 @Profile("dev")
+@EnableJpaAuditing
 @RequiredArgsConstructor
 public class DatabaseInitializer {
     private final CategoryRepository categoryRepository;

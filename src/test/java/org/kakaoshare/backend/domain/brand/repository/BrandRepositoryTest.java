@@ -4,7 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kakaoshare.backend.common.RepositoryTest;
-import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
+import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

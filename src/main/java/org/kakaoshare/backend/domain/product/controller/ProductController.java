@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
+import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,8 +39,16 @@ public class ProductController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getSimpleProductsInPage(@RequestParam("categoryId") Long categoryId, @PageableDefault(size = 20) Pageable pageable) {
-        Page<SimpleProductDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
+    public ResponseEntity<?> getSimpleProductsInPage(@RequestParam("categoryId") Long categoryId,
+                                                     @PageableDefault(size = 20) Pageable pageable) {
+        Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
         return ResponseEntity.ok(simpleProductsPage);
+    }
+    
+    @GetMapping("/brands/{brandId}")
+    public ResponseEntity<?> getBrandsProducts(@PathVariable("brandId") Long brandId,
+                                               @PageableDefault(size = 20)Pageable pageable){
+        Page<ProductDto> simpleProductPage = productService.getSimpleProductsByBrandId(brandId, pageable);
+        return ResponseEntity.ok(simpleProductPage);
     }
 }
