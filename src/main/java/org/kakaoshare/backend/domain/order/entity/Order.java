@@ -46,8 +46,9 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "funding_detail_id")
     private FundingDetail fundingDetail;
 
-    @OneToMany(mappedBy = "order")
-    private List<Payment> payments;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
     @OneToMany(mappedBy = "order")
     private List<Gift> gifts;

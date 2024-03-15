@@ -35,7 +35,5 @@ public class Payment extends BaseTimeEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal deliveryPrice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orders_id", nullable = false)
-    private Order order;
+
 }
