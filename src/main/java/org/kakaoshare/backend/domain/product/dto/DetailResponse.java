@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 
 @Getter
 @Builder
@@ -25,6 +26,7 @@ public class DetailResponse {
     private final String deliverDescription;
     private final String billingNotice;
     private final String caution;
+    private final List<ProductThumbnail> productThumbnails;
     public static DetailResponse from(final Product product) {
         return DetailResponse.builder()
                 .productId(product.getProductId())
