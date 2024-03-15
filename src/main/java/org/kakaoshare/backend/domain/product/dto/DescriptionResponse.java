@@ -33,6 +33,7 @@ public class DescriptionResponse {
                 .description(product.getProductDetail().getDescription())
                 .descriptionPhotos(product.getProductDescriptionPhotos())
                 .productName(product.getProductDetail().getProductName())
+                .productThumbnails(product.getProductThumbnails())
                 .options(product.getOptions())
                 .brand(product.getBrand())
                 .build();
