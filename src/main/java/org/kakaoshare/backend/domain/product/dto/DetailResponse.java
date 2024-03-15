@@ -17,7 +17,6 @@ public class DetailResponse {
     private final BigDecimal price;
     private final String type;
     private final String productName;
-    private final Boolean hasPhoto;
     private final List<Option> options;
     private final Brand brand;
     private final String origin;
@@ -33,7 +32,6 @@ public class DetailResponse {
                 .name(product.getName())
                 .price(product.getPrice())
                 .type(product.getType())
-                .hasPhoto(product.getProductDetail().getHasPhoto())
                 .productName(product.getProductDetail().getProductName())
                 .origin(product.getProductDetail().getOrigin())
                 .manufacturer(product.getProductDetail().getManufacturer())
