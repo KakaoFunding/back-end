@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
