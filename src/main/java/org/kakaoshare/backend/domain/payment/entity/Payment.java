@@ -39,5 +39,12 @@ public class Payment extends BaseTimeEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal deliveryPrice = BigDecimal.ZERO;
 
+    protected Payment() {
+    }
 
+    @Builder
+    public Payment(final BigDecimal totalPrice, final BigDecimal purchasePrice) {
+        this.totalPrice = totalPrice;
+        this.purchasePrice = purchasePrice;
+    }
 }
