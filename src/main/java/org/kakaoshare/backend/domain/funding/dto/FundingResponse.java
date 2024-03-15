@@ -19,7 +19,8 @@ public class FundingResponse {
     private final String productName;
     private final String productImage;
 
-    public static FundingResponse of(Funding funding, Product product) {
+    public static FundingResponse from(Funding funding) {
+        Product product = funding.getProduct();
         String productImage = null;
         if (!product.getProductThumbnails().isEmpty()) {
             productImage = product.getProductThumbnails().get(0).getThumbnailUrl();
