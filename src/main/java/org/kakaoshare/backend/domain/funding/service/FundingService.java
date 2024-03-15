@@ -1,7 +1,10 @@
 package org.kakaoshare.backend.domain.funding.service;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
+import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegistrationResponse;
@@ -11,6 +14,8 @@ import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,4 +52,22 @@ public class FundingService {
 
         return ProgressResponse.from(funding);
     }
+
+    public FundingSliceResponse getMyAllFundingItems(String providerId, Pageable pageable) {
+        Member member = memberRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
+        List<Funding> fundingList = fundingRepository.findAllByMemberId(member.getMemberId());
+        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(),
+                pageable);
+        List<FundingResponse> fundingResponses = allFundingSlices.getContent().stream().map(FundingResponse::from)
+                .toList();
+
+        return FundingSliceResponse.builder()
+                .fundingItems(fundingResponses)
+                .numberOfFundingItems(fundingList.size())
+                .page(allFundingSlices.getPageable().getPageNumber())
+                .isLast(allFundingSlices.isLast())
+                .build();
+    }
+
 }
