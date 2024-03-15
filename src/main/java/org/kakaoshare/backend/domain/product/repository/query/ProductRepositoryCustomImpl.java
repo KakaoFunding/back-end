@@ -8,10 +8,21 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
+import org.kakaoshare.backend.domain.brand.entity.QBrand;
+import org.kakaoshare.backend.domain.option.entity.Option;
+import org.kakaoshare.backend.domain.option.entity.QOption;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.QSimpleProductDto;
 import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
+import org.kakaoshare.backend.domain.product.entity.ProductDetail;
+import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
+import org.kakaoshare.backend.domain.product.entity.QProduct;
+import org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto;
+import org.kakaoshare.backend.domain.product.entity.QProductDetail;
+import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +30,11 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
+import static org.kakaoshare.backend.domain.option.entity.QOption.option;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
+import static org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto.productDescriptionPhoto;
 import static org.kakaoshare.backend.domain.product.entity.QProductDetail.productDetail;
 
 @RequiredArgsConstructor
@@ -56,29 +70,44 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 Stream.of(product.name.asc()) // 기본 정렬 조건
         ).toArray(OrderSpecifier[]::new);
     }
-    
-    @Override
+
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
-        return queryFactory
-                .select(Projections.bean(DescriptionResponse.class,
-                        product.name,
-                        product.price,
-                        product.type,
-                        product.photo,
-                        product.productDetail.description.as("description"),
-                        product.productDescriptionPhotos.as("descriptionPhotos"),
-                        product.productDetail.as("hasPhoto"),
-                        product.productDetail.productName.as("productName"),
-                        product.options,
-                        product.brand))
-                .from(product)
-                .leftJoin(product.productDetail).fetchJoin()
-                .leftJoin(product.productDescriptionPhotos).fetchJoin()
-                .leftJoin(product.options).fetchJoin()
-                .where(product.productId.eq(productId))
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
                 .fetchOne();
+
+        List<Option> options = queryFactory
+                .selectFrom(QOption.option)
+                .where(QOption.option.product.productId.eq(productId))
+                .fetch();
+
+        List<ProductThumbnail> thumbnails = queryFactory
+                .selectFrom(QProductThumbnail.productThumbnail)
+                .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
+                .fetch();
+
+        List<ProductDescriptionPhoto> descriptionPhotos = queryFactory
+                .selectFrom(QProductDescriptionPhoto.productDescriptionPhoto)
+                .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(productId))
+                .fetch();
+
+        // 모든 정보를 하나의 DescriptionResponse 객체로 합칩니다.
+        return DescriptionResponse.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .type(product.getType())
+                .brandName(product.getBrand().getName())
+                .options(options)
+                .productThumbnails(thumbnails)
+                .descriptionPhotos(descriptionPhotos)
+                .build();
     }
-    
+
+
+
+
     @Override
     public DetailResponse findProductDetail(Long productId) {
         return queryFactory

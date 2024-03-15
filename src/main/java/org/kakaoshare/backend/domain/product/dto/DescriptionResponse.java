@@ -22,7 +22,7 @@ public class DescriptionResponse {
     private final String productName;
     private final List<Option> options;
     private final List<ProductThumbnail> productThumbnails;
-    private final Brand brand;
+    private final String brandName;
 
     public static DescriptionResponse from(final Product product) {
         return DescriptionResponse.builder()
@@ -35,7 +35,7 @@ public class DescriptionResponse {
                 .productName(product.getProductDetail().getProductName())
                 .productThumbnails(product.getProductThumbnails())
                 .options(product.getOptions())
-                .brand(product.getBrand())
+                .brandName(product.getBrand().getName())
                 .build();
     }
 }
