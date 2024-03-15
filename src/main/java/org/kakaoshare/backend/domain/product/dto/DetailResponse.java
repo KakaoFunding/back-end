@@ -41,6 +41,7 @@ public class DetailResponse {
                 .deliverDescription(product.getProductDetail().getDeliverDescription())
                 .billingNotice(product.getProductDetail().getBillingNotice())
                 .caution(product.getProductDetail().getCaution())
+                .productThumbnails(product.getProductThumbnails())
                 .options(product.getOptions())
                 .brand(product.getBrand())
                 .build();
