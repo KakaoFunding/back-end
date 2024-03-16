@@ -38,7 +38,7 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer stockQuantity;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 10)
     private String orderNumber;
 
     @Builder.Default
