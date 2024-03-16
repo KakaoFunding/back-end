@@ -5,10 +5,14 @@ import static org.mockito.ArgumentMatchers.any;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegistrationResponse;
@@ -18,12 +22,17 @@ import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
+import org.kakaoshare.backend.fixture.BrandFixture;
 import org.kakaoshare.backend.fixture.FundingFixture;
 import org.kakaoshare.backend.fixture.MemberFixture;
 import org.kakaoshare.backend.fixture.ProductFixture;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.given;
@@ -88,4 +97,24 @@ public class FundingServiceTest {
         verify(fundingRepository).findByIdAndMemberId(fundingId, member.getMemberId());
     }
 
+    @Test
+    @DisplayName("내가 등록한 펀딩아이템 조회 성공")
+    void getMyAllFundingItems_Success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Member member = MemberFixture.KAKAO.생성();
+        Brand brand = BrandFixture.BRAND_C.생성();
+        Product product = ProductFixture.TEST_PRODUCT.브랜드포함생성(brand);
+        List<Funding> fundingList = Arrays.asList(FundingFixture.SAMPLE_FUNDING.생성(member, product),
+                FundingFixture.SAMPLE_FUNDING2.생성(member, product));
+        Slice<Funding> fundingSlice = new SliceImpl<>(fundingList, pageable, false);
+
+        when(memberRepository.findByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
+        when(fundingRepository.findAllByMemberId(member.getMemberId())).thenReturn(fundingList);
+        when(fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(), pageable)).thenReturn(fundingSlice);
+
+        FundingSliceResponse response = fundingService.getMyAllFundingItems(member.getProviderId(), pageable);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getFundingItems()).hasSize(fundingList.size());
+    }
 }
