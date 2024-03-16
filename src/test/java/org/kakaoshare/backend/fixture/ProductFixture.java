@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.fixture;
 
 import java.math.BigDecimal;
+import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
 public enum ProductFixture {
@@ -23,5 +24,15 @@ public enum ProductFixture {
                 .type(type)
                 .build();
     }
+
+    public Product 브랜드포함생성(Brand brand) {
+        return Product.builder()
+                .name(name)
+                .price(price)
+                .type(type)
+                .brand(brand)
+                .build();
+    }
+
 
 }
