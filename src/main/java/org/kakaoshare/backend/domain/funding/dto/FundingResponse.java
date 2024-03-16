@@ -22,7 +22,7 @@ public class FundingResponse {
     public static FundingResponse from(Funding funding) {
         Product product = funding.getProduct();
         String productImage = null;
-        if (!product.getProductThumbnails().isEmpty()) {
+        if (product.getProductThumbnails() != null && !product.getProductThumbnails().isEmpty()) {
             productImage = product.getProductThumbnails().get(0).getThumbnailUrl();
         }
 
@@ -36,6 +36,4 @@ public class FundingResponse {
                 .productImage(productImage)
                 .build();
     }
-
-
 }
