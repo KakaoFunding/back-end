@@ -9,7 +9,9 @@ import org.kakaoshare.backend.domain.funding.entity.QFunding;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class FundingRepositoryCustomImpl implements FundingRepositoryCustom {
     private final JPAQueryFactory queryFactory;
