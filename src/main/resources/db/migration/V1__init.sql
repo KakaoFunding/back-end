@@ -112,13 +112,14 @@ CREATE TABLE `theme`
 
 CREATE TABLE `orders`
 (
-    `orders_id`         BIGINT      NOT NULL AUTO_INCREMENT,
-    `stock_quantity`    BIGINT      NOT NULL,
-    `order_number`      VARCHAR(50) NOT NULL,
-    `status`            VARCHAR(50) NOT NULL,
-    `member_id`         BIGINT      NOT NULL,
-    `product_id`        BIGINT      NOT NULL,
-    `funding_detail_id` BIGINT      NOT NULL,
+    `orders_id`         BIGINT       NOT NULL AUTO_INCREMENT,
+    `stock_quantity`    BIGINT       NOT NULL,
+    `order_number`      VARCHAR(10)  NOT NULL,
+    `status`            VARCHAR(255) NOT NULL,
+    `member_id`         BIGINT       NOT NULL,
+    `product_id`        BIGINT       NOT NULL,
+    `payment_id`        BIGINT       NOT NULL,
+    `funding_detail_id` BIGINT       NOT NULL,
     `created_at`        DATETIME DEFAULT NOW(),
     `updated_at`        DATETIME,
     PRIMARY KEY (`orders_id`)
@@ -127,11 +128,10 @@ CREATE TABLE `orders`
 CREATE TABLE `payment`
 (
     `payment_id`     BIGINT         NOT NULL AUTO_INCREMENT,
-    `method`         VARCHAR(50)    NOT NULL,
+    `method`         VARCHAR(255)   NOT NULL,
     `total_price`    DECIMAL(10, 2) NOT NULL,
     `purchase_price` DECIMAL(10, 2) NOT NULL,
     `delivery_price` DECIMAL(10, 2) NOT NULL,
-    `orders_id`      BIGINT         NOT NULL,
     `created_at`     DATETIME DEFAULT NOW(),
     `updated_at`     DATETIME,
     PRIMARY KEY (`payment_id`)
