@@ -47,4 +47,15 @@ public class Payment extends BaseTimeEntity {
         this.totalPrice = totalPrice;
         this.purchasePrice = purchasePrice;
     }
+
+    @Override
+    public String toString() {
+        return "Payment{" +
+                "paymentId=" + paymentId +
+                ", method=" + method +
+                ", totalPrice=" + totalPrice +
+                ", purchasePrice=" + purchasePrice +
+                ", deliveryPrice=" + deliveryPrice +
+                '}';
+    }
 }
