@@ -76,4 +76,18 @@ public class Order extends BaseTimeEntity {
         this.product = product;
         this.payment = payment;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "ordersId=" + ordersId +
+                ", stockQuantity=" + stockQuantity +
+                ", orderNumber='" + orderNumber + '\'' +
+                ", status=" + status +
+                ", member=" + member +
+                ", fundingDetail=" + fundingDetail +
+                ", payment=" + payment +
+                ", product=" + product +
+                '}';
+    }
 }
