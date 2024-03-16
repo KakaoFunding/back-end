@@ -49,6 +49,11 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Build and Execute FlywayApplication
+        run: |
+          cd ./data-flyway/build/libs
+          java -Dspring.profiles.active=dev -jar data-flyway.jar
+
       - name: Build with Gradle
         run: ./gradlew build -x test -Djasypt.encryptor.password=${{ secrets.APPLICATION_SECRET }}
 
