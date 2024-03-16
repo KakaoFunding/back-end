@@ -51,8 +51,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(WebClientResponseException.class)
     protected ResponseEntity<?> handleWebClientResponseException(final WebClientResponseException exception) {
-        logException(exception, INTERNAL_SERVER_ERROR);
-        log.error("response body = {}", exception.getResponseBodyAsString());   // TODO: 3/15/24 WebClient 관련 예외는 예외 메시지가 아닌 다른 값을 가져와야 하므로 별도로 표현
+        logException(exception, INTERNAL_SERVER_ERROR, exception.getResponseBodyAsString());
         return handleExceptionInternal(INTERNAL_SERVER_ERROR);
     }
     
@@ -74,5 +73,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getClass(),
                 errorCode.getHttpStatus().value(),
                 errorCode.getMessage());
+    }
+
+    /**
+     * ErrorCode가 아닌 예외 객체의 특정 값이 필요한 경우 사용하는 로깅 메서드
+     * @param e 예외 클래스
+     * @param errorCode 에러 코드
+     * @param message 예외 객체의 특정 값
+     */
+    private void logException(final Exception e, final ErrorCode errorCode, final String message) {
+        log.error(LOG_FORMAT,
+                e.getClass(),
+                errorCode.getHttpStatus().value(),
+                message);
     }
 }
