@@ -29,12 +29,13 @@ import java.util.UUID;
 public class PaymentService {
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
+    private final OrderNumberProvider orderNumberProvider;
     private final PaymentRepository paymentRepository;
     private final PaymentWebClientService webClientService;
 
     public PaymentReadyResponse ready(final String providerId,
                                       final List<PaymentReadyRequest> paymentRequests) {
-        final String orderNumber = createOrderNumber();
+        final String orderNumber = orderNumberProvider.createOrderNumber();
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentRequests, orderNumber);
         final List<PaymentDetail> details = extractedDetails(paymentRequests);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), details, kakaoPayReadyResponse.next_redirect_pc_url(), orderNumber);
@@ -96,9 +97,5 @@ public class PaymentService {
     private Member findMemberByProviderId(final String providerId) {
         return memberRepository.findByProviderId(providerId)
                 .orElseThrow(IllegalArgumentException::new);
-    }
-
-    private String createOrderNumber() {
-        return String.valueOf(UUID.randomUUID().toString().hashCode()); // TODO: 3/15/24 주문 번호를 UUID의 해시코드 값으로 설정
     }
 }
