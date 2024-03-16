@@ -93,10 +93,6 @@ public class Product extends BaseTimeEntity {
     @JoinColumn(name = "product_id")
     private List<ProductDescriptionPhoto> productDescriptionPhotos;
 
-    public Product(final Long productId) {
-        this.productId = productId;
-    }
-
     @Override
     public String toString() {
         return "Product{" +
