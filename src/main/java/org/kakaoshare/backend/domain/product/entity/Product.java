@@ -96,4 +96,17 @@ public class Product extends BaseTimeEntity {
     public Product(final Long productId) {
         this.productId = productId;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", type='" + type + '\'' +
+                ", photo='" + photo + '\'' +
+                ", brand=" + brand +
+                ", productDetail=" + productDetail +
+                '}';
+    }
 }
