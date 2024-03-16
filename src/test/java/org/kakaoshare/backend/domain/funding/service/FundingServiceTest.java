@@ -1,12 +1,15 @@
 package org.kakaoshare.backend.domain.funding.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegistrationResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
@@ -21,6 +24,7 @@ import org.kakaoshare.backend.fixture.ProductFixture;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +43,7 @@ public class FundingServiceTest {
 
     @Mock
     private FundingRepository fundingRepository;
+
     @Test
     @DisplayName("성공적으로 펀딩 아이템 등록")
     void registerFundingItem_Success() {
@@ -63,4 +68,24 @@ public class FundingServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(funding.getFundingId());
     }
+
+    @Test
+    @DisplayName("펀딩 진행 상황 조회 성공")
+    void getFundingProgress_Success() {
+        Long fundingId = 1L;
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성();
+        Funding funding = FundingFixture.SAMPLE_FUNDING.생성(member, product);
+
+        given(memberRepository.findByProviderId(member.getProviderId())).willReturn(Optional.of(member));
+        given(fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())).willReturn(Optional.of(funding));
+
+        ProgressResponse response = fundingService.getFundingProgress(fundingId, member.getProviderId());
+
+        assertThat(response).isNotNull();
+
+        verify(memberRepository).findByProviderId(member.getProviderId());
+        verify(fundingRepository).findByIdAndMemberId(fundingId, member.getMemberId());
+    }
+
 }
