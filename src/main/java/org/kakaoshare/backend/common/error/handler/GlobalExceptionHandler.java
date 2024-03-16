@@ -17,7 +17,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static org.kakaoshare.backend.common.error.GlobalErrorCode.WEB_CLIENT_ERROR;
+import static org.kakaoshare.backend.common.error.GlobalErrorCode.INTERNAL_SERVER_ERROR;
 
 @RestControllerAdvice
 @Slf4j
@@ -51,9 +51,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(WebClientResponseException.class)
     protected ResponseEntity<?> handleWebClientResponseException(final WebClientResponseException exception) {
-        logException(exception, WEB_CLIENT_ERROR);
+        logException(exception, INTERNAL_SERVER_ERROR);
         log.error("response body = {}", exception.getResponseBodyAsString());   // TODO: 3/15/24 WebClient 관련 예외는 예외 메시지가 아닌 다른 값을 가져와야 하므로 별도로 표현
-        return handleExceptionInternal(WEB_CLIENT_ERROR);
+        return handleExceptionInternal(INTERNAL_SERVER_ERROR);
     }
     
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
