@@ -7,7 +7,8 @@ import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
 public enum FundingFixture {
-    SAMPLE_FUNDING("ACTIVE", LocalDate.now().plusDays(30), new BigDecimal("1000.00"), new BigDecimal("500.00"));
+    SAMPLE_FUNDING("ACTIVE", LocalDate.now().plusDays(30), new BigDecimal("1000.00"), new BigDecimal("500.00")),
+    SAMPLE_FUNDING2("ACTIVE", LocalDate.now().plusDays(30), new BigDecimal("1000.00"), new BigDecimal("500.00"));
 
     private final String status;
     private final LocalDate expiredAt;
