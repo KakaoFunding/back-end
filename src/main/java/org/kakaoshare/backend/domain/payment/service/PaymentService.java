@@ -7,21 +7,24 @@ import org.kakaoshare.backend.domain.order.dto.OrderSummary;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.PaymentDetail;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
+import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
+import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +35,7 @@ public class PaymentService {
     private final OrderNumberProvider orderNumberProvider;
     private final PaymentRepository paymentRepository;
     private final PaymentWebClientService webClientService;
+    private final ProductRepository productRepository;
 
     public PaymentReadyResponse ready(final String providerId,
                                       final List<PaymentReadyRequest> paymentRequests) {
@@ -70,9 +74,21 @@ public class PaymentService {
                                        final List<PaymentDetail> details,
                                        final String orderNumber,
                                        final Payment payment) {
+        // TODO: 3/16/24 PaymentDetail -> Order 를 만들어주는 별도의 방법 필요. 아래 방법은 불안정
+        final List<Long> productIds = extractedProductIds(details);
+        final Map<Long, Product> productById = findProductsByIdsGroupById(productIds);
         return details.stream()
-                .map(detail -> detail.of(member, orderNumber, payment))
+                .map(detail -> createOrder(member, orderNumber, payment, productById.get(detail.productId()), detail.stockQuantity()))
                 .toList();
+    }
+
+    private Map<Long, Product> findProductsByIdsGroupById(final List<Long> productIds) {
+        return productRepository.findAllById(productIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        Product::getProductId,
+                        product -> product
+                ));
     }
 
     private List<OrderSummary> extractedOrderSummaries(final List<Order> orders) {
@@ -87,10 +103,30 @@ public class PaymentService {
                 .toList();
     }
 
+    private List<Long> extractedProductIds(final List<PaymentDetail> details) {
+        return details.stream()
+                .map(PaymentDetail::productId)
+                .toList();
+    }
+
     private Payment createPayment(final KakaoPayApproveResponse approveResponse) {
         return Payment.builder()
                 .totalPrice(BigDecimal.valueOf(approveResponse.amount().total()))
                 .purchasePrice(BigDecimal.valueOf(approveResponse.amount().total()))
+                .build();
+    }
+
+    private Order createOrder(final Member member,
+                              final String orderNumber,
+                              final Payment payment,
+                              final Product product,
+                              final int stockQuantity) {
+        return Order.builder()
+                .product(product)
+                .member(member)
+                .payment(payment)
+                .orderNumber(orderNumber)
+                .stockQuantity(stockQuantity)
                 .build();
     }
 
