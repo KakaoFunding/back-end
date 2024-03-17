@@ -112,7 +112,7 @@ public class FundingServiceTest {
         when(fundingRepository.findAllByMemberId(member.getMemberId())).thenReturn(fundingList);
         when(fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(), pageable)).thenReturn(fundingSlice);
 
-        FundingSliceResponse response = fundingService.getMyAllFundingItems(member.getProviderId(), pageable);
+        FundingSliceResponse response = fundingService.getMyAllFundingProducts(member.getProviderId(), pageable);
 
         assertThat(response).isNotNull();
         assertThat(response.getFundingItems()).hasSize(fundingList.size());

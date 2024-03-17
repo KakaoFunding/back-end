@@ -40,12 +40,12 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/myFundingItems")
-    public ResponseEntity<?> getMyAllFundingItems(@LoggedInMember String providerId,
+    @GetMapping("/myFundingProducts")
+    public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                   @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                   @RequestParam(value = "size", required = false, defaultValue = "4") int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        FundingSliceResponse response = fundingService.getMyAllFundingItems(providerId, pageRequest);
+        FundingSliceResponse response = fundingService.getMyAllFundingProducts(providerId, pageRequest);
         return ResponseEntity.ok(response);
     }
 }
