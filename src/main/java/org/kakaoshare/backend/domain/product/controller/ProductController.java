@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
+import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,13 +39,16 @@ public class ProductController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getSimpleProductsInfo(@RequestParam("categoryId") Long categoryId,
-                                                   @PageableDefault(size = 20) Pageable pageable){
-        try {
-            Page<SimpleProductDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
-            return ResponseEntity.ok(simpleProductsPage);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<?> getSimpleProductsInPage(@RequestParam("categoryId") Long categoryId,
+                                                     @PageableDefault(size = 20) Pageable pageable) {
+        Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
+        return ResponseEntity.ok(simpleProductsPage);
+    }
+    
+    @GetMapping("/brands/{brandId}")
+    public ResponseEntity<?> getBrandsProducts(@PathVariable("brandId") Long brandId,
+                                               @PageableDefault(size = 20)Pageable pageable){
+        Page<ProductDto> simpleProductPage = productService.getSimpleProductsByBrandId(brandId, pageable);
+        return ResponseEntity.ok(simpleProductPage);
     }
 }

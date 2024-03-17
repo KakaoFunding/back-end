@@ -26,6 +26,7 @@ import static org.springframework.data.domain.Sort.Order;
 public enum SortUtil {
     PRICE(product.price),
     WISH_COUNT(product.wishes.size()),
+    MOST_RECENT(product.createdAt),
     PRODUCT_NAME(product.name);
     
     private final ComparableExpressionBase<?> expression;
