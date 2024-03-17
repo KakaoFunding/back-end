@@ -20,8 +20,8 @@ public class ProgressResponse {
         BigDecimal goalAmount = funding.getGoalAmount();
         BigDecimal accumulateAmount = funding.getAccumulateAmount();
         double progressRate = Optional.of(goalAmount)
-                .filter(ga -> ga.compareTo(BigDecimal.ZERO) != 0)
-                .map(ga -> accumulateAmount.divide(ga, 4, RoundingMode.HALF_UP).doubleValue() * 100)
+                .filter(goalAmountValue -> goalAmountValue.compareTo(BigDecimal.ZERO) != 0)
+                .map(goalAmountValue -> accumulateAmount.divide(goalAmountValue, 4, RoundingMode.HALF_UP).doubleValue() * 100)
                 .orElse(0.0);
         BigDecimal remainAmount = goalAmount.subtract(accumulateAmount);
 
