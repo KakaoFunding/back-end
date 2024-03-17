@@ -9,8 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +23,9 @@ import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.theme.entity.Theme;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 
 @Entity
@@ -91,5 +92,17 @@ public class Product extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private List<ProductDescriptionPhoto> productDescriptionPhotos;
-    
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", type='" + type + '\'' +
+                ", photo='" + photo + '\'' +
+                ", brand=" + brand +
+                ", productDetail=" + productDetail +
+                '}';
+    }
 }
