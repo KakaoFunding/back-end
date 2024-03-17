@@ -54,7 +54,7 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
-    public FundingSliceResponse getMyAllFundingItems(String providerId, Pageable pageable) {
+    public FundingSliceResponse getMyAllFundingProducts(String providerId, Pageable pageable) {
         Member member = memberRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
         List<Funding> fundingList = fundingRepository.findAllByMemberId(member.getMemberId());
