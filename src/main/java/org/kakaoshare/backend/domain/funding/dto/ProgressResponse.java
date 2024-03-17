@@ -10,6 +10,12 @@ import org.kakaoshare.backend.domain.funding.entity.Funding;
 @Getter
 @Builder
 public class ProgressResponse {
+
+    private static final BigDecimal ZERO = BigDecimal.ZERO;
+    private static final int SCALE = 4;
+    private static final double DEFAULT_PROGRESS_RATE = 0.0;
+    private static final double PERCENT_MULTIPLIER = 100.0;
+
     private final Long fundingId;
     private final double progressRate;
     private final BigDecimal remainAmount;
@@ -20,9 +26,11 @@ public class ProgressResponse {
         BigDecimal goalAmount = funding.getGoalAmount();
         BigDecimal accumulateAmount = funding.getAccumulateAmount();
         double progressRate = Optional.of(goalAmount)
-                .filter(goalAmountValue -> goalAmountValue.compareTo(BigDecimal.ZERO) != 0)
-                .map(goalAmountValue -> accumulateAmount.divide(goalAmountValue, 4, RoundingMode.HALF_UP).doubleValue() * 100)
-                .orElse(0.0);
+                .filter(goalAmountValue -> goalAmountValue.compareTo(ZERO) != 0)
+                .map(goalAmountValue ->
+                        accumulateAmount.divide(goalAmountValue, SCALE, RoundingMode.HALF_UP).doubleValue()
+                                * PERCENT_MULTIPLIER)
+                .orElse(DEFAULT_PROGRESS_RATE);
         BigDecimal remainAmount = goalAmount.subtract(accumulateAmount);
 
         return ProgressResponse.builder()
