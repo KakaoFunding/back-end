@@ -3,12 +3,13 @@ package org.kakaoshare.backend.domain.category.service;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.category.dto.CategoryDto;
 import org.kakaoshare.backend.domain.category.entity.Category;
+import org.kakaoshare.backend.domain.category.error.CategoryErrorCode;
+import org.kakaoshare.backend.domain.category.error.exception.CategoryException;
 import org.kakaoshare.backend.domain.category.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,13 +24,13 @@ public class CategoryService {
     
     public CategoryDto getParentCategory(final Long categoryId) {
         Category category = categoryRepository.findParentCategoryWithChildren(categoryId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 카테고리 ID 입니다."));
+                .orElseThrow(() -> new CategoryException(CategoryErrorCode.CATEGORY_NOT_FOUND));
         return CategoryDto.from(category);
     }
     
     public CategoryDto getChildCategory(final Long categoryId, final Long subcategoryId) {
         Category category = categoryRepository.findChildCategoryWithParentCheck(categoryId, subcategoryId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 카테고리 ID 입니다.(부모 카테고리 ID 불일치)"));
+                .orElseThrow(() -> new CategoryException(CategoryErrorCode.INVALID_SUB_CATEGORY_ID));
         return CategoryDto.from(category);
     }
 }

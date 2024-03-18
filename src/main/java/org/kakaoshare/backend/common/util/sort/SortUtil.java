@@ -1,13 +1,14 @@
-package org.kakaoshare.backend.common.util;
+package org.kakaoshare.backend.common.util.sort;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import org.kakaoshare.backend.common.util.OrderByNull;
+import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
+import org.kakaoshare.backend.common.util.sort.error.exception.UnsupportedSortTypeException;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.springframework.data.domain.Sort.Order;
@@ -20,11 +21,12 @@ import static org.springframework.data.domain.Sort.Order;
  * 기본 정렬 조건이 가장 마지막에 들어가야합니다
  *
  * @author sin-yechan
- * @see org.kakaoshare.backend.common.util.SortableRepository
+ * @see SortableRepository
  */
 public enum SortUtil {
     PRICE(product.price),
     WISH_COUNT(product.wishes.size()),
+    MOST_RECENT(product.createdAt),
     PRODUCT_NAME(product.name);
     
     private final ComparableExpressionBase<?> expression;
@@ -49,7 +51,7 @@ public enum SortUtil {
                 SortUtil sortUtil = valueOf(property);
                 orderSpecifiers.add(sortUtil.getOrderSpecifiers(order));
             } catch (IllegalArgumentException e) {
-                //TODO 2024 02 28 18:34:33 : 주어진 속성에 대한 정렬 순서가 열거형에 정의되어 있지 않은 경우
+                throw new UnsupportedSortTypeException(SortErrorCode.UNSUPPORTED_SORT_TYPE);
             }
         });
         
@@ -62,17 +64,5 @@ public enum SortUtil {
             return expression.asc();
         }
         return expression.desc();
-    }
-    
-    public static void checkSortCondition(Pageable pageable) {
-        if(pageable.getSort().get().findAny().isEmpty())
-            return;
-        Arrays.stream(values())
-                .map(Enum::name)
-                .filter(s -> !pageable.getSort().isEmpty())
-                .filter(s -> Objects.nonNull(pageable.getSort().getOrderFor(s)))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("정렬 조건이 맞지 않습니다!"));
-        //TODO 2024 03 04 20:00:28 : 정렬 조건이 맞지 않은 경우 예외 처리 구체화
     }
 }

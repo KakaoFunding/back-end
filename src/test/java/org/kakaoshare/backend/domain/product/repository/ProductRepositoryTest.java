@@ -6,8 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.RepositoryTest;
-import org.kakaoshare.backend.common.util.SortUtil;
-import org.kakaoshare.backend.domain.product.entity.query.SimpleProductDto;
+import org.kakaoshare.backend.common.util.sort.SortUtil;
+import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
+import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
+import org.kakaoshare.backend.domain.product.dto.ProductDto;
+import org.kakaoshare.backend.domain.product.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,20 +44,20 @@ class ProductRepositoryTest {
     void testProductPagination(String order) {
         PageRequest first = PageRequest.of(0, PAGE_SIZE,
                 Direction.ASC, order);
-        Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
+        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
         System.out.println(firstPage.getContent());
         
         Pageable next = first.next();
-        Page<SimpleProductDto> nextPage = productRepository.findAllByCategoryId(CATEGORY_ID, next);
+        Page<Product4DisplayDto> nextPage = productRepository.findAllByCategoryId(CATEGORY_ID, next);
         System.out.println(nextPage.getContent());
         
         assertThat(firstPage.getSize()).isEqualTo(PAGE_SIZE);
         if (order.equals(PRICE)) {
             assertThat(firstPage.getContent())
-                    .isSortedAccordingTo(Comparator.comparing(SimpleProductDto::getPrice));
+                    .isSortedAccordingTo(Comparator.comparing(Product4DisplayDto::getPrice));
         } else if (order.equals(WISH_COUNT)) {
             assertThat(firstPage.getContent())
-                    .isSortedAccordingTo(Comparator.comparing(SimpleProductDto::getWishCount));
+                    .isSortedAccordingTo(Comparator.comparing(Product4DisplayDto::getWishCount));
         }
         assertThat(nextPage.getSize()).isEqualTo(PAGE_SIZE);
     }
@@ -63,8 +66,8 @@ class ProductRepositoryTest {
     @DisplayName("정렬은 기본적으로 상품명을 기준으로 정렬된다")
     void testDefaultPagination() {
         PageRequest first = PageRequest.of(0, PAGE_SIZE);
-        Page<SimpleProductDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
-        assertThat(firstPage.getContent().stream().map(SimpleProductDto::getName).toList())
+        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
+        assertThat(firstPage.getContent().stream().map(Product4DisplayDto::getName).toList())
                 .isSortedAccordingTo(String::compareTo);
     }
     
@@ -73,18 +76,18 @@ class ProductRepositoryTest {
     void testMultipleCondition() {
         Sort sort = Sort.by(Sort.Order.asc(SortUtil.PRICE.name()), Sort.Order.desc(SortUtil.PRODUCT_NAME.name()));
         PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE, sort);
-        Page<SimpleProductDto> page = productRepository.findAllByCategoryId(CATEGORY_ID, pageRequest);
+        Page<Product4DisplayDto> page = productRepository.findAllByCategoryId(CATEGORY_ID, pageRequest);
         page.forEach(System.out::println);
         
-        assertThat(page.getContent().stream().map(SimpleProductDto::getPrice).toList())
+        assertThat(page.getContent().stream().map(Product4DisplayDto::getPrice).toList())
                 .isSortedAccordingTo(BigDecimal::compareTo);
         
-        Map<BigDecimal, List<SimpleProductDto>> groupedByPrice = page.getContent().stream()
-                .collect(Collectors.groupingBy(SimpleProductDto::getPrice));
+        Map<BigDecimal, List<Product4DisplayDto>> groupedByPrice = page.getContent().stream()
+                .collect(Collectors.groupingBy(Product4DisplayDto::getPrice));
         
         groupedByPrice.forEach((price, productsWithSamePrice) -> {
             if (productsWithSamePrice.size() > 1) {
-                assertThat(productsWithSamePrice.stream().map(SimpleProductDto::getName).toList())
+                assertThat(productsWithSamePrice.stream().map(Product4DisplayDto::getName).toList())
                         .isSortedAccordingTo(Comparator.reverseOrder());
             }
         });
@@ -95,11 +98,11 @@ class ProductRepositoryTest {
     void testFindProductsByChildCategoryId() {
         // given
         PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE);
-        Page<SimpleProductDto> productDtos = productRepository.findAllByCategoryId(2L, pageRequest);
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(2L, pageRequest);
         // then
         assertThat(productDtos.getContent().size()).isEqualTo(PAGE_SIZE);
         
-        assertThat(productDtos.map(SimpleProductDto::getBrandName)
+        assertThat(productDtos.map(Product4DisplayDto::getBrandName)
                 .stream().distinct().toList().size()).isEqualTo(PAGE_SIZE / 10 + (PAGE_SIZE % 10 == 0 ? 0 : 1));
     }
     
@@ -108,9 +111,34 @@ class ProductRepositoryTest {
     void testFindProductsByParentCategoryId() {
         // given
         PageRequest pageRequest = PageRequest.of(0, 20000);
-        Page<SimpleProductDto> productDtos = productRepository.findAllByCategoryId(1L, pageRequest);
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(1L, pageRequest);
         // then
         System.out.println(productDtos.getContent().size());
         assertThat(productDtos.getContent().size()).isEqualTo(250);
+    }
+    
+    @Test
+    @DisplayName("브랜드에 등록된 상품들을 조회 가능하다")
+    void testFindAllByBrandId() {
+        // given
+        PageRequest pageRequest = PageRequest.of(0, 20000);
+        Page<ProductDto> productDtos = productRepository.findAllByBrandId(1L, pageRequest);
+        // then
+        assertThat(productDtos.getContent().size()).isEqualTo(10);
+    }
+    
+    @Test
+    @DisplayName("브랜드 상품 목록은 상품 등록 시간으로 정렬 가능하다")
+    void testSortByCreateAt() {
+        // given
+        PageRequest pageRequest = PageRequest.of(0, 20000,Sort.by(SortUtil.MOST_RECENT.name()));
+        // when
+        Page<ProductDto> productPage = productRepository.findAllByBrandId(1L, pageRequest);
+        List<Product> products = productPage.getContent().stream()
+                .map(ProductDto::getProductId)
+                .map(id -> productRepository.findById(id).orElseThrow())
+                .toList();
+        
+        assertThat(products).isSortedAccordingTo(Comparator.comparing(BaseTimeEntity::getCreatedAt));
     }
 }
