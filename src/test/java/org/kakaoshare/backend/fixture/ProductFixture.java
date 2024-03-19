@@ -25,7 +25,7 @@ public enum ProductFixture {
                 .build();
     }
 
-    public Product 브랜드포함생성(Brand brand) {
+    public Product 생성(final Brand brand) {
         return Product.builder()
                 .name(name)
                 .price(price)

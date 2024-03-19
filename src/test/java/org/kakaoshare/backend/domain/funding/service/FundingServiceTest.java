@@ -103,7 +103,7 @@ public class FundingServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Member member = MemberFixture.KAKAO.생성();
         Brand brand = BrandFixture.BRAND_C.생성();
-        Product product = ProductFixture.TEST_PRODUCT.브랜드포함생성(brand);
+        Product product = ProductFixture.TEST_PRODUCT.생성(brand);
         List<Funding> fundingList = Arrays.asList(FundingFixture.SAMPLE_FUNDING.생성(member, product),
                 FundingFixture.SAMPLE_FUNDING2.생성(member, product));
         Slice<Funding> fundingSlice = new SliceImpl<>(fundingList, pageable, false);
