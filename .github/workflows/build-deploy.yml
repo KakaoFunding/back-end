@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - develop
-      - 'releases/**'
+
+  pull_request:
+    branches:
+      - develop
 
 env:
   AWS_REGION: ap-northeast-2
