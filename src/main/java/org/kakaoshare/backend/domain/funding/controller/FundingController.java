@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/funding")
+@RequestMapping("/api/v1")
 public class FundingController {
     private final FundingService fundingService;
 
-    @PostMapping("/{productId}")
+    @PostMapping("/funding/{productId}")
     public ResponseEntity<?> registerFunding(@PathVariable Long productId, @LoggedInMember String providerId,
                                              @RequestBody
                                              RegisterRequest registerRequest) {
@@ -34,13 +34,13 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/myFunding/{fundingId}")
+    @GetMapping("/members/funding/{fundingId}")
     public ResponseEntity<?> getFundingProgress(@PathVariable Long fundingId, @LoggedInMember String providerId) {
         ProgressResponse response = fundingService.getFundingProgress(fundingId, providerId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/myFundingProducts")
+    @GetMapping("/funding/myFundingProducts")
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                   @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                   @RequestParam(value = "size", required = false, defaultValue = "4") int size) {
