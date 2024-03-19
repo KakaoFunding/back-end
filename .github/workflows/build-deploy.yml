@@ -3,7 +3,7 @@ run-name: Running
 on:
   push:
     branches:
-      - production
+      - develop
       - 'releases/**'
 
 env:
