@@ -15,13 +15,6 @@ public class RegisterRequest {
     private LocalDate expiredAt;
 
     public Funding toEntity(Member member, Product product){
-        return Funding.builder()
-                .member(member)
-                .product(product)
-                .goalAmount(this.goalAmount)
-                .expiredAt(this.expiredAt)
-                .accumulateAmount(BigDecimal.ZERO)
-                .status("ACTIVE")
-                .build();
+        return new Funding(member, product, this.goalAmount, this.expiredAt);
     }
 }
