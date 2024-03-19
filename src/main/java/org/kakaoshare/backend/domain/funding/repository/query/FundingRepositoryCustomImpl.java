@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.funding.repository.query;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +21,14 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom {
     public Optional<Funding> findByIdAndMemberId(Long fundingId, Long memberId) {
         Funding funding = queryFactory
                 .selectFrom(QFunding.funding)
-                .where(QFunding.funding.fundingId.eq(fundingId)
-                        .and(QFunding.funding.member.memberId.eq(memberId)))
+                .where(fundingAndMemberPredicate(fundingId, memberId))
                 .fetchOne();
         return Optional.ofNullable(funding);
+    }
+
+    private BooleanExpression fundingAndMemberPredicate(Long fundingId, Long memberId) {
+        return QFunding.funding.fundingId.eq(fundingId)
+                .and(QFunding.funding.member.memberId.eq(memberId));
     }
 
     @Override
