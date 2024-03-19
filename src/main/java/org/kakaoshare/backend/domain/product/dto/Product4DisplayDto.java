@@ -6,7 +6,9 @@ import lombok.Getter;
 @Getter
 public class Product4DisplayDto extends ProductDto {
     private final String brandName;
+    private final boolean isWished;
     private final Long wishCount;
+
     @QueryProjection
     public Product4DisplayDto(final Long productId, final String name,
                               final String photo, final Long price,
@@ -14,6 +16,7 @@ public class Product4DisplayDto extends ProductDto {
         super(productId, name, photo, price);
         this.brandName = brandName;
         this.wishCount = wishCount;
+        this.isWished = false;
     }
     
     @Override
@@ -24,7 +27,8 @@ public class Product4DisplayDto extends ProductDto {
                 ", photo='" + photo + '\'' +
                 ", price=" + price +
                 ", brandName='" + brandName + '\'' +
-                ", wishCount=" + wishCount +
+                ", wishCount=" + wishCount + '\'' +
+                ", isWished=" + isWished +
                 '}';
     }
 }
