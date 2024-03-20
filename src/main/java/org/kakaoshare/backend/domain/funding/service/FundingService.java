@@ -29,8 +29,7 @@ public class FundingService {
     private final MemberRepository memberRepository;
 
     public RegistrationResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+        Product product = findById(productId);
         Member member = findByProviderId(providerId);
 
         Optional<Funding> existingFunding = fundingRepository.findByIdAndMemberId(productId, member.getMemberId());
@@ -73,5 +72,8 @@ public class FundingService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
     }
 
-
+    private Product findById(Long productId){
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+    }
 }
