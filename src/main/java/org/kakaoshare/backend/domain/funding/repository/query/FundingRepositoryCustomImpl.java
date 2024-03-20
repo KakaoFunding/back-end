@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.QFunding;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,18 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FundingRepositoryCustomImpl implements FundingRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public Optional<FundingResponse> findByProductIdAndMemberId(Long productId, Long memberId) {
+
+        Funding funding = queryFactory
+                .selectFrom(QFunding.funding)
+                .where(QFunding.funding.product.productId.eq(productId)
+                        .and(QFunding.funding.member.memberId.eq(memberId)))
+                .fetchOne();
+
+        return Optional.ofNullable(funding).map(FundingResponse::from);
+    }
 
     @Override
     public Optional<Funding> findByIdAndMemberId(Long fundingId, Long memberId) {
