@@ -3,11 +3,11 @@ run-name: Running
 on:
   push:
     branches:
-      - develop
+      - deploy
 
   pull_request:
     branches:
-      - develop
+      - deploy
 
 env:
   AWS_REGION: ap-northeast-2
