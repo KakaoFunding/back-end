@@ -31,8 +31,7 @@ public class FundingService {
     public RegistrationResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
-        Member member = memberRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
+        Member member = findByProviderId(providerId);
 
         Optional<Funding> existingFunding = fundingRepository.findByIdAndMemberId(productId, member.getMemberId());
         if (existingFunding.isPresent() && "Active".equals(existingFunding.get().getStatus())) {
@@ -46,8 +45,7 @@ public class FundingService {
     }
 
     public ProgressResponse getFundingProgress(Long fundingId, String providerId) {
-        Member member = memberRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
+        Member member = findByProviderId(providerId);
         Funding funding = fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
 
@@ -55,8 +53,7 @@ public class FundingService {
     }
 
     public FundingSliceResponse getMyAllFundingProducts(String providerId, Pageable pageable) {
-        Member member = memberRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
+        Member member = findByProviderId(providerId);
         List<Funding> fundingList = fundingRepository.findAllByMemberId(member.getMemberId());
         Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(),
                 pageable);
@@ -70,5 +67,11 @@ public class FundingService {
                 .isLast(allFundingSlices.isLast())
                 .build();
     }
+
+    private Member findByProviderId(String providerId) {
+        return memberRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
+    }
+
 
 }
