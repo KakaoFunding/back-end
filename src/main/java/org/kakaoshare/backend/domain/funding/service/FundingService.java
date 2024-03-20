@@ -32,7 +32,8 @@ public class FundingService {
         Product product = findById(productId);
         Member member = findByProviderId(providerId);
 
-        Optional<Funding> existingFunding = fundingRepository.findByIdAndMemberId(productId, member.getMemberId());
+        Optional<FundingResponse> existingFunding = fundingRepository.findByProductIdAndMemberId(productId,
+                member.getMemberId());
         if (existingFunding.isPresent() && "Active".equals(existingFunding.get().getStatus())) {
             throw new IllegalStateException("There is already an active funding for this product and user.");
         }
@@ -72,7 +73,7 @@ public class FundingService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
     }
 
-    private Product findById(Long productId){
+    private Product findById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
     }
