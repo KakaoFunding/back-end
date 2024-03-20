@@ -1,10 +1,17 @@
 package org.kakaoshare.backend.domain.funding.repository.query;
 
+import static org.kakaoshare.backend.common.util.sort.SortUtil.MOST_RECENT;
+
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+
+import org.kakaoshare.backend.common.util.sort.SortUtil;
+import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.QFunding;
@@ -15,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class FundingRepositoryCustomImpl implements FundingRepositoryCustom {
+public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
@@ -57,7 +64,7 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom {
         List<Funding> content = queryFactory
                 .selectFrom(QFunding.funding)
                 .where(QFunding.funding.member.memberId.eq(memberId))
-                .orderBy(QFunding.funding.fundingId.desc()) // 예시로 ID 내림차순 정렬
+                .orderBy(SortUtil.from(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1) // 다음 페이지 존재 여부 확인을 위해 1 추가
                 .fetch();
@@ -69,5 +76,10 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom {
         }
 
         return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
+        return Stream.concat(Stream.of(SortUtil.from(pageable)), Stream.of(MOST_RECENT)).toArray(OrderSpecifier[]::new);
     }
 }
