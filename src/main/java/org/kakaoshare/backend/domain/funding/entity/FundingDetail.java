@@ -8,12 +8,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.order.entity.Order;
+
+import java.math.BigDecimal;
 
 
 @Entity
@@ -29,9 +27,6 @@ public class FundingDetail extends BaseTimeEntity {
 
     @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal rate;
-
-    @OneToMany(mappedBy = "fundingDetail")
-    private List<Order> orders;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funding_id", nullable = false)
