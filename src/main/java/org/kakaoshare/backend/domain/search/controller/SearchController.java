@@ -28,8 +28,6 @@ public class SearchController {
     public ResponseEntity<?> searchProducts(@LoggedInMember @Nullable final String providerId,
                                             @ModelAttribute final ProductSearchRequest productSearchRequest,
                                             @PageableDefault(size = PRODUCT_DEFAULT_SIZE) final Pageable pageable) {
-        System.out.println(pageable.getOffset());
-        System.out.println(pageable.getPageSize());
         return ResponseEntity.ok(
                 searchService.searchProducts(productSearchRequest, pageable, providerId)
         );
