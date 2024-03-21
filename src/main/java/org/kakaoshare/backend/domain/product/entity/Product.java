@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +17,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
-import org.kakaoshare.backend.domain.category.entity.Category;
+import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.gift.entity.Gift;
+import org.kakaoshare.backend.domain.hashtag.entity.ProductHashtag;
+import org.kakaoshare.backend.domain.option.entity.Option;
+import org.kakaoshare.backend.domain.order.entity.Order;
+import org.kakaoshare.backend.domain.theme.entity.Theme;
+import org.kakaoshare.backend.domain.wish.entity.Wish;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 
 @Entity
@@ -34,35 +44,56 @@ public class Product extends BaseTimeEntity {
     private String name;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private Long price;
+    private BigDecimal price;
 
     @Column(nullable = false, length = 50)
     private String type;
-    
     @Column
     private String photo;
-    
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-    
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_detail_id", nullable = true)//TODO 2024 02 17 19:45:17 : Detail 관련 로직 작성시 nullable=true 설정
     private ProductDetail productDetail;
-    
-    @Column(name = "wish_count")
-    private Integer wishCount;//TODO 2024 03 21 17:11:42 : pre persist 고려
-    
-    @Column(name = "order_count")
-    private Integer orderCount;//TODO 2024 03 21 17:11:33 : pre persist 고려
-    
-    @Column(name = "brand_name")
-    private String brandName;//TODO 2024 03 21 16:29:28 : pre persist 고려
-    
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<Option> options;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<ProductHashtag> productHashtags;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<Wish> wishes;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<Theme> themes;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<Order> orders;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<Gift> gifts;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<Funding> funding;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<ProductThumbnail> productThumbnails;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<ProductDescriptionPhoto> productDescriptionPhotos;
+
     @Override
     public String toString() {
         return "Product{" +
@@ -71,9 +102,8 @@ public class Product extends BaseTimeEntity {
                 ", price=" + price +
                 ", type='" + type + '\'' +
                 ", photo='" + photo + '\'' +
-                ", wishCount=" + wishCount +
-                ", orderCount=" + orderCount +
-                ", brandName='" + brandName + '\'' +
+                ", brand=" + brand +
+                ", productDetail=" + productDetail +
                 '}';
     }
 }
