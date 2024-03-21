@@ -1406,3 +1406,8 @@ INSERT INTO Product (name, price, type, brand_id,created_at) VALUES
     ('Product 125-8', 6700, 'Type A', 125, '2024-03-07 10:05:48'),
     ('Product 125-9', 4100, 'Type A', 125, '2023-05-10 10:05:48'),
     ('Product 125-10', 15500, 'Type A', 125, '2023-05-26 10:05:48');
+
+UPDATE Product
+SET wish_count = FLOOR(1 + (RANDOM() * 10000)),
+    order_count = 0,
+    brand_name = CONCAT('Brand Name ', CAST(brand_id AS VARCHAR));

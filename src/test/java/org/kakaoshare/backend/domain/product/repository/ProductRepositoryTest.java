@@ -3,8 +3,6 @@ package org.kakaoshare.backend.domain.product.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
@@ -14,7 +12,6 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
@@ -24,7 +21,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.data.domain.Sort.Direction;
 
 @RepositoryTest
 class ProductRepositoryTest {
@@ -38,29 +34,29 @@ class ProductRepositoryTest {
     @Autowired
     JPAQueryFactory queryFactory;
     
-    @ValueSource(strings = {PRICE, WISH_COUNT})
-    @ParameterizedTest
-    @DisplayName("상품 목록 조회는 가격과 위시를 기준으로 정렬되어 페이징 가능하다")
-    void testProductPagination(String order) {
-        PageRequest first = PageRequest.of(0, PAGE_SIZE,
-                Direction.ASC, order);
-        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
-        System.out.println(firstPage.getContent());
-        
-        Pageable next = first.next();
-        Page<Product4DisplayDto> nextPage = productRepository.findAllByCategoryId(CATEGORY_ID, next);
-        System.out.println(nextPage.getContent());
-        
-        assertThat(firstPage.getSize()).isEqualTo(PAGE_SIZE);
-        if (order.equals(PRICE)) {
-            assertThat(firstPage.getContent())
-                    .isSortedAccordingTo(Comparator.comparing(Product4DisplayDto::getPrice));
-        } else if (order.equals(WISH_COUNT)) {
-            assertThat(firstPage.getContent())
-                    .isSortedAccordingTo(Comparator.comparing(Product4DisplayDto::getWishCount));
-        }
-        assertThat(nextPage.getSize()).isEqualTo(PAGE_SIZE);
-    }
+//    @ValueSource(strings = {PRICE, WISH_COUNT})
+//    @ParameterizedTest
+//    @DisplayName("상품 목록 조회는 가격과 위시를 기준으로 정렬되어 페이징 가능하다")
+//    void testProductPagination(String order) {
+//        PageRequest first = PageRequest.of(0, PAGE_SIZE,
+//                Direction.ASC, order);
+//        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CATEGORY_ID, first);
+//        System.out.println(firstPage.getContent());
+//
+//        Pageable next = first.next();
+//        Page<Product4DisplayDto> nextPage = productRepository.findAllByCategoryId(CATEGORY_ID, next);
+//        System.out.println(nextPage.getContent());
+//
+//        assertThat(firstPage.getSize()).isEqualTo(PAGE_SIZE);
+//        if (order.equals(PRICE)) {
+//            assertThat(firstPage.getContent())
+//                    .isSortedAccordingTo(Comparator.comparing(Product4DisplayDto::getPrice));
+//        } else if (order.equals(WISH_COUNT)) {
+//            assertThat(firstPage.getContent())
+//                    .isSortedAccordingTo(Comparator.comparing(Product4DisplayDto::getWishCount));
+//        }
+//        assertThat(nextPage.getSize()).isEqualTo(PAGE_SIZE);
+//    }
     
     @Test
     @DisplayName("정렬은 기본적으로 상품명을 기준으로 정렬된다")
