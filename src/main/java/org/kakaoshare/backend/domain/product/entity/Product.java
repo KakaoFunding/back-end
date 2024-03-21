@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.product.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -49,7 +50,7 @@ public class Product extends BaseTimeEntity {
     private String type;
     @Column
     private String photo;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
