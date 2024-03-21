@@ -10,8 +10,8 @@ import org.kakaoshare.backend.domain.search.dto.BrandSearchRequest;
 import org.kakaoshare.backend.domain.search.dto.ProductSearchRequest;
 import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
 import org.kakaoshare.backend.domain.wish.repository.WishRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -30,8 +30,8 @@ public class SearchService {
     public PageResponse<?> searchProducts(final ProductSearchRequest productSearchRequest,
                                           final Pageable pageable,
                                           final String providerId) {
-        final Slice<Product4DisplayDto> slice = findProductsBySearchConditions(productSearchRequest, pageable);
-        return PageResponse.from(slice);
+        final Page<Product4DisplayDto> page = findProductsBySearchConditions(productSearchRequest, pageable);
+        return PageResponse.from(page);
     }
 
     public List<SimpleBrandDto> searchBrands(final BrandSearchRequest brandSearchRequest,
@@ -44,11 +44,11 @@ public class SearchService {
                                                      final Pageable pageable,
                                                      final String providerId) {
         final String keyword = brandSearchRequest.keyword();
-        final Slice<SimpleBrandProductDto> slice = productRepository.findBySearchConditionsGroupByBrand(keyword, pageable);
+        final Page<SimpleBrandProductDto> slice = productRepository.findBySearchConditionsGroupByBrand(keyword, pageable);
         return PageResponse.from(slice);
     }
 
-    private Slice<Product4DisplayDto> findProductsBySearchConditions(final ProductSearchRequest productSearchRequest,
+    private Page<Product4DisplayDto> findProductsBySearchConditions(final ProductSearchRequest productSearchRequest,
                                                                      final Pageable pageable) {
         final String keyword = productSearchRequest.keyword();
         final List<String> categories = productSearchRequest.categories();

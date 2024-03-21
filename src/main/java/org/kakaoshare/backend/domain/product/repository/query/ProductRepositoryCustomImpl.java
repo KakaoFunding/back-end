@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
+import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
@@ -22,9 +23,10 @@ import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
@@ -102,13 +104,21 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     @Override
-    public Slice<Product4DisplayDto> findBySearchConditions(final String keyword,
+    public Page<Product4DisplayDto> findBySearchConditions(final String keyword,
                                                             final Integer minPrice,
                                                             final Integer maxPrice,
                                                             final List<String> categories,
                                                             final Pageable pageable) {
+        final JPAQuery<Long> countQuery = queryFactory.select(product.productId.count())
+                .from(product)
+                .where(
+                        containsExpression(product.name, keyword),
+                        containsExpression(product.price, minPrice, maxPrice)
+//                        containsExpression(category.name, categories)
+                );
+
         // TODO: 3/19/24 카테고리 필터링은 추후 구현 예정
-        final JPAQuery<Product4DisplayDto> jpaQuery = queryFactory.select(getProduct4DisplayDto())
+        final JPAQuery<Product4DisplayDto> contentQuery = queryFactory.select(getProduct4DisplayDto())
                 .from(product)
                 .leftJoin(product.brand, brand)
 //                .leftJoin(brand.category, category)
@@ -118,24 +128,40 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 //                        containsExpression(category.name, categories)
                 )
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
+                .limit(pageable.getPageSize())
                 .orderBy(createOrderSpecifiers(product, pageable));
-        return toSlice(pageable, jpaQuery.fetch());
+        return toPage(pageable, contentQuery, countQuery);
     }
 
     @Override
-    public Slice<SimpleBrandProductDto> findBySearchConditionsGroupByBrand(final String keyword, final Pageable pageable) {
-        final JPAQuery<Long> subQuery = getBrandIdsSubQueryByProductName(keyword);
-        final List<Long> brandIds = extractedBrandIds(pageable, subQuery);
-        final List<SimpleBrandProductDto> transform = queryFactory.selectFrom(brand)
-                .join(product).on(eqExpression(product.brand.brandId, brand.brandId))
-                .where(containsExpression(brand.brandId, brandIds))
+    public Page<SimpleBrandProductDto> findBySearchConditionsGroupByBrand(final String keyword, final Pageable pageable) {
+        final JPAQuery<Long> countQuery = queryFactory.select(product.brand.brandId.countDistinct())
+                .from(product)
+                .where(containsExpression(product.name, keyword));
+        final List<SimpleBrandProductDto> fetch = queryFactory.selectFrom(product)
+                .leftJoin(product.brand, brand)
+                .where(containsExpression(product.name, keyword))
                 .orderBy(createOrderSpecifiers(brand, pageable))
+                .offset(pageable.getOffset())
                 .transform(groupBy(brand.brandId)
                         .list(new QSimpleBrandProductDto(getSimpleBrandDto(), GroupBy.list(getProduct4DisplayDto())))
                 );
 
-        return toSlice(pageable, transform);
+        // TODO: 3/21/24 일단은 메모리에서 페이징하는 것으로 구현
+        final Map<SimpleBrandDto, List<Product4DisplayDto>> productsGroupByBrand = fetch.stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .collect(Collectors.toMap(
+                        SimpleBrandProductDto::brand,
+                        brandProducts -> brandProducts.products().subList(0, Math.min(brandProducts.products().size(), PRODUCT_SIZE_GROUP_BY_BRAND))
+                ));
+
+        final List<SimpleBrandProductDto> content = productsGroupByBrand.keySet()
+                .stream()
+                .map(brand -> new SimpleBrandProductDto(brand, productsGroupByBrand.get(brand)))
+                .toList();
+
+        return toPage(pageable, content, countQuery);
     }
 
     @Override
@@ -174,7 +200,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .where(brand.brandId.in(subQuery))
                 .orderBy(createOrderSpecifiers(brand, pageable))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
+                .limit(pageable.getPageSize())
                 .fetch();
     }
 
