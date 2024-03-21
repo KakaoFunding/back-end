@@ -37,24 +37,21 @@ public class Category extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
     
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", referencedColumnName = "category_id")
     private Category parent;
     
-    @BatchSize(size = 100)//TODO 2024 02 26 21:15:10 : 추후 부모 카테고리당 자식 카테고리 수에 따라 결정하여 최적화
+    @BatchSize(size=100)//TODO 2024 02 26 21:15:10 : 추후 부모 카테고리당 자식 카테고리 수에 따라 결정하여 최적화
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children;
     
-    public boolean isChildEmpty() {
-        return children.isEmpty();
-    }
+    public boolean isChildEmpty() { return children.isEmpty(); }
     
     @Override
     public String toString() {
-        return "Category{" +
-                "categoryId=" + categoryId +
-                ", name='" + name + '\'' +
-                ", parent=" + parent +
+        return "Category{" + '\n' +
+                "categoryId=" + categoryId + '\n' +
+                ", name='" + name + '\n' +
                 '}';
     }
 }
