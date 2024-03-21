@@ -9,11 +9,12 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.jpa.impl.JPAQuery;
 import io.jsonwebtoken.lang.Collections;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -23,13 +24,20 @@ public final class RepositoryUtils {
 
     }
 
-    public static <T> Slice<T> toSlice(final Pageable pageable, final List<T> items) {
-        if (items.size() > pageable.getPageSize()) {
-            items.remove(items.size() - 1);
-            return new SliceImpl<>(items, pageable, true);
+    public static <T> Page<T> toPage(final Pageable pageable, final JPAQuery<T> contentQuery, final JPAQuery<Long> countQuery) {
+        if (countQuery.fetchFirst() == null) {
+            return Page.empty();
         }
 
-        return new SliceImpl<>(items, pageable, false);
+        return PageableExecutionUtils.getPage(contentQuery.fetch(), pageable, countQuery::fetchOne);
+    }
+
+    public static <T> Page<T> toPage(final Pageable pageable, final List<T> content, final JPAQuery<Long> countQuery) {
+        if (countQuery.fetchFirst() == null) {
+            return Page.empty();
+        }
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final T target) {
@@ -63,7 +71,7 @@ public final class RepositoryUtils {
             return numberExpression.loe(max);
         }
 
-        if (max ==  null) {
+        if (max == null) {
             return numberExpression.goe(min);
         }
 

@@ -1,34 +1,24 @@
 package org.kakaoshare.backend.common.dto;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Page;
 
-import java.util.Collections;
 import java.util.List;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class PageResponse<E> {
-    private boolean hasNext;
-    private List<E> items;
+    private final boolean hasNext;
+    private final List<E> items;
+    private final int pageNumber;
+    private final int pageSize;
+    private final int totalPages;
+    private final long totalElements;
+    private final boolean isLast;
 
-    private PageResponse() {
-
-    }
-
-    private PageResponse(final boolean hasNext, final List<E> items) {
-        this.hasNext = hasNext;
-        this.items = items;
-    }
-
-    public static PageResponse<?> of(final boolean hasNext, final List<?> items) {
-        return new PageResponse<>(hasNext, items);
-    }
-
-    public static PageResponse<?> from(final Slice<?> slice) {
-        return new PageResponse<>(slice.hasNext(), slice.getContent());
-    }
-
-    public static PageResponse<?> empty() {
-        return new PageResponse<>(false, Collections.emptyList());
+    public static PageResponse<?> from(final Page<?> page) {
+        return new PageResponse<>(page.hasNext(), page.getContent(), page.getNumber(), page.getSize(), page.getTotalPages(), page.getTotalElements(), page.isLast());
     }
 }
