@@ -17,6 +17,7 @@ public class DetailResponse {
     private final BigDecimal price;
     private final String type;
     private final String productName;
+    private final Boolean hasPhoto;
     private final List<Option> options;
     private final String brandName;
     private final String origin;
@@ -32,6 +33,7 @@ public class DetailResponse {
                 .name(product.getName())
                 .price(product.getPrice())
                 .type(product.getType())
+                .hasPhoto(product.getProductDetail().getHasPhoto())
                 .productName(product.getProductDetail().getProductName())
                 .origin(product.getProductDetail().getOrigin())
                 .manufacturer(product.getProductDetail().getManufacturer())
@@ -39,9 +41,9 @@ public class DetailResponse {
                 .deliverDescription(product.getProductDetail().getDeliverDescription())
                 .billingNotice(product.getProductDetail().getBillingNotice())
                 .caution(product.getProductDetail().getCaution())
-                .productThumbnails(product.getProductThumbnails())
-                .options(product.getOptions())
-                .brandName(product.getBrand().getName())
+                .productThumbnails(null)//TODO 2024 03 25 01:07:03 : 추후 수정 필요
+                .options(null)//TODO 2024 03 21 16:34:14 : 추후 수정 필요
+                .brandName(product.getBrandName())
                 .build();
     }
 }
