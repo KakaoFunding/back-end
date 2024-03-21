@@ -46,7 +46,6 @@ public class DatabaseInitializer {
                     .name("Child Category " + (i + 1))
                     .parent(parent)
                     .children(new ArrayList<>())
-                    .brands(new ArrayList<>())
                     .build();
             parent.getChildren().add(child);
             createBrands(child, 5);
@@ -59,10 +58,8 @@ public class DatabaseInitializer {
                     .builder()
                     .name(category.getName()+" Brand " + (i + 1))
                     .category(category)
-                    .products(new ArrayList<>())
                     .build();
             createProducts(brand, 10);
-            category.getBrands().add(brand);
         }
     }
     
@@ -74,10 +71,8 @@ public class DatabaseInitializer {
                     .name(brand.getName()+" Product " + (i + 1))
                     .price(BigDecimal.valueOf(price))
                     .brand(brand)
-                    .wishes(new ArrayList<>())
                     .type("type"+(i+1))
                     .build();
-            brand.getProducts().add(product);
         }
     }
 }
