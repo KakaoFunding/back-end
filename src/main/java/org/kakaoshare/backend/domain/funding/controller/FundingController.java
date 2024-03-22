@@ -40,7 +40,7 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/funding/myFundingProducts")
+    @GetMapping("/members/funding/myFundingProducts")
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                   @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                   @RequestParam(value = "size", required = false, defaultValue = "4") int size) {
