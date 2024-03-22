@@ -1,20 +1,22 @@
 package org.kakaoshare.backend.domain.brand.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.category.entity.Category;
+import org.kakaoshare.backend.domain.product.entity.Product;
+
+import java.util.List;
 
 
 @Entity
@@ -34,9 +36,8 @@ public class Brand extends BaseTimeEntity {
     @Column
     private String iconPhoto;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @OneToMany(mappedBy = "brand",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Product> products;
 
     @Override
     public String toString() {
@@ -44,7 +45,6 @@ public class Brand extends BaseTimeEntity {
                 "brandId=" + brandId +
                 ", name='" + name + '\'' +
                 ", iconPhoto='" + iconPhoto + '\'' +
-                ", category=" + category +
                 '}';
     }
 }
