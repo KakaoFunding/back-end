@@ -22,18 +22,28 @@ public enum ProductFixture {
         return 생성(null);
     }
 
-    public Product 생성(final Long providerId) {
-        return 생성(providerId, null);
+    public Product 생성(final Long productId) {
+        return 생성(productId, null);
     }
 
-    public Product 생성(final Long providerId,
+    public Product 생성(final Long productId,
                       final Brand brand) {
+        return 생성(productId, brand, this.price);
+    }
+
+    public Product 생성(final Long productId,
+                      final Brand brand,
+                      final BigDecimal price) {
         return Product.builder()
-                .productId(providerId)
+                .productId(productId)
                 .brand(brand)
                 .name(name)
                 .price(price)
                 .type(type)
                 .build();
+    }
+
+    public Product 가격_설정_생성(final BigDecimal price) {
+        return 생성(null, null, price);
     }
 }
