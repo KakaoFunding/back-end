@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.category.entity.Category;
 
 import java.math.BigDecimal;
 
@@ -41,9 +42,13 @@ public class Product extends BaseTimeEntity {
     private String type;
     @Column
     private String photo;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "brand_id", nullable = false)
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+    
+    @ManyToOne
+    @JoinColumn(name = "brand_id",nullable = false)
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -51,10 +56,10 @@ public class Product extends BaseTimeEntity {
     private ProductDetail productDetail;
     
     @Column
-    private int wishCount;
+    private Integer wishCount;//TODO 2024 03 21 17:11:42 : pre persist 고려
     
     @Column
-    private int orderCount;
+    private Integer orderCount;//TODO 2024 03 21 17:11:33 : pre persist 고려
     
     @Column
     private String brandName;//TODO 2024 03 21 16:29:28 : pre persist 고려
