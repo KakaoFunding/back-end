@@ -1,8 +1,11 @@
 package org.kakaoshare.backend.common;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Repository;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.annotation.Documented;
@@ -16,8 +19,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@DataJpaTest(showSql = false)
-@Import(value = {TestQueryDslConfig.class})
+@DataJpaTest(showSql = false, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
+@Import(value = {TestQueryDslConfig.class, TestJpaAuditingConfig.class})
 @ActiveProfiles("test")
 @PropertySource("classpath:/application-test.yml")
 public @interface RepositoryTest {
