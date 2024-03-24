@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
-import org.kakaoshare.backend.domain.category.entity.QCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,19 +22,25 @@ import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 
 @Component
 @RequiredArgsConstructor
-public class BrandRepositoryCustomImpl implements BrandRepositoryCustom,SortableRepository {
+public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
     
     
-    private static BooleanExpression isCondition(final Long categoryId) {
-        BooleanExpression isChildCategory = product.category.categoryId.eq(categoryId);
-        return isChildCategory.or(product.category.parent.categoryId.eq(categoryId));
+    private static BooleanExpression isEqCategoryId(final Long categoryId) {
+        return category.categoryId.eq(categoryId);
     }
     
     @Override
     public Page<SimpleBrandDto> findAllSimpleBrandByCategoryId(final Long categoryId, final Pageable pageable) {
-        QCategory child = new QCategory("child");
-        BooleanExpression isParentCategory = category.parent.categoryId.isNull().and(category.categoryId.eq(categoryId));
+        Long count = countCategory(categoryId);
+        
+        if (count == null || count == 0) {
+            return Page.empty();
+        }
+        
+        BooleanExpression isParent = isEqCategoryId(categoryId).and(category.parent.isNull());
+        
+        BooleanExpression condition = isConditionOf(categoryId, isParent);
         
         List<SimpleBrandDto> fetch = queryFactory
                 .select(new QSimpleBrandDto(
@@ -43,25 +49,48 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom,Sortable
                         brand.iconPhoto))
                 .from(brand)
                 .join(brand.products, product)
-                .leftJoin(product.category, child)
-                .on(isParentCategory)
-                .where(isCondition(categoryId))
+                .where(condition)
                 .distinct()
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
         
-        Long total =queryFactory
+        Long totalElement = countTotalElement(condition);
+        
+        return new PageImpl<>(fetch, pageable, totalElement);
+    }
+    
+    @Nullable
+    private Long countTotalElement(final BooleanExpression condition) {
+        return queryFactory
                 .select(brand.countDistinct())
                 .from(brand)
                 .join(brand.products, product)
-                .leftJoin(product.category, child)
-                .on(isParentCategory)
-                .where(isCondition(categoryId))
+                .where(condition)
+                .fetchOne();
+    }
+    
+    private BooleanExpression isConditionOf(final Long categoryId, final BooleanExpression isParent) {
+        BooleanExpression condition;
+        Long parentCount = queryFactory.select(category.countDistinct())
+                .from(category)
+                .where(isParent)
                 .fetchOne();
         
-        return new PageImpl<>(fetch, pageable, total);
+        if (parentCount > 0L) {
+            condition = product.category.parent.categoryId.eq(categoryId);
+        } else {
+            condition = product.category.categoryId.eq(categoryId);
+        }
+        return condition;
+    }
+    
+    private Long countCategory(final Long categoryId) {
+        return queryFactory.select(category.countDistinct())
+                .from(category)
+                .where(isEqCategoryId(categoryId))
+                .fetchOne();
     }
     
     @Override
