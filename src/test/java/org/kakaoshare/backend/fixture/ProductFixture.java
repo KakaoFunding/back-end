@@ -28,14 +28,11 @@ public enum ProductFixture {
         return 생성(productId, null);
     }
 
-    public Product 생성(final Long productId,
-                      final Brand brand) {
+    public Product 생성(final Long productId, final Brand brand) {
         return 생성(productId, brand, this.price);
     }
 
-    public Product 생성(final Long productId,
-                      final Brand brand,
-                      final BigDecimal price) {
+    public Product 생성(final Long productId, final Brand brand, final BigDecimal price) {
         return Product.builder()
                 .productId(productId)
                 .brand(brand)

@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.fixture;
 
+
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 
 public enum BrandFixture {
@@ -23,3 +24,4 @@ public enum BrandFixture {
                 .build();
     }
 }
+

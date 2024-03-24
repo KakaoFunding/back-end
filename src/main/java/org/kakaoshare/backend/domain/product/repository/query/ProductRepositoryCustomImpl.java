@@ -2,7 +2,6 @@ package org.kakaoshare.backend.domain.product.repository.query;
 
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -12,12 +11,20 @@ import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
+import org.kakaoshare.backend.domain.option.entity.Option;
+import org.kakaoshare.backend.domain.option.entity.QOption;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.dto.QProduct4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.QProductDto;
+import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
+import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
+import org.kakaoshare.backend.domain.product.entity.QProduct;
+import org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto;
+import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
 import org.kakaoshare.backend.domain.search.dto.QSimpleBrandProductDto;
 import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
 import org.springframework.data.domain.Page;
@@ -34,7 +41,6 @@ import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
-import static org.kakaoshare.backend.domain.product.entity.QProductDetail.productDetail;
 
 @RequiredArgsConstructor
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, SortableRepository {
@@ -53,7 +59,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
 
         return new PageImpl<>(fetch, pageable, fetch.size());
     }
@@ -77,30 +82,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .fetch();
 
         return new PageImpl<>(fetch, pageable, fetch.size());
-    }
-
-    @Override
-    public DetailResponse findProductDetail(Long productId) {
-        return queryFactory
-                .select(Projections.constructor(DetailResponse.class,
-                        product.productId,
-                        product.name,
-                        product.price,
-                        product.type,
-                        product.productDetail.hasPhoto,
-                        product.productDetail.productName,
-                        product.productDetail.origin,
-                        product.productDetail.manufacturer,
-                        product.productDetail.tel,
-                        product.productDetail.deliverDescription,
-                        product.productDetail.billingNotice,
-                        product.productDetail.caution,
-                        product.options.any(),
-                        product.brand))
-                .from(product)
-                .leftJoin(product.productDetail, productDetail)
-                .where(product.productId.eq(productId))
-                .fetchOne();
     }
 
     @Override
@@ -166,24 +147,72 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
     @Override
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
-        return queryFactory
-                .select(Projections.bean(DescriptionResponse.class,
-                        product.name,
-                        product.price,
-                        product.type,
-                        product.photo,
-                        product.productDetail.description.as("description"),
-                        product.productDescriptionPhotos.as("descriptionPhotos"),
-                        product.productDetail.as("hasPhoto"),
-                        product.productDetail.productName.as("productName"),
-                        product.options,
-                        product.brand))
-                .from(product)
-                .leftJoin(product.productDetail).fetchJoin()
-                .leftJoin(product.productDescriptionPhotos).fetchJoin()
-                .leftJoin(product.options).fetchJoin()
-                .where(product.productId.eq(productId))
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
                 .fetchOne();
+
+        List<Option> options = queryFactory
+                .selectFrom(QOption.option)
+                .where(QOption.option.product.productId.eq(productId))
+                .fetch();
+
+        List<ProductThumbnail> thumbnails = queryFactory
+                .selectFrom(QProductThumbnail.productThumbnail)
+                .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
+                .fetch();
+
+        List<ProductDescriptionPhoto> descriptionPhotos = queryFactory
+                .selectFrom(QProductDescriptionPhoto.productDescriptionPhoto)
+                .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(productId))
+                .fetch();
+
+        // 모든 정보를 하나의 DescriptionResponse 객체로 합칩니다.
+        return DescriptionResponse.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .type(product.getType())
+                .brandName(product.getBrand().getName())
+                .options(options)
+                .productThumbnails(thumbnails)
+                .descriptionPhotos(descriptionPhotos)
+                .build();
+    }
+
+    @Override
+    public DetailResponse findProductDetail(Long productId) {
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
+                .fetchOne();
+
+        List<Option> options = queryFactory
+                .selectFrom(QOption.option)
+                .where(QOption.option.product.productId.eq(productId))
+                .fetch();
+
+        List<ProductThumbnail> thumbnails = queryFactory
+                .selectFrom(QProductThumbnail.productThumbnail)
+                .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
+                .fetch();
+
+        return DetailResponse.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .type(product.getType())
+                .productName(product.getProductDetail().getProductName())
+                .origin(product.getProductDetail().getOrigin())
+                .manufacturer(product.getProductDetail().getManufacturer())
+                .tel(product.getProductDetail().getTel())
+                .deliverDescription(product.getProductDetail().getDeliverDescription())
+                .billingNotice(product.getProductDetail().getBillingNotice())
+                .caution(product.getProductDetail().getCaution())
+                .productThumbnails(thumbnails)
+                .options(options)
+                .brandName(product.getBrand().getName())
+                .build();
     }
 
     @Override
@@ -192,26 +221,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 Stream.of(SortUtil.from(pageable)),
                 Stream.of(product.name.asc()) // 기본 정렬 조건
         ).toArray(OrderSpecifier[]::new);
-    }
-
-    private List<Long> extractedBrandIds(final Pageable pageable, final JPAQuery<Long> subQuery) {
-        return queryFactory.select(brand.brandId)
-                .from(brand)
-                .where(brand.brandId.in(subQuery))
-                .orderBy(createOrderSpecifiers(brand, pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-    }
-
-    private JPAQuery<Long> getBrandIdsSubQueryByProductName(final String keyword) {
-        return queryFactory.select(product.brand.brandId)
-                .from(product)
-                .where(containsExpression(product.name, keyword))
-                .groupBy(product.brand.brandId);
-//                .orderBy(product.brand.brandId.asc())
-//                .limit(PRODUCT_SIZE_GROUP_BY_BRAND);
-        // TODO: 3/19/24 서브쿼리 LIMIT 이 적용이 안되서 주석 처리
     }
 
     private QSimpleBrandDto getSimpleBrandDto() {
@@ -230,16 +239,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 product.brand.name.as("brandName"),
                 product.wishes.size().longValue().as("wishCount"));
     }
-    
+
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {
         BooleanExpression isParentCategory = product.brand.category
                 .in(JPAExpressions
                         .select(category)
                         .from(category)
                         .where(category.parent.categoryId.eq(categoryId)));
-        
+
         BooleanExpression isChildCategory = product.brand.category.categoryId.eq(categoryId);
-        
+
         return isChildCategory.or(isParentCategory);
     }
 }
