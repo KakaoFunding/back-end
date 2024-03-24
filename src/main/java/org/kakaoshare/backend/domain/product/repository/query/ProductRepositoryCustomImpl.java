@@ -45,8 +45,12 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        
-        return new PageImpl<>(fetch, pageable, fetch.size());
+        Long total = queryFactory
+                .select(product.countDistinct())
+                .from(product)
+                .where(categoryIdEqualTo(categoryId))
+                .fetchOne();
+        return new PageImpl<>(fetch, pageable, total);
     }
     
     @Override
@@ -67,7 +71,13 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .limit(pageable.getPageSize())
                 .fetch();
         
-        return new PageImpl<>(fetch, pageable, fetch.size());
+        Long total = queryFactory
+                .select(product.countDistinct())
+                .from(product)
+                .join(product.brand, brand)
+                .where(brand.brandId.eq(brandId))
+                .fetchOne();
+        return new PageImpl<>(fetch, pageable, total);
     }
     
     @Override
@@ -127,14 +137,14 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
     
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {
-        BooleanExpression isParentCategory = product.brand.category
+        BooleanExpression isParentCategory = product.category
                 .in(JPAExpressions
                         .select(category)
                         .from(category)
                         .where(category.parent.categoryId.eq(categoryId)));
-        
-        BooleanExpression isChildCategory = product.brand.category.categoryId.eq(categoryId);
-        
+
+        BooleanExpression isChildCategory = product.category.categoryId.eq(categoryId);
+
         return isChildCategory.or(isParentCategory);
     }
 }
