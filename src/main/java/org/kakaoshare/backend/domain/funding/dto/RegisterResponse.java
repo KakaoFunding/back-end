@@ -6,11 +6,11 @@ import org.kakaoshare.backend.domain.funding.entity.Funding;
 
 @Getter
 @Builder
-public class RegistrationResponse {
+public class RegisterResponse {
     private final Long id;
 
-    public static RegistrationResponse from(Funding funding) {
-        return RegistrationResponse.builder()
+    public static RegisterResponse from(Funding funding) {
+        return RegisterResponse.builder()
                 .id(funding.getFundingId())
                 .build();
     }

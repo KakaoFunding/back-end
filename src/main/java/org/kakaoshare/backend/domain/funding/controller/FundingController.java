@@ -1,17 +1,14 @@
 package org.kakaoshare.backend.domain.funding.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
-import org.kakaoshare.backend.domain.funding.dto.RegistrationResponse;
+import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.service.FundingService;
-import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +27,7 @@ public class FundingController {
     public ResponseEntity<?> registerFunding(@PathVariable Long productId, @LoggedInMember String providerId,
                                              @RequestBody
                                              RegisterRequest registerRequest) {
-        RegistrationResponse response = fundingService.registerFundingItem(productId, providerId, registerRequest);
+        RegisterResponse response = fundingService.registerFundingItem(productId, providerId, registerRequest);
         return ResponseEntity.ok(response);
     }
 

@@ -8,7 +8,7 @@ import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
-import org.kakaoshare.backend.domain.funding.dto.RegistrationResponse;
+import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -28,7 +28,7 @@ public class FundingService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
 
-    public RegistrationResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
+    public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
         Product product = findById(productId);
         Member member = findByProviderId(providerId);
 
@@ -41,7 +41,7 @@ public class FundingService {
         Funding funding = request.toEntity(member, product);
         funding = fundingRepository.save(funding);
 
-        return RegistrationResponse.from(funding);
+        return RegisterResponse.from(funding);
     }
 
     public ProgressResponse getFundingProgress(Long fundingId, String providerId) {

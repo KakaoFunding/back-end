@@ -15,7 +15,7 @@ import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
-import org.kakaoshare.backend.domain.funding.dto.RegistrationResponse;
+import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -72,7 +72,7 @@ public class FundingServiceTest {
         given(fundingRepository.findByIdAndMemberId(any(), any())).willReturn(Optional.empty());
         given(fundingRepository.save(any(Funding.class))).willReturn(funding);
 
-        RegistrationResponse response = fundingService.registerFundingItem(productId, providerId, request);
+        RegisterResponse response = fundingService.registerFundingItem(productId, providerId, request);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(funding.getFundingId());
