@@ -48,9 +48,11 @@ public class Product extends BaseTimeEntity {
 
     @Column(nullable = false, length = 50)
     private String type;
+
     @Column
     private String photo;
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 

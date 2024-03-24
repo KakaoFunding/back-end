@@ -1,6 +1,5 @@
 package org.kakaoshare.backend.fixture;
 
-
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
@@ -25,14 +24,17 @@ public enum ProductFixture {
         return 생성(null);
     }
 
-    public Product 생성(final Long providerId) {
-        return 생성(providerId, null);
+    public Product 생성(final Long productId) {
+        return 생성(productId, null);
     }
 
-    public Product 생성(final Long providerId,
-                      final Brand brand) {
+    public Product 생성(final Long productId, final Brand brand) {
+        return 생성(productId, brand, this.price);
+    }
+
+    public Product 생성(final Long productId, final Brand brand, final BigDecimal price) {
         return Product.builder()
-                .productId(providerId)
+                .productId(productId)
                 .brand(brand)
                 .name(name)
                 .price(price)
@@ -40,4 +42,15 @@ public enum ProductFixture {
                 .build();
     }
 
+    public Product 브랜드_설정_생성(final Brand brand) {
+        return 생성(null, brand);
+    }
+
+    public Product 가격_설정_생성(final BigDecimal price) {
+        return 생성(null, null, price);
+    }
+
+    public Product 브랜드_가격_설정_생성(final Brand brand, final BigDecimal price) {
+        return 생성(null, brand, price);
+    }
 }

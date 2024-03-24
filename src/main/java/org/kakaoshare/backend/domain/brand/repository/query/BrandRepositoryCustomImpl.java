@@ -16,19 +16,21 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
+import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 
 @Component
 @RequiredArgsConstructor
-public class BrandRepositoryCustomImpl implements BrandRepositoryCustom,SortableRepository {
+public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
-    
-    
+
     @Override
     public Page<SimpleBrandDto> findAllSimpleBrandByCategoryId(final Long categoryId,
-                                                            final Pageable pageable) {
-        List<SimpleBrandDto> fetch = queryFactory
+                                                               final Pageable pageable) {
+        final List<SimpleBrandDto> fetch = queryFactory
                 .select(new QSimpleBrandDto(
                         brand.brandId,
                         brand.name,
@@ -43,7 +45,26 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom,Sortable
         
         return new PageImpl<>(fetch, pageable, fetch.size());
     }
-    
+
+    @Override
+    public List<SimpleBrandDto> findBySearchConditions(final String keyword, final Pageable pageable) {
+        return queryFactory.select(getSimpleBrandDto())
+                .from(brand)
+                .leftJoin(product).on(product.brand.eq(brand))
+                .where(containsExpression(product.name, keyword))
+                .orderBy(createOrderSpecifiers(brand, pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
+
+    private QSimpleBrandDto getSimpleBrandDto() {
+        return new QSimpleBrandDto(
+                brand.brandId,
+                brand.name,
+                brand.iconPhoto);
+    }
+
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {
         BooleanExpression isParentCategory = brand.category
                 .in(JPAExpressions

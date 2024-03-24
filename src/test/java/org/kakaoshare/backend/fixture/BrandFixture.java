@@ -4,7 +4,8 @@ package org.kakaoshare.backend.fixture;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 
 public enum BrandFixture {
-    STARBUCKS("스타벅스");
+    STARBUCKS("스타벅스"),
+    EDIYA("이디야");
 
     private final String name;
 
