@@ -42,7 +42,15 @@ public enum ProductFixture {
                 .build();
     }
 
+    public Product 브랜드_설정_생성(final Brand brand) {
+        return 생성(null, brand);
+    }
+
     public Product 가격_설정_생성(final BigDecimal price) {
         return 생성(null, null, price);
+    }
+
+    public Product 브랜드_가격_설정_생성(final Brand brand, final BigDecimal price) {
+        return 생성(null, brand, price);
     }
 }
