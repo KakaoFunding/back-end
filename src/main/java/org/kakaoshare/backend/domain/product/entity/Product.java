@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.product.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,8 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +24,9 @@ import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.theme.entity.Theme;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 
 @Entity
@@ -52,7 +54,7 @@ public class Product extends BaseTimeEntity {
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_detail_id", nullable = true)//TODO 2024 02 17 19:45:17 : Detail 관련 로직 작성시 nullable=true 설정
     private ProductDetail productDetail;
 
@@ -91,5 +93,17 @@ public class Product extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private List<ProductDescriptionPhoto> productDescriptionPhotos;
-    
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", type='" + type + '\'' +
+                ", photo='" + photo + '\'' +
+                ", brand=" + brand +
+                ", productDetail=" + productDetail +
+                '}';
+    }
 }
