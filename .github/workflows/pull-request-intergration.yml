@@ -54,7 +54,7 @@ jobs:
 
       - name: Build and Execute FlywayApplication
         run: |
-          cd ./build/libs
+          cd ./data-flyway/build/libs
           java -Dspring.profiles.active=dev -jar data-flyway.jar
 
       - name: Test with Gradle
