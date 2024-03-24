@@ -34,13 +34,13 @@ class ProductRepositoryCustomImplTest {
     @Test
     @DisplayName("상품명으로 상품 조회")
     public void findBySearchConditions() throws Exception {
-        final Brand starbucks = STARBUCKS.생성(1L);
-        final Product starbucksCake = CAKE.생성(1L, starbucks);
-        final Product starbucksCoffee = COFFEE.생성(2L, starbucks);
+        final Brand starbucks = STARBUCKS.생성();
+        final Product starbucksCake = CAKE.브랜드_설정_생성(starbucks);
+        final Product starbucksCoffee = COFFEE.브랜드_설정_생성(starbucks);
 
-        final Brand ediya = EDIYA.생성(2L);
-        final Product ediyaCake = CAKE.생성(3L, ediya);
-        final Product ediyaCoffee = COFFEE.생성(4L, ediya);
+        final Brand ediya = EDIYA.생성();
+        final Product ediyaCake = CAKE.브랜드_설정_생성(ediya);
+        final Product ediyaCoffee = COFFEE.브랜드_설정_생성(ediya);
 
         productRepository.save(starbucksCake);
         productRepository.save(starbucksCoffee);
@@ -61,13 +61,13 @@ class ProductRepositoryCustomImplTest {
     @Test
     @DisplayName("상품명으로 상품 조회 낮은 가격 순")
     public void findBySearchConditionsOrderByPriceAsc() throws Exception {
-        final Brand starbucks = STARBUCKS.생성(1L);
-        final Product starbucksCoffee1 = COFFEE.생성(1L, starbucks, BigDecimal.valueOf(7_000));
-        final Product starbucksCoffee2 = COFFEE.생성(2L, starbucks, BigDecimal.valueOf(8_000));
+        final Brand starbucks = STARBUCKS.생성();
+        final Product starbucksCoffee1 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(7_000));
+        final Product starbucksCoffee2 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(8_000));
 
-        final Brand ediya = EDIYA.생성(2L);
-        final Product ediyaCoffee1 = COFFEE.생성(3L, ediya, BigDecimal.valueOf(9_000));
-        final Product ediyaCoffee2 = COFFEE.생성(4L, ediya, BigDecimal.valueOf(10_000));
+        final Brand ediya = EDIYA.생성();
+        final Product ediyaCoffee1 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(9_000));
+        final Product ediyaCoffee2 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(10_000));
 
         productRepository.save(starbucksCoffee1);
         productRepository.save(starbucksCoffee2);
@@ -93,13 +93,13 @@ class ProductRepositoryCustomImplTest {
     @Test
     @DisplayName("상품명으로 조회 높은 가격 순")
     public void findBySearchConditionsOrderByPriceDesc() throws Exception {
-        final Brand starbucks = STARBUCKS.생성(1L);
-        final Product starbucksCoffee1 = COFFEE.생성(1L, starbucks, BigDecimal.valueOf(10_000));
-        final Product starbucksCoffee2 = COFFEE.생성(2L, starbucks, BigDecimal.valueOf(9_000));
+        final Brand starbucks = STARBUCKS.생성();
+        final Product starbucksCoffee1 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(10_000));
+        final Product starbucksCoffee2 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(9_000));
 
-        final Brand ediya = EDIYA.생성(2L);
-        final Product ediyaCoffee1 = COFFEE.생성(3L, ediya, BigDecimal.valueOf(8_000));
-        final Product ediyaCoffee2 = COFFEE.생성(4L, ediya, BigDecimal.valueOf(7_000));
+        final Brand ediya = EDIYA.생성();
+        final Product ediyaCoffee1 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(8_000));
+        final Product ediyaCoffee2 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(7_000));
 
         productRepository.save(starbucksCoffee1);
         productRepository.save(starbucksCoffee2);
@@ -125,13 +125,13 @@ class ProductRepositoryCustomImplTest {
     @Test
     @DisplayName("상품명으로 조회 후 브랜드별 그룹핑")
     public void findBySearchConditionsGroupByBrand() throws Exception {
-        final Brand starbucks = STARBUCKS.생성(1L);
-        final Product starbucksCoffee1 = COFFEE.생성(1L, starbucks);
-        final Product starbucksCoffee2 = COFFEE.생성(2L, starbucks);
+        final Brand starbucks = STARBUCKS.생성();
+        final Product starbucksCoffee1 = COFFEE.브랜드_설정_생성(starbucks);
+        final Product starbucksCoffee2 = COFFEE.브랜드_설정_생성(starbucks);
 
-        final Brand ediya = EDIYA.생성(2L);
-        final Product ediyaCoffee1 = COFFEE.생성(3L, ediya);
-        final Product ediyaCoffee2 = COFFEE.생성(4L, ediya);
+        final Brand ediya = EDIYA.생성();
+        final Product ediyaCoffee1 = COFFEE.브랜드_설정_생성(ediya);
+        final Product ediyaCoffee2 = COFFEE.브랜드_설정_생성(ediya);
 
         productRepository.save(starbucksCoffee1);
         productRepository.save(starbucksCoffee2);
