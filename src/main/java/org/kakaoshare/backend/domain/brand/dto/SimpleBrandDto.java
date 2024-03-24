@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.brand.entity.query;
+package org.kakaoshare.backend.domain.brand.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;

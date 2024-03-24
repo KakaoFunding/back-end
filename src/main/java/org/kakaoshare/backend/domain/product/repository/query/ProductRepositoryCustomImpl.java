@@ -23,6 +23,10 @@ import org.kakaoshare.backend.domain.product.entity.QProduct;
 import org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto;
 import org.kakaoshare.backend.domain.product.entity.QProductDetail;
 import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
+import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
+import org.kakaoshare.backend.domain.product.dto.ProductDto;
+import org.kakaoshare.backend.domain.product.dto.QProduct4DisplayDto;
+import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -42,17 +46,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<SimpleProductDto> findAllByCategoryId(final Long categoryId,
-                                                      final Pageable pageable) {
-        List<SimpleProductDto> fetch = queryFactory
-                .select(new QSimpleProductDto(
+    public Page<Product4DisplayDto> findAllByCategoryId(final Long categoryId,
+                                                        final Pageable pageable) {
+        List<Product4DisplayDto> fetch = queryFactory
+                .select(new QProduct4DisplayDto(
                         product.productId,
                         product.name,
                         product.photo,
                         product.price,
                         product.brand.name.as("brandName"),
-                        product.wishes.size().longValue().as("wishCount")
-                ))
+                        product.wishes.size().longValue().as("wishCount")))
                 .from(product)
                 .where(categoryIdEqualTo(categoryId))
                 .orderBy(getOrderSpecifiers(pageable))
@@ -63,6 +66,27 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         return new PageImpl<>(fetch, pageable, fetch.size());
     }
 
+    @Override
+    public Page<ProductDto> findAllByBrandId(final Long brandId,
+                                             final Pageable pageable) {
+        List<ProductDto> fetch = queryFactory
+                .select(new QProductDto(
+                        product.productId,
+                        product.name,
+                        product.photo,
+                        product.price)
+                )
+                .from(product)
+                .join(product.brand,brand)
+                .where(brand.brandId.eq(brandId))
+                .orderBy(getOrderSpecifiers(pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        
+        return new PageImpl<>(fetch, pageable, fetch.size());
+    }
+    
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
         return Stream.concat(

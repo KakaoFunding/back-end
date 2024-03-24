@@ -1,11 +1,9 @@
 package org.kakaoshare.backend.domain.brand.repository.query;
 
-import org.kakaoshare.backend.domain.brand.entity.query.SimpleBrandDto;
-
-import java.util.List;
+import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BrandRepositoryCustom {
-    List<SimpleBrandDto> findAllSimpleBrandByChildId(Long categoryId);
-    
-    List<SimpleBrandDto> findAllSimpleBrandByParentId(Long categoryId);
+    Page<SimpleBrandDto> findAllSimpleBrandByCategoryId(Long categoryId, Pageable pageable);
 }

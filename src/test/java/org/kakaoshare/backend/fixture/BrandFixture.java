@@ -1,28 +1,25 @@
 package org.kakaoshare.backend.fixture;
+
+
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 
 public enum BrandFixture {
-    BRAND_A("Brand A", "iconPhotoA.jpg"),
-    BRAND_B("Brand B", "iconPhotoB.jpg"),
-    BRAND_C("Brand C"); // 아이콘 없는 예시
+    STARBUCKS("스타벅스");
 
     private final String name;
-    private final String iconPhoto;
 
-    BrandFixture(String name, String iconPhoto) {
+    BrandFixture(final String name) {
         this.name = name;
-        this.iconPhoto = iconPhoto;
-    }
-
-    BrandFixture(String name) {
-        this.name = name;
-        this.iconPhoto = null;
     }
 
     public Brand 생성() {
+        return 생성(null);
+    }
+
+    public Brand 생성(final Long brandId) {
         return Brand.builder()
-                .name(this.name)
-                .iconPhoto(this.iconPhoto)
+                .brandId(brandId)
+                .name(name)
                 .build();
     }
 }
