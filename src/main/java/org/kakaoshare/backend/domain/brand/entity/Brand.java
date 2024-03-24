@@ -43,7 +43,16 @@ public class Brand extends BaseTimeEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "brand",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Product> products;
 
+    @Override
+    public String toString() {
+        return "Brand{" +
+                "brandId=" + brandId +
+                ", name='" + name + '\'' +
+                ", iconPhoto='" + iconPhoto + '\'' +
+                ", category=" + category +
+                '}';
+    }
 }

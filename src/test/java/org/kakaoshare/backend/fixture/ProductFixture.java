@@ -1,11 +1,15 @@
 package org.kakaoshare.backend.fixture;
 
-import java.math.BigDecimal;
+
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
+import java.math.BigDecimal;
+
 public enum ProductFixture {
-    TEST_PRODUCT("Test Product", new BigDecimal("999.99"), "Test Type");
+    TEST_PRODUCT("Test Product", new BigDecimal("999.99"), "Test Type"),
+    CAKE("케이크", BigDecimal.valueOf(10_000), "Dessert"),
+    COFFEE("커피", BigDecimal.valueOf(3_000), "Beverage");
 
     private final String name;
     private final BigDecimal price;
@@ -18,21 +22,22 @@ public enum ProductFixture {
     }
 
     public Product 생성() {
-        return Product.builder()
-                .name(name)
-                .price(price)
-                .type(type)
-                .build();
+        return 생성(null);
     }
 
-    public Product 생성(final Brand brand) {
+    public Product 생성(final Long providerId) {
+        return 생성(providerId, null);
+    }
+
+    public Product 생성(final Long providerId,
+                      final Brand brand) {
         return Product.builder()
-                .name(name)
-                .price(price)
-                .type(type)
+                .productId(providerId)
                 .brand(brand)
+                .name(name)
+                .price(price)
+                .type(type)
                 .build();
     }
-
 
 }
