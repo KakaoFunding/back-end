@@ -18,8 +18,6 @@ import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.category.entity.Category;
 
-import java.math.BigDecimal;
-
 
 @Entity
 @Getter
@@ -36,32 +34,32 @@ public class Product extends BaseTimeEntity {
     private String name;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal price;
+    private Long price;
 
     @Column(nullable = false, length = 50)
     private String type;
     @Column
     private String photo;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     
-    @ManyToOne
-    @JoinColumn(name = "brand_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_detail_id", nullable = true)//TODO 2024 02 17 19:45:17 : Detail 관련 로직 작성시 nullable=true 설정
     private ProductDetail productDetail;
     
-    @Column
+    @Column(name = "wish_count")
     private Integer wishCount;//TODO 2024 03 21 17:11:42 : pre persist 고려
     
-    @Column
+    @Column(name = "order_count")
     private Integer orderCount;//TODO 2024 03 21 17:11:33 : pre persist 고려
     
-    @Column
+    @Column(name = "brand_name")
     private String brandName;//TODO 2024 03 21 16:29:28 : pre persist 고려
     
     @Override
