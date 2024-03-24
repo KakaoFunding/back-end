@@ -21,7 +21,6 @@ import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -111,8 +110,8 @@ public class PaymentService {
 
     private Payment createPayment(final KakaoPayApproveResponse approveResponse) {
         return Payment.builder()
-                .totalPrice(BigDecimal.valueOf(approveResponse.amount().total()))
-                .purchasePrice(BigDecimal.valueOf(approveResponse.amount().total()))
+                .totalPrice(Long.valueOf(approveResponse.amount().total()))
+                .purchasePrice(Long.valueOf(approveResponse.amount().total()))
                 .build();
     }
 

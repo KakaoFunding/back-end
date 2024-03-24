@@ -26,7 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -109,7 +108,7 @@ class PaymentServiceTest {
         final List<PaymentDetail> details = createDetails(stockQuantity, cake, coffee);
         final PaymentSuccessRequest paymentSuccessRequest = new PaymentSuccessRequest(details, orderNumber, pgToken, tid);
 
-        final int totalAmount = cake.getPrice().add(coffee.getPrice()).intValue();
+        final int totalAmount = (int) (cake.getPrice()+coffee.getPrice());
         final String itemName = cake.getName() + " 외 1건";
 
         final KakaoPayApproveResponse approveResponse = createApproveResponse(tid, orderNumber, providerId, totalAmount, itemName, 2);
@@ -157,8 +156,8 @@ class PaymentServiceTest {
 
     private Payment createPayment(final int totalAmount) {
         return Payment.builder()
-                .purchasePrice(BigDecimal.valueOf(totalAmount))
-                .totalPrice(BigDecimal.valueOf(totalAmount))
+                .purchasePrice((long) totalAmount)
+                .totalPrice((long) totalAmount)
                 .build();
     }
 

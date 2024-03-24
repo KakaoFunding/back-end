@@ -7,7 +7,6 @@ import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -15,7 +14,7 @@ import java.util.List;
 public class DescriptionResponse {
     private final Long productId;
     private final String name;
-    private final BigDecimal price;
+    private final Long price;
     private final String type;
     private final String description;
     private final List<ProductDescriptionPhoto> descriptionPhotos;
