@@ -8,25 +8,20 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
-import org.kakaoshare.backend.domain.brand.entity.QBrand;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.option.entity.QOption;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.dto.QSimpleProductDto;
-import org.kakaoshare.backend.domain.product.dto.SimpleProductDto;
+import org.kakaoshare.backend.domain.product.dto.QProduct4DisplayDto;
+import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
-import org.kakaoshare.backend.domain.product.entity.ProductDetail;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 import org.kakaoshare.backend.domain.product.entity.QProduct;
 import org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto;
-import org.kakaoshare.backend.domain.product.entity.QProductDetail;
 import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
-import org.kakaoshare.backend.domain.product.dto.QProduct4DisplayDto;
-import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -83,10 +78,10 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        
+
         return new PageImpl<>(fetch, pageable, fetch.size());
     }
-    
+
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
         return Stream.concat(
