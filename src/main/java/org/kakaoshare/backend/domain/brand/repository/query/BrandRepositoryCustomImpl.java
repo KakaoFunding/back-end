@@ -10,10 +10,10 @@ import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
@@ -42,7 +42,7 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
         
         BooleanExpression isParent = isEqCategoryId(categoryId).and(category.parent.isNull());
         
-        BooleanExpression condition = isConditionOf(categoryId, isParent);
+        BooleanExpression condition = categoryTypeOf(categoryId, isParent);
         
         List<SimpleBrandDto> fetch = queryFactory
                 .select(new QSimpleBrandDto(
@@ -63,22 +63,21 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
         return new PageImpl<>(fetch, pageable, totalElement);
     }
     
-    @Nullable
     private Long countTotalElement(final BooleanExpression condition) {
-        return queryFactory
+        return Objects.requireNonNull(queryFactory
                 .select(brand.countDistinct())
                 .from(brand)
                 .join(brand.products, product)
                 .where(condition)
-                .fetchOne();
+                .fetchOne());
     }
     
-    private BooleanExpression isConditionOf(final Long categoryId, final BooleanExpression isParent) {
+    private BooleanExpression conditionByCategoryType(final Long categoryId, final BooleanExpression isParent) {
         BooleanExpression condition;
-        Long parentCount = queryFactory.select(category.countDistinct())
+        Long parentCount = Objects.requireNonNull(queryFactory.select(category.countDistinct())
                 .from(category)
                 .where(isParent)
-                .fetchOne();
+                .fetchOne());
         
         if (parentCount > 0L) {
             condition = product.category.parent.categoryId.eq(categoryId);
