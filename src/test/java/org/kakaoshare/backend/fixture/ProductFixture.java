@@ -3,18 +3,16 @@ package org.kakaoshare.backend.fixture;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
-import java.math.BigDecimal;
-
 public enum ProductFixture {
-    TEST_PRODUCT("Test Product", new BigDecimal("999.99"), "Test Type"),
-    CAKE("케이크", BigDecimal.valueOf(10_000), "Dessert"),
-    COFFEE("커피", BigDecimal.valueOf(3_000), "Beverage");
+    TEST_PRODUCT("Test Product", 999L, "Test Type"),
+    CAKE("케이크", 10_000L, "Dessert"),
+    COFFEE("커피", 3_000L, "Beverage");
 
     private final String name;
-    private final BigDecimal price;
+    private final Long price;
     private final String type;
 
-    ProductFixture(String name, BigDecimal price, String type) {
+    ProductFixture(String name, Long price, String type) {
         this.name = name;
         this.price = price;
         this.type = type;

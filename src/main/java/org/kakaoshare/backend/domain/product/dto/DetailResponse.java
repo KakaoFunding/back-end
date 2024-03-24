@@ -7,14 +7,15 @@ import lombok.Getter;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
-import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
+
+import java.util.List;
 
 @Getter
 @Builder
 public class DetailResponse {
     private final Long productId;
     private final String name;
-    private final BigDecimal price;
+    private final Long price;
     private final String type;
     private final String productName;
     private final Boolean hasPhoto;
