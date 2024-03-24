@@ -29,8 +29,8 @@ public class FundingService {
     private final MemberRepository memberRepository;
 
     public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
-        Product product = findById(productId);
-        Member member = findByProviderId(providerId);
+        Product product = findProductById(productId);
+        Member member = findMemberByProviderId(providerId);
 
         Optional<FundingResponse> existingFunding = fundingRepository.findByProductIdAndMemberId(productId,
                 member.getMemberId());
@@ -45,7 +45,7 @@ public class FundingService {
     }
 
     public ProgressResponse getFundingProgress(Long fundingId, String providerId) {
-        Member member = findByProviderId(providerId);
+        Member member = findMemberByProviderId(providerId);
         Funding funding = fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
 
@@ -53,7 +53,7 @@ public class FundingService {
     }
 
     public FundingSliceResponse getMyAllFundingProducts(String providerId, Pageable pageable) {
-        Member member = findByProviderId(providerId);
+        Member member = findMemberByProviderId(providerId);
         List<Funding> fundingList = fundingRepository.findAllByMemberId(member.getMemberId());
         Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(),
                 pageable);
@@ -68,12 +68,12 @@ public class FundingService {
                 .build();
     }
 
-    private Member findByProviderId(String providerId) {
+    private Member findMemberByProviderId(String providerId) {
         return memberRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
     }
 
-    private Product findById(Long productId) {
+    private Product findProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
     }
