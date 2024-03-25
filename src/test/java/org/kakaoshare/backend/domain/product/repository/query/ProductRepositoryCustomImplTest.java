@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.brand.repository.BrandRepository;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
@@ -14,8 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,11 +32,16 @@ import static org.kakaoshare.backend.fixture.ProductFixture.COFFEE;
 class ProductRepositoryCustomImplTest {
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    BrandRepository brandRepository;
 
     @Test
     @DisplayName("상품명으로 상품 조회")
+    @Transactional
+    @Rollback
     public void findBySearchConditions() throws Exception {
         final Brand starbucks = STARBUCKS.생성();
+        
         final Product starbucksCake = CAKE.브랜드_설정_생성(starbucks);
         final Product starbucksCoffee = COFFEE.브랜드_설정_생성(starbucks);
 
@@ -60,19 +67,21 @@ class ProductRepositoryCustomImplTest {
 
     @Test
     @DisplayName("상품명으로 상품 조회 낮은 가격 순")
+    @Transactional
+    @Rollback
     public void findBySearchConditionsOrderByPriceAsc() throws Exception {
         final Brand starbucks = STARBUCKS.생성();
-        final Product starbucksCoffee1 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(7_000));
-        final Product starbucksCoffee2 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(8_000));
+        final Product starbucksCoffee1 = COFFEE.브랜드_가격_설정_생성(starbucks, 7000L);
+        final Product starbucksCoffee2 = COFFEE.브랜드_가격_설정_생성(starbucks, 8000L);
+        starbucks.getProducts()
+                .addAll(List.of(starbucksCoffee1,starbucksCoffee2));
 
         final Brand ediya = EDIYA.생성();
-        final Product ediyaCoffee1 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(9_000));
-        final Product ediyaCoffee2 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(10_000));
-
-        productRepository.save(starbucksCoffee1);
-        productRepository.save(starbucksCoffee2);
-        productRepository.save(ediyaCoffee1);
-        productRepository.save(ediyaCoffee2);
+        final Product ediyaCoffee1 = COFFEE.브랜드_가격_설정_생성(ediya, 9000L);
+        final Product ediyaCoffee2 = COFFEE.브랜드_가격_설정_생성(ediya, 10000L);
+        ediya.getProducts()
+                .addAll(List.of(ediyaCoffee1,ediyaCoffee2));
+        brandRepository.saveAll(List.of(starbucks,ediya));
 
         final String keyword = "커피";
         final Pageable pageable = PageRequest.of(0, 4, Sort.by("price").ascending());
@@ -92,19 +101,21 @@ class ProductRepositoryCustomImplTest {
 
     @Test
     @DisplayName("상품명으로 조회 높은 가격 순")
+    @Transactional
+    @Rollback
     public void findBySearchConditionsOrderByPriceDesc() throws Exception {
         final Brand starbucks = STARBUCKS.생성();
-        final Product starbucksCoffee1 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(10_000));
-        final Product starbucksCoffee2 = COFFEE.브랜드_가격_설정_생성(starbucks, BigDecimal.valueOf(9_000));
-
+        final Product starbucksCoffee1 = COFFEE.브랜드_가격_설정_생성(starbucks, 7000L);
+        final Product starbucksCoffee2 = COFFEE.브랜드_가격_설정_생성(starbucks, 8000L);
+        starbucks.getProducts()
+                .addAll(List.of(starbucksCoffee1,starbucksCoffee2));
+        
         final Brand ediya = EDIYA.생성();
-        final Product ediyaCoffee1 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(8_000));
-        final Product ediyaCoffee2 = COFFEE.브랜드_가격_설정_생성(ediya, BigDecimal.valueOf(7_000));
-
-        productRepository.save(starbucksCoffee1);
-        productRepository.save(starbucksCoffee2);
-        productRepository.save(ediyaCoffee1);
-        productRepository.save(ediyaCoffee2);
+        final Product ediyaCoffee1 = COFFEE.브랜드_가격_설정_생성(ediya, 9000L);
+        final Product ediyaCoffee2 = COFFEE.브랜드_가격_설정_생성(ediya, 10000L);
+        ediya.getProducts()
+                .addAll(List.of(ediyaCoffee1,ediyaCoffee2));
+        brandRepository.saveAll(List.of(starbucks,ediya));
 
         final String keyword = "커피";
         final Pageable pageable = PageRequest.of(0, 4, Sort.by("price").ascending());
@@ -124,19 +135,21 @@ class ProductRepositoryCustomImplTest {
 
     @Test
     @DisplayName("상품명으로 조회 후 브랜드별 그룹핑")
+    @Transactional
+    @Rollback
     public void findBySearchConditionsGroupByBrand() throws Exception {
         final Brand starbucks = STARBUCKS.생성();
-        final Product starbucksCoffee1 = COFFEE.브랜드_설정_생성(starbucks);
-        final Product starbucksCoffee2 = COFFEE.브랜드_설정_생성(starbucks);
-
+        final Product starbucksCoffee1 = COFFEE.브랜드_가격_설정_생성(starbucks, 7000L);
+        final Product starbucksCoffee2 = COFFEE.브랜드_가격_설정_생성(starbucks, 8000L);
+        starbucks.getProducts()
+                .addAll(List.of(starbucksCoffee1,starbucksCoffee2));
+        
         final Brand ediya = EDIYA.생성();
-        final Product ediyaCoffee1 = COFFEE.브랜드_설정_생성(ediya);
-        final Product ediyaCoffee2 = COFFEE.브랜드_설정_생성(ediya);
-
-        productRepository.save(starbucksCoffee1);
-        productRepository.save(starbucksCoffee2);
-        productRepository.save(ediyaCoffee1);
-        productRepository.save(ediyaCoffee2);
+        final Product ediyaCoffee1 = COFFEE.브랜드_가격_설정_생성(ediya, 9000L);
+        final Product ediyaCoffee2 = COFFEE.브랜드_가격_설정_생성(ediya, 10000L);
+        ediya.getProducts()
+                .addAll(List.of(ediyaCoffee1,ediyaCoffee2));
+        brandRepository.saveAll(List.of(starbucks,ediya));
 
         final String keyword = "커피";
         final Pageable pageable = PageRequest.of(0, 4, Sort.unsorted());
