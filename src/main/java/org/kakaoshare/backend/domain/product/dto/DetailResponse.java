@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
-
 import java.util.List;
 
 @Getter
@@ -16,7 +15,6 @@ public class DetailResponse {
     private final Long price;
     private final String type;
     private final String productName;
-    private final Boolean hasPhoto;
     private final List<Option> options;
     private final String brandName;
     private final String origin;
@@ -32,7 +30,6 @@ public class DetailResponse {
                 .name(product.getName())
                 .price(product.getPrice())
                 .type(product.getType())
-                .hasPhoto(product.getProductDetail().getHasPhoto())
                 .productName(product.getProductDetail().getProductName())
                 .origin(product.getProductDetail().getOrigin())
                 .manufacturer(product.getProductDetail().getManufacturer())

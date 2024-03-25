@@ -17,7 +17,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,7 +40,6 @@ class ProductRepositoryCustomImplTest {
     @Rollback
     public void findBySearchConditions() throws Exception {
         final Brand starbucks = STARBUCKS.생성();
-        
         final Product starbucksCake = CAKE.브랜드_설정_생성(starbucks);
         final Product starbucksCoffee = COFFEE.브랜드_설정_생성(starbucks);
 

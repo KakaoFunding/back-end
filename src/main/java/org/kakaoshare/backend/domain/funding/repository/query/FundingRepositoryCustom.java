@@ -1,6 +1,5 @@
 package org.kakaoshare.backend.domain.funding.repository.query;
 
-
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.springframework.data.domain.Pageable;

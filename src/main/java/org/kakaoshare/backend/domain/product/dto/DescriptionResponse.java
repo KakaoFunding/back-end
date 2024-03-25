@@ -6,7 +6,6 @@ import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
-
 import java.util.List;
 
 @Getter
@@ -18,7 +17,6 @@ public class DescriptionResponse {
     private final String type;
     private final String description;
     private final List<ProductDescriptionPhoto> descriptionPhotos;
-    private final Boolean hasPhoto;
     private final String productName;
     private final List<Option> options;
     private final List<ProductThumbnail> productThumbnails;

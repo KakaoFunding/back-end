@@ -26,8 +26,7 @@ import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 @RequiredArgsConstructor
 public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
-    
-    
+        
     private BooleanExpression isEqCategoryId(final Long categoryId) {
         return category.categoryId.eq(categoryId);
     }
@@ -62,7 +61,7 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
         
         return new PageImpl<>(fetch, pageable, totalElement);
     }
-    
+
     @Override
     public List<SimpleBrandDto> findBySearchConditions(final String keyword, final Pageable pageable) {
         return queryFactory.select(getSimpleBrandDto())
@@ -74,7 +73,7 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
                 .limit(pageable.getPageSize())
                 .fetch();
     }
-    
+  
     private QSimpleBrandDto getSimpleBrandDto() {
         return new QSimpleBrandDto(
                 brand.brandId,

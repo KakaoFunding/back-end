@@ -35,6 +35,7 @@ public enum ProductFixture {
         Category category = Category.builder()
                 .name("category")
                 .build();
+
         return Product.builder()
                 .productId(productId)
                 .brand(brand)
@@ -54,6 +55,7 @@ public enum ProductFixture {
     }
     
     public Product 브랜드_가격_설정_생성(final Brand brand, final Long price) {
+
         return 생성(null, brand, price);
     }
 }

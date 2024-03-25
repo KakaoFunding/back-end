@@ -11,6 +11,7 @@ import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
+
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
@@ -57,6 +58,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+      
         Long total = queryFactory
                 .select(product.countDistinct())
                 .from(product)
@@ -76,7 +78,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                         product.price)
                 )
                 .from(product)
-                .join(product.brand,brand)
+                .join(product.brand, brand)
                 .where(brand.brandId.eq(brandId))
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
@@ -152,15 +154,37 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
         return toPage(pageable, content, countQuery);
     }
-    
+
     @Override
-    public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
-        return Stream.concat(
-                Stream.of(SortUtil.from(pageable)),
-                Stream.of(product.name.asc()) // 기본 정렬 조건
-        ).toArray(OrderSpecifier[]::new);
+    public Page<Product4DisplayDto> findBySearchConditions(final String keyword,
+                                                            final Integer minPrice,
+                                                            final Integer maxPrice,
+                                                            final List<String> categories,
+                                                            final Pageable pageable) {
+        final JPAQuery<Long> countQuery = queryFactory.select(product.productId.count())
+                .from(product)
+                .where(
+                        containsExpression(product.name, keyword),
+                        containsExpression(product.price, minPrice, maxPrice)
+//                        containsExpression(category.name, categories)
+                );
+
+        // TODO: 3/19/24 카테고리 필터링은 추후 구현 예정
+        final JPAQuery<Product4DisplayDto> contentQuery = queryFactory.select(getProduct4DisplayDto())
+                .from(product)
+                .leftJoin(product.brand, brand)
+//                .leftJoin(brand.category, category)
+                .where(
+                        containsExpression(product.name, keyword),
+                        containsExpression(product.price, minPrice, maxPrice)
+//                        containsExpression(category.name, categories)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(createOrderSpecifiers(product, pageable));
+        return toPage(pageable, contentQuery, countQuery);
     }
-    
+
     @Override
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
         return null;
@@ -183,7 +207,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 //                .where(product.productId.eq(productId))
 //                .fetchOne();
     }
-    
+
     @Override
     public DetailResponse findProductDetail(Long productId) {
         return null;
@@ -209,11 +233,13 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 //                .fetchOne();
     }
     
+
     private QSimpleBrandDto getSimpleBrandDto() {
         return new QSimpleBrandDto(
                 brand.brandId,
                 brand.name,
                 brand.iconPhoto);
+
     }
     
     private QProduct4DisplayDto getProduct4DisplayDto() {

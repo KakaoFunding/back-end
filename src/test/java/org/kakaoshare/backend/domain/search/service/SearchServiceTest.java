@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,6 +69,7 @@ class SearchServiceTest {
     public void searchProductsFilterByPrice() throws Exception {
         final Product coffee1 = COFFEE.가격_설정_생성(10_000L);
         final Product coffee2 = COFFEE.가격_설정_생성(10_000L);
+
         final int minPrice = 3_000;
         final int maxPrice = 9_000;
         final Pageable pageable = Pageable.unpaged();
