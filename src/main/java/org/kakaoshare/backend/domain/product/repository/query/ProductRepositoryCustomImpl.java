@@ -1,25 +1,34 @@
 package org.kakaoshare.backend.domain.product.repository.query;
 
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
+import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
+import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.dto.QProduct4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.QProductDto;
+import org.kakaoshare.backend.domain.search.dto.QSimpleBrandProductDto;
+import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.querydsl.core.group.GroupBy.groupBy;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
@@ -214,7 +223,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 product.photo,
                 product.price,
                 product.brand.name.as("brandName"),
-                product.wishes.size().longValue().as("wishCount"));
+                product.wishCount.longValue().as("wishCount"));
     }
 
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {

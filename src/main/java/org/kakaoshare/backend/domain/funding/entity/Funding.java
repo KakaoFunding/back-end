@@ -8,10 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +15,6 @@ import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
@@ -40,10 +35,10 @@ public class Funding extends BaseTimeEntity {
     private LocalDate expiredAt;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal goalAmount;
+    private Long goalAmount;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal accumulateAmount;
+    private Long accumulateAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -52,12 +47,12 @@ public class Funding extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
-    public Funding(Member member, Product product, BigDecimal goalAmount, LocalDate expiredAt) {
+    public Funding(Member member, Product product, Long goalAmount, LocalDate expiredAt) {
         this.member = member;
         this.product = product;
         this.goalAmount = goalAmount;
         this.expiredAt = expiredAt;
-        this.accumulateAmount = BigDecimal.ZERO; // 초기값 설정
+        this.accumulateAmount = 0L; // 초기값 설정
         this.status = "ACTIVE"; // 초기 상태 설정
     }
 }

@@ -20,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,13 +68,14 @@ class SearchServiceTest {
     @Test
     @DisplayName("상품 검색 결과 가격 범위 필터링")
     public void searchProductsFilterByPrice() throws Exception {
-        final Product coffee1 = COFFEE.가격_설정_생성(BigDecimal.valueOf(10_000));
-        final Product coffee2 = COFFEE.가격_설정_생성(BigDecimal.valueOf(10_000));
+        final Product coffee1 = COFFEE.가격_설정_생성(10_000L);
+        final Product coffee2 = COFFEE.가격_설정_생성(10_000L);
         final int minPrice = 3_000;
         final int maxPrice = 9_000;
         final Pageable pageable = Pageable.unpaged();
         final ProductSearchRequest request = new ProductSearchRequest("커피", null, minPrice, maxPrice);
         final List<Product4DisplayDto> product4DisplayDtos = List.of(
+                getProduct4DisplayDto(coffee1, null),
                 getProduct4DisplayDto(coffee2, null)
         );
 

@@ -25,8 +25,8 @@ CREATE TABLE funding
     updated_at        TIMESTAMP,
     status            VARCHAR(255),
     expired_at        date                                    NOT NULL,
-    goal_amount       DECIMAL(12, 2)                          NOT NULL,
-    accumulate_amount DECIMAL(12, 2)                          NOT NULL,
+    goal_amount       BIGINT                                  NOT NULL,
+    accumulate_amount BIGINT                                  NOT NULL,
     member_id         BIGINT                                  NOT NULL,
     product_id        BIGINT                                  NOT NULL,
     CONSTRAINT pk_funding PRIMARY KEY (funding_id)
@@ -85,7 +85,7 @@ CREATE TABLE option_detail
     updated_at       TIMESTAMP,
     name             VARCHAR(255)                            NOT NULL,
     stock_quantity   INT                                     NOT NULL,
-    additional_price DECIMAL(12, 2)                          NOT NULL,
+    additional_price BIGINT                                  NOT NULL,
     photo            VARCHAR(255),
     option_id        BIGINT                                  NOT NULL,
     CONSTRAINT pk_optiondetail PRIMARY KEY (option_detail_id)

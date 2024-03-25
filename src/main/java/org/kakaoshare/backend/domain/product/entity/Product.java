@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,8 @@ import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.category.entity.Category;
+
+import java.util.List;
 
 
 @Entity
@@ -61,6 +64,9 @@ public class Product extends BaseTimeEntity {
     
     @Column(name = "brand_name")
     private String brandName;//TODO 2024 03 21 16:29:28 : pre persist 고려
+    
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<ProductThumbnail> productThumbnails;
     
     @Override
     public String toString() {
