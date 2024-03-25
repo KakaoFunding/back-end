@@ -27,9 +27,9 @@ import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
     
-    private BooleanExpression categoryTypeOf(final Long categoryId) {
-        BooleanExpression isChildCategory = product.category.categoryId.eq(categoryId);
-        return isChildCategory.or(product.category.parent.categoryId.eq(categoryId));
+    
+    private BooleanExpression isEqCategoryId(final Long categoryId) {
+        return category.categoryId.eq(categoryId);
     }
     
     @Override
@@ -42,7 +42,7 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
         
         BooleanExpression isParent = isEqCategoryId(categoryId).and(category.parent.isNull());
         
-        BooleanExpression condition = categoryTypeOf(categoryId, isParent);
+        BooleanExpression condition = conditionByCategoryType(categoryId, isParent);
         
         List<SimpleBrandDto> fetch = queryFactory
                 .select(new QSimpleBrandDto(
@@ -61,6 +61,25 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
         Long totalElement = countTotalElement(condition);
         
         return new PageImpl<>(fetch, pageable, totalElement);
+    }
+    
+    @Override
+    public List<SimpleBrandDto> findBySearchConditions(final String keyword, final Pageable pageable) {
+        return queryFactory.select(getSimpleBrandDto())
+                .from(brand)
+                .leftJoin(product).on(product.brand.eq(brand))
+                .where(containsExpression(product.name, keyword))
+                .orderBy(createOrderSpecifiers(brand, pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
+    
+    private QSimpleBrandDto getSimpleBrandDto() {
+        return new QSimpleBrandDto(
+                brand.brandId,
+                brand.name,
+                brand.iconPhoto);
     }
     
     private Long countTotalElement(final BooleanExpression condition) {
@@ -92,37 +111,6 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
                 .from(category)
                 .where(isEqCategoryId(categoryId))
                 .fetchOne();
-    }
-    
-    @Override
-    public List<SimpleBrandDto> findBySearchConditions(final String keyword, final Pageable pageable) {
-        return queryFactory.select(getSimpleBrandDto())
-                .from(brand)
-                .leftJoin(product).on(product.brand.eq(brand))
-                .where(containsExpression(product.name, keyword))
-                .orderBy(createOrderSpecifiers(brand, pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-    }
-    
-    private QSimpleBrandDto getSimpleBrandDto() {
-        return new QSimpleBrandDto(
-                brand.brandId,
-                brand.name,
-                brand.iconPhoto);
-    }
-    
-    private BooleanExpression categoryIdEqualTo(final Long categoryId) {
-        BooleanExpression isParentCategory = brand.category
-                .in(JPAExpressions
-                        .select(category)
-                        .from(category)
-                        .where(category.parent.categoryId.eq(categoryId)));
-        
-        BooleanExpression isChildCategory = brand.category.categoryId.eq(categoryId);
-        
-        return isChildCategory.or(isParentCategory);
     }
     
     @Override
