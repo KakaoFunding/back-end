@@ -56,7 +56,7 @@ public class PaymentService {
     }
 
     private Payment savePayment(final KakaoPayApproveResponse approveResponse) {
-        final Payment payment = createPayment(approveResponse);
+        final Payment payment = approveResponse.toEntity();
         return paymentRepository.save(payment);
     }
 
@@ -107,13 +107,6 @@ public class PaymentService {
         return values.stream()
                 .map(mapper)
                 .toList();
-    }
-
-    private Payment createPayment(final KakaoPayApproveResponse approveResponse) {
-        return Payment.builder()
-                .totalPrice(Long.valueOf(approveResponse.amount().total()))
-                .purchasePrice(Long.valueOf(approveResponse.amount().total()))
-                .build();
     }
 
     private Order createOrder(final Member member,
