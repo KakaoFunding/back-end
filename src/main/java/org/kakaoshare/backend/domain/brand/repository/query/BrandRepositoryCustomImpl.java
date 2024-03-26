@@ -77,18 +77,15 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
     }
     
     private BooleanExpression conditionByCategoryType(final Long categoryId, final BooleanExpression isParent) {
-        BooleanExpression condition;
         Long parentCount = Objects.requireNonNull(queryFactory.select(category.countDistinct())
                 .from(category)
                 .where(isParent)
                 .fetchOne());
         
         if (parentCount > 0L) {
-            condition = product.category.parent.categoryId.eq(categoryId);
-        } else {
-            condition = product.category.categoryId.eq(categoryId);
+            return product.category.parent.categoryId.eq(categoryId);
         }
-        return condition;
+        return product.category.categoryId.eq(categoryId);
     }
     
     private JPAQuery<Long> countCategory(final Long categoryId) {
