@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -74,7 +75,7 @@ public class PaymentService {
                                        final String orderNumber,
                                        final Payment payment) {
         // TODO: 3/16/24 OrderDetail -> Order 를 만들어주는 별도의 방법 필요. 아래 방법은 불안정
-        final List<Long> productIds = extractedProductIds(details);
+        final List<Long> productIds = extractedProductIds(details, OrderDetail::productId);
         final Map<Long, Product> productById = findProductsByIdsGroupById(productIds);
         return details.stream()
                 .map(detail -> createOrder(member, orderNumber, payment, productById.get(detail.productId()), detail.stockQuantity()))
@@ -102,9 +103,9 @@ public class PaymentService {
                 .toList();
     }
 
-    private List<Long> extractedProductIds(final List<OrderDetail> details) {
-        return details.stream()
-                .map(OrderDetail::productId)
+    private <T> List<Long> extractedProductIds(final List<T> values, final Function<T, Long> mapper) {
+        return values.stream()
+                .map(mapper)
                 .toList();
     }
 
