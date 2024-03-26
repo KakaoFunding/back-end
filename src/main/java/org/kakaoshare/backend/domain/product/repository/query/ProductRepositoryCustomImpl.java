@@ -11,7 +11,6 @@ import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
-
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
@@ -21,7 +20,6 @@ import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.kakaoshare.backend.domain.search.dto.QSimpleBrandProductDto;
 import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -38,9 +36,9 @@ import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 @RequiredArgsConstructor
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, SortableRepository {
     private static final int PRODUCT_SIZE_GROUP_BY_BRAND = 9;
-
+    
     private final JPAQueryFactory queryFactory;
-
+    
     @Override
     public Page<Product4DisplayDto> findAllByCategoryId(final Long categoryId,
                                                         final Pageable pageable) {
@@ -52,25 +50,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-      
-        Long total = queryFactory
-                .select(product.countDistinct())
-                .from(product)
-                .where(categoryIdEqualTo(categoryId))
-                .fetchOne();
-        return new PageImpl<>(fetch, pageable, total);
+        JPAQuery<Long> countQuery = countProduct(categoryId);
+        return toPage(pageable, fetch, countQuery);
     }
-
+    
     @Override
     public Page<ProductDto> findAllByBrandId(final Long brandId,
                                              final Pageable pageable) {
         List<ProductDto> fetch = queryFactory
-                .select(new QProductDto(
-                        product.productId,
-                        product.name,
-                        product.photo,
-                        product.price)
-                )
+                .select(getProductDto())
                 .from(product)
                 .join(product.brand, brand)
                 .where(brand.brandId.eq(brandId))
@@ -79,21 +67,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .limit(pageable.getPageSize())
                 .fetch();
         
-        Long total = queryFactory
-                .select(product.countDistinct())
-                .from(product)
-                .join(product.brand, brand)
-                .where(brand.brandId.eq(brandId))
-                .fetchOne();
-        return new PageImpl<>(fetch, pageable, total);
+        JPAQuery<Long> countQuery = countBrand(brandId);
+        return toPage(pageable, fetch, countQuery);
     }
-
+    
     @Override
     public Page<Product4DisplayDto> findBySearchConditions(final String keyword,
-                                                            final Integer minPrice,
-                                                            final Integer maxPrice,
-                                                            final List<String> categories,
-                                                            final Pageable pageable) {
+                                                           final Integer minPrice,
+                                                           final Integer maxPrice,
+                                                           final List<String> categories,
+                                                           final Pageable pageable) {
         final JPAQuery<Long> countQuery = queryFactory.select(product.productId.count())
                 .from(product)
                 .where(
@@ -101,7 +84,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                         containsExpression(product.price, minPrice, maxPrice)
 //                        containsExpression(category.name, categories)
                 );
-
+        
         // TODO: 3/19/24 카테고리 필터링은 추후 구현 예정
         final JPAQuery<Product4DisplayDto> contentQuery = queryFactory.select(getProduct4DisplayDto())
                 .from(product)
@@ -117,7 +100,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .orderBy(createOrderSpecifiers(product, pageable));
         return toPage(pageable, contentQuery, countQuery);
     }
-
+    
     @Override
     public Page<SimpleBrandProductDto> findBySearchConditionsGroupByBrand(final String keyword, final Pageable pageable) {
         final JPAQuery<Long> countQuery = queryFactory.select(product.brand.brandId.countDistinct())
@@ -131,7 +114,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .transform(groupBy(brand.brandId)
                         .list(new QSimpleBrandProductDto(getSimpleBrandDto(), GroupBy.list(getProduct4DisplayDto())))
                 );
-
+        
         // TODO: 3/21/24 일단은 메모리에서 페이징하는 것으로 구현
         final Map<SimpleBrandDto, List<Product4DisplayDto>> productsGroupByBrand = fetch.stream()
                 .skip(pageable.getOffset())
@@ -140,45 +123,23 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                         SimpleBrandProductDto::brand,
                         brandProducts -> brandProducts.products().subList(0, Math.min(brandProducts.products().size(), PRODUCT_SIZE_GROUP_BY_BRAND))
                 ));
-
+        
         final List<SimpleBrandProductDto> content = productsGroupByBrand.keySet()
                 .stream()
                 .map(brand -> new SimpleBrandProductDto(brand, productsGroupByBrand.get(brand)))
                 .toList();
-
+        
         return toPage(pageable, content, countQuery);
     }
-
+    
     @Override
-    public Page<Product4DisplayDto> findBySearchConditions(final String keyword,
-                                                            final Integer minPrice,
-                                                            final Integer maxPrice,
-                                                            final List<String> categories,
-                                                            final Pageable pageable) {
-        final JPAQuery<Long> countQuery = queryFactory.select(product.productId.count())
-                .from(product)
-                .where(
-                        containsExpression(product.name, keyword),
-                        containsExpression(product.price, minPrice, maxPrice)
-//                        containsExpression(category.name, categories)
-                );
-
-        // TODO: 3/19/24 카테고리 필터링은 추후 구현 예정
-        final JPAQuery<Product4DisplayDto> contentQuery = queryFactory.select(getProduct4DisplayDto())
-                .from(product)
-                .leftJoin(product.brand, brand)
-//                .leftJoin(brand.category, category)
-                .where(
-                        containsExpression(product.name, keyword),
-                        containsExpression(product.price, minPrice, maxPrice)
-//                        containsExpression(category.name, categories)
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(createOrderSpecifiers(product, pageable));
-        return toPage(pageable, contentQuery, countQuery);
+    public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
+        return Stream.concat(
+                Stream.of(SortUtil.from(pageable)),
+                Stream.of(product.name.asc()) // 기본 정렬 조건
+        ).toArray(OrderSpecifier[]::new);
     }
-
+    
     @Override
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
         return null;
@@ -201,7 +162,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 //                .where(product.productId.eq(productId))
 //                .fetchOne();
     }
-
+    
     @Override
     public DetailResponse findProductDetail(Long productId) {
         return null;
@@ -227,13 +188,11 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 //                .fetchOne();
     }
     
-
     private QSimpleBrandDto getSimpleBrandDto() {
         return new QSimpleBrandDto(
                 brand.brandId,
                 brand.name,
                 brand.iconPhoto);
-
     }
     
     private QProduct4DisplayDto getProduct4DisplayDto() {
@@ -245,16 +204,39 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 product.brand.name.as("brandName"),
                 product.wishCount.longValue().as("wishCount"));
     }
-
+    
+    private QProductDto getProductDto() {
+        return new QProductDto(
+                product.productId,
+                product.name,
+                product.photo,
+                product.price);
+    }
+    
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {
         BooleanExpression isParentCategory = product.category
                 .in(JPAExpressions
                         .select(category)
                         .from(category)
                         .where(category.parent.categoryId.eq(categoryId)));
-
+        
         BooleanExpression isChildCategory = product.category.categoryId.eq(categoryId);
-
+        
         return isChildCategory.or(isParentCategory);
+    }
+    
+    private JPAQuery<Long> countBrand(final Long brandId) {
+        return queryFactory
+                .select(product.countDistinct())
+                .from(product)
+                .join(product.brand, brand)
+                .where(brand.brandId.eq(brandId));
+    }
+    
+    private JPAQuery<Long> countProduct(final Long categoryId) {
+        return queryFactory
+                .select(product.countDistinct())
+                .from(product)
+                .where(categoryIdEqualTo(categoryId));
     }
 }

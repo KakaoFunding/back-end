@@ -2,13 +2,14 @@ package org.kakaoshare.backend.domain.brand.repository.query;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -33,12 +34,6 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
     
     @Override
     public Page<SimpleBrandDto> findAllSimpleBrandByCategoryId(final Long categoryId, final Pageable pageable) {
-        Long count = countCategory(categoryId);
-        
-        if (count == null || count == 0) {
-            return Page.empty();
-        }
-        
         BooleanExpression isParent = isEqCategoryId(categoryId).and(category.parent.isNull());
         
         BooleanExpression condition = conditionByCategoryType(categoryId, isParent);
@@ -57,9 +52,9 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
                 .limit(pageable.getPageSize())
                 .fetch();
         
-        Long totalElement = countTotalElement(condition);
+        JPAQuery<Long> countQuery = countCategory(categoryId);
         
-        return new PageImpl<>(fetch, pageable, totalElement);
+        return RepositoryUtils.toPage(pageable, fetch, countQuery);
     }
 
     @Override
@@ -81,15 +76,6 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
                 brand.iconPhoto);
     }
     
-    private Long countTotalElement(final BooleanExpression condition) {
-        return Objects.requireNonNull(queryFactory
-                .select(brand.countDistinct())
-                .from(brand)
-                .join(brand.products, product)
-                .where(condition)
-                .fetchOne());
-    }
-    
     private BooleanExpression conditionByCategoryType(final Long categoryId, final BooleanExpression isParent) {
         BooleanExpression condition;
         Long parentCount = Objects.requireNonNull(queryFactory.select(category.countDistinct())
@@ -105,11 +91,10 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
         return condition;
     }
     
-    private Long countCategory(final Long categoryId) {
+    private JPAQuery<Long> countCategory(final Long categoryId) {
         return queryFactory.select(category.countDistinct())
                 .from(category)
-                .where(isEqCategoryId(categoryId))
-                .fetchOne();
+                .where(isEqCategoryId(categoryId));
     }
     
     @Override
