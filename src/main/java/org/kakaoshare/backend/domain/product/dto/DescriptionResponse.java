@@ -6,6 +6,7 @@ import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
+
 import java.util.List;
 
 @Getter
@@ -30,7 +31,6 @@ public class DescriptionResponse {
                 .type(product.getType())
                 .description(product.getProductDetail().getDescription())
                 .descriptionPhotos(null)//TODO 2024 03 21 16:33:40 : 추후 수정 필요
-                .hasPhoto(product.getProductDetail().getHasPhoto())
                 .productName(product.getProductDetail().getProductName())
                 .options(null)//TODO 2024 03 21 16:33:50 : 추후 수정 필요
                 .brandName(product.getBrandName())
