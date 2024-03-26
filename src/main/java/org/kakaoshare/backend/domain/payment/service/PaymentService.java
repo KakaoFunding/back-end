@@ -66,11 +66,11 @@ public class PaymentService {
         final Member member = findMemberByProviderId(providerId);
         final String orderNumber = paymentSuccessRequest.orderNumber();
         final List<OrderDetail> details = paymentSuccessRequest.details();
-        final List<Order> orders = extractedOrder(member, details, orderNumber, payment);
+        final List<Order> orders = extractedOrders(member, details, orderNumber, payment);
         return orderRepository.saveAll(orders);
     }
 
-    private List<Order> extractedOrder(final Member member,
+    private List<Order> extractedOrders(final Member member,
                                        final List<OrderDetail> details,
                                        final String orderNumber,
                                        final Payment payment) {
