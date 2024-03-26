@@ -6,7 +6,7 @@ import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummary;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
-import org.kakaoshare.backend.domain.payment.dto.PaymentDetail;
+import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
@@ -40,7 +40,7 @@ public class PaymentService {
                                       final List<PaymentReadyRequest> paymentRequests) {
         final String orderNumber = orderNumberProvider.createOrderNumber();
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentRequests, orderNumber);
-        final List<PaymentDetail> details = extractedDetails(paymentRequests);
+        final List<OrderDetail> details = extractedDetails(paymentRequests);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), details, kakaoPayReadyResponse.next_redirect_pc_url(), orderNumber);
     }
 
@@ -64,16 +64,16 @@ public class PaymentService {
                                    final Payment payment) {
         final Member member = findMemberByProviderId(providerId);
         final String orderNumber = paymentSuccessRequest.orderNumber();
-        final List<PaymentDetail> details = paymentSuccessRequest.details();
+        final List<OrderDetail> details = paymentSuccessRequest.details();
         final List<Order> orders = extractedOrder(member, details, orderNumber, payment);
         return orderRepository.saveAll(orders);
     }
 
     private List<Order> extractedOrder(final Member member,
-                                       final List<PaymentDetail> details,
+                                       final List<OrderDetail> details,
                                        final String orderNumber,
                                        final Payment payment) {
-        // TODO: 3/16/24 PaymentDetail -> Order 를 만들어주는 별도의 방법 필요. 아래 방법은 불안정
+        // TODO: 3/16/24 OrderDetail -> Order 를 만들어주는 별도의 방법 필요. 아래 방법은 불안정
         final List<Long> productIds = extractedProductIds(details);
         final Map<Long, Product> productById = findProductsByIdsGroupById(productIds);
         return details.stream()
@@ -96,15 +96,15 @@ public class PaymentService {
                 .toList();
     }
 
-    private List<PaymentDetail> extractedDetails(final List<PaymentReadyRequest> paymentRequests) {
+    private List<OrderDetail> extractedDetails(final List<PaymentReadyRequest> paymentRequests) {
         return paymentRequests.stream()
-                .map(paymentRequest -> new PaymentDetail(paymentRequest.productId(), paymentRequest.stockQuantity()))
+                .map(paymentRequest -> new OrderDetail(paymentRequest.productId(), paymentRequest.stockQuantity()))
                 .toList();
     }
 
-    private List<Long> extractedProductIds(final List<PaymentDetail> details) {
+    private List<Long> extractedProductIds(final List<OrderDetail> details) {
         return details.stream()
-                .map(PaymentDetail::productId)
+                .map(OrderDetail::productId)
                 .toList();
     }
 

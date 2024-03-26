@@ -9,7 +9,7 @@ import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummary;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
-import org.kakaoshare.backend.domain.payment.dto.PaymentDetail;
+import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.Amount;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
@@ -80,7 +80,7 @@ class PaymentServiceTest {
         doReturn(orderNumber).when(orderNumberProvider).createOrderNumber();
         doReturn(readyResponse).when(webClientService).ready(providerId, readyRequests, orderNumber);
 
-        final List<PaymentDetail> details = createDetails(stockQuantity, cake, coffee);
+        final List<OrderDetail> details = createDetails(stockQuantity, cake, coffee);
 
         final PaymentReadyResponse expect = new PaymentReadyResponse(
                 readyResponse.tid(),
@@ -105,7 +105,7 @@ class PaymentServiceTest {
         final Brand brand = STARBUCKS.생성(1L);
         final Product cake = CAKE.생성(1L, brand);
         final Product coffee = COFFEE.생성(2L, brand);
-        final List<PaymentDetail> details = createDetails(stockQuantity, cake, coffee);
+        final List<OrderDetail> details = createDetails(stockQuantity, cake, coffee);
         final PaymentSuccessRequest paymentSuccessRequest = new PaymentSuccessRequest(details, orderNumber, pgToken, tid);
 
         final int totalAmount = (int) (cake.getPrice()+coffee.getPrice());
@@ -161,10 +161,10 @@ class PaymentServiceTest {
                 .build();
     }
 
-    private List<PaymentDetail> createDetails(final int stockQuantity,
-                                              final Product... products) {
+    private List<OrderDetail> createDetails(final int stockQuantity,
+                                            final Product... products) {
         return Arrays.stream(products)
-                .map(product -> new PaymentDetail(product.getProductId(), stockQuantity))
+                .map(product -> new OrderDetail(product.getProductId(), stockQuantity))
                 .toList();
     }
 

@@ -8,5 +8,5 @@ package org.kakaoshare.backend.domain.payment.dto;
  *
  * @author kim-minwoo
  */
-public record PaymentDetail(Long productId, Integer stockQuantity) {
+public record OrderDetail(Long productId, Integer stockQuantity) {
 }
