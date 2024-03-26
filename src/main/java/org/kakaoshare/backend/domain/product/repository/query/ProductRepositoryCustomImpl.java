@@ -45,13 +45,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     public Page<Product4DisplayDto> findAllByCategoryId(final Long categoryId,
                                                         final Pageable pageable) {
         List<Product4DisplayDto> fetch = queryFactory
-                .select(new QProduct4DisplayDto(
-                        product.productId,
-                        product.name,
-                        product.photo,
-                        product.price,
-                        product.brand.name.as("brandName"),
-                        product.wishCount.longValue().as("wishCount")))
+                .select(getProduct4DisplayDto())
                 .from(product)
                 .where(categoryIdEqualTo(categoryId))
                 .orderBy(getOrderSpecifiers(pageable))
