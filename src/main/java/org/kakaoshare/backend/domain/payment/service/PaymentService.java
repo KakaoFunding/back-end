@@ -38,10 +38,10 @@ public class PaymentService {
     private final ProductRepository productRepository;
 
     public PaymentReadyResponse ready(final String providerId,
-                                      final List<PaymentReadyRequest> paymentRequests) {
+                                      final List<PaymentReadyRequest> paymentReadyRequests) {
         final String orderNumber = orderNumberProvider.createOrderNumber();
-        final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentRequests, orderNumber);
-        final List<OrderDetail> details = extractedDetails(paymentRequests);
+        final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentReadyRequests, orderNumber);
+        final List<OrderDetail> details = extractedDetails(paymentReadyRequests);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), details, kakaoPayReadyResponse.next_redirect_pc_url(), orderNumber);
     }
 
