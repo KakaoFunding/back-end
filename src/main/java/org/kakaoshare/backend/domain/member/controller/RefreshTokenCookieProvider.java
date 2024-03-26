@@ -6,7 +6,7 @@ import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import static org.springframework.http.ResponseCookie.*;
+import static org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 
 @Component
 public class RefreshTokenCookieProvider {

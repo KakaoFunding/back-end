@@ -8,10 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.math.BigDecimal;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.option.entity.Option;
 
 
 @Entity
@@ -29,7 +27,7 @@ public class OptionDetail extends BaseTimeEntity {
     private Integer stockQuantity;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal additionalPrice;
+    private Long additionalPrice;
 
     @Column
     private String photo;

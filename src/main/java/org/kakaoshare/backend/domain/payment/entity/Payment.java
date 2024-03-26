@@ -11,8 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 
-import java.math.BigDecimal;
-
 import static org.kakaoshare.backend.domain.payment.entity.PaymentMethod.KAKAO_PAY;
 
 
@@ -30,20 +28,20 @@ public class Payment extends BaseTimeEntity {
     private PaymentMethod method = KAKAO_PAY;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal totalPrice;
+    private Long totalPrice;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal purchasePrice;
+    private Long purchasePrice;
 
     @Builder.Default
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal deliveryPrice = BigDecimal.ZERO;
+    private Long deliveryPrice = 0L;
 
     protected Payment() {
     }
 
     @Builder
-    public Payment(final BigDecimal totalPrice, final BigDecimal purchasePrice) {
+    public Payment(final Long totalPrice, final Long purchasePrice) {
         this.totalPrice = totalPrice;
         this.purchasePrice = purchasePrice;
     }

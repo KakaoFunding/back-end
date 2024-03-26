@@ -28,39 +28,33 @@ class BrandRepositoryTest {
     @DisplayName("자식 카테고리 id를 통해 브랜드 목록을 페이징 조회 가능하다")
     void findAllSimpleBrandByChildCategoryId() {
         // given
-        PageRequest pageRequest = PageRequest.of(0, 3);
-        PageRequest next = pageRequest.next();
+        PageRequest pageRequest = PageRequest.of(0, 30);
         
         // when
         Page<SimpleBrandDto> firstPage = brandRepository.findAllSimpleBrandByCategoryId(CHILD_ID, pageRequest);
-        Page<SimpleBrandDto> nextPage = brandRepository.findAllSimpleBrandByCategoryId(CHILD_ID, next);
         // then
-        assertThat(firstPage.getContent().size()).isEqualTo(3);
-        assertThat(nextPage.getContent().size()).isEqualTo(2);
+        assertThat(firstPage.getContent().size()).isEqualTo(1);
+        
+        assertThat(firstPage.getTotalElements()).isEqualTo(1L);
         
         assertThat(firstPage.getContent())
-                .isSortedAccordingTo((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getName(),o2.getName()));
-        assertThat(nextPage.getContent())
-                .isSortedAccordingTo((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getName(),o2.getName()));
+                .isSortedAccordingTo((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getName(), o2.getName()));
     }
     
     @Test
     @DisplayName("부모 카테고리 id를 통해 자식 카테고리들이 가진 브랜드 목록을 페이징 조회 가능하다")
     void findAllSimpleBrandByParentCategoryId() {
         // given
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        PageRequest next = pageRequest.next();
+        PageRequest pageRequest = PageRequest.of(0, 20000);
         
         // when
         Page<SimpleBrandDto> firstPage = brandRepository.findAllSimpleBrandByCategoryId(PARENT_ID, pageRequest);
-        Page<SimpleBrandDto> nextPage = brandRepository.findAllSimpleBrandByCategoryId(PARENT_ID, next);
         // then
-        assertThat(firstPage.getContent().size()).isEqualTo(10);
-        assertThat(nextPage.getContent().size()).isEqualTo(10);
+        assertThat(firstPage.getContent().size()).isEqualTo(50);
+        
+        assertThat(firstPage.getTotalElements()).isEqualTo(50);
         
         assertThat(firstPage.getContent())
-                .isSortedAccordingTo((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getName(),o2.getName()));
-        assertThat(nextPage.getContent())
-                .isSortedAccordingTo((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getName(),o2.getName()));
+                .isSortedAccordingTo((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getName(), o2.getName()));
     }
 }

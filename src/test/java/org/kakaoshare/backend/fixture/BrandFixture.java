@@ -3,6 +3,8 @@ package org.kakaoshare.backend.fixture;
 
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 
+import java.util.ArrayList;
+
 public enum BrandFixture {
     STARBUCKS("스타벅스"),
     EDIYA("이디야");
@@ -20,6 +22,7 @@ public enum BrandFixture {
     public Brand 생성(final Long brandId) {
         return Brand.builder()
                 .brandId(brandId)
+                .products(new ArrayList<>())
                 .name(name)
                 .build();
     }

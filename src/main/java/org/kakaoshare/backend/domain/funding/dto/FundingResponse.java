@@ -1,12 +1,11 @@
 package org.kakaoshare.backend.domain.funding.dto;
 
-import jakarta.persistence.Column;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.product.entity.Product;
+
+import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -14,7 +13,7 @@ public class FundingResponse {
     private final Long fundingId;
     private final String status;
     private final LocalDate expiredAt;
-    private final BigDecimal goalAmount;
+    private final Long goalAmount;
     private final String brandName;
     private final String productName;
     private final String productImage;

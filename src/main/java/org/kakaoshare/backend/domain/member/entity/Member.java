@@ -7,14 +7,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.funding.entity.Funding;
-import org.kakaoshare.backend.domain.order.entity.Order;
-
-import java.util.List;
 
 import static org.kakaoshare.backend.domain.member.entity.Role.USER;
 
@@ -44,12 +39,6 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role = USER;
-
-    @OneToMany(mappedBy = "member")
-    private List<Order> orders;
-
-    @OneToMany(mappedBy = "member")
-    private List<Funding> funding;
 
     protected Member() {
 

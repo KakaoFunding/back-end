@@ -3,8 +3,6 @@ package org.kakaoshare.backend.domain.product.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
-import java.math.BigDecimal;
-
 @Getter
 public class Product4DisplayDto extends ProductDto {
     private final String brandName;
@@ -13,7 +11,7 @@ public class Product4DisplayDto extends ProductDto {
 
     @QueryProjection
     public Product4DisplayDto(final Long productId, final String name,
-                              final String photo, final BigDecimal price,
+                              final String photo, final Long price,
                               final String brandName, final Long wishCount) {
         super(productId, name, photo, price);
         this.brandName = brandName;

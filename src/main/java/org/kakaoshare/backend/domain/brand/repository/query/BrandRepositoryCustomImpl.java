@@ -2,18 +2,19 @@ package org.kakaoshare.backend.domain.brand.repository.query;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
@@ -26,24 +27,34 @@ import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 @RequiredArgsConstructor
 public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, SortableRepository {
     private final JPAQueryFactory queryFactory;
-
+        
+    private BooleanExpression isEqCategoryId(final Long categoryId) {
+        return category.categoryId.eq(categoryId);
+    }
+    
     @Override
-    public Page<SimpleBrandDto> findAllSimpleBrandByCategoryId(final Long categoryId,
-                                                               final Pageable pageable) {
-        final List<SimpleBrandDto> fetch = queryFactory
+    public Page<SimpleBrandDto> findAllSimpleBrandByCategoryId(final Long categoryId, final Pageable pageable) {
+        BooleanExpression isParent = isEqCategoryId(categoryId).and(category.parent.isNull());
+        
+        BooleanExpression condition = conditionByCategoryType(categoryId, isParent);
+        
+        List<SimpleBrandDto> fetch = queryFactory
                 .select(new QSimpleBrandDto(
                         brand.brandId,
                         brand.name,
                         brand.iconPhoto))
                 .from(brand)
-                .where(categoryIdEqualTo(categoryId))
+                .join(brand.products, product)
+                .where(condition)
+                .distinct()
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
         
+        JPAQuery<Long> countQuery = countCategory(categoryId);
         
-        return new PageImpl<>(fetch, pageable, fetch.size());
+        return RepositoryUtils.toPage(pageable, fetch, countQuery);
     }
 
     @Override
@@ -57,24 +68,30 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
                 .limit(pageable.getPageSize())
                 .fetch();
     }
-
+  
     private QSimpleBrandDto getSimpleBrandDto() {
         return new QSimpleBrandDto(
                 brand.brandId,
                 brand.name,
                 brand.iconPhoto);
     }
-
-    private BooleanExpression categoryIdEqualTo(final Long categoryId) {
-        BooleanExpression isParentCategory = brand.category
-                .in(JPAExpressions
-                        .select(category)
-                        .from(category)
-                        .where(category.parent.categoryId.eq(categoryId)));
+    
+    private BooleanExpression conditionByCategoryType(final Long categoryId, final BooleanExpression isParent) {
+        Long parentCount = Objects.requireNonNull(queryFactory.select(category.countDistinct())
+                .from(category)
+                .where(isParent)
+                .fetchOne());
         
-        BooleanExpression isChildCategory = brand.category.categoryId.eq(categoryId);
-        
-        return isChildCategory.or(isParentCategory);
+        if (parentCount > 0L) {
+            return product.category.parent.categoryId.eq(categoryId);
+        }
+        return product.category.categoryId.eq(categoryId);
+    }
+    
+    private JPAQuery<Long> countCategory(final Long categoryId) {
+        return queryFactory.select(category.countDistinct())
+                .from(category)
+                .where(isEqCategoryId(categoryId));
     }
     
     @Override

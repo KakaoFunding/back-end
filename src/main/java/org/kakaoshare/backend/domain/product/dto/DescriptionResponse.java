@@ -1,7 +1,5 @@
 package org.kakaoshare.backend.domain.product.dto;
 
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.option.entity.Option;
@@ -9,12 +7,14 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 
+import java.util.List;
+
 @Getter
 @Builder
 public class DescriptionResponse {
     private final Long productId;
     private final String name;
-    private final BigDecimal price;
+    private final Long price;
     private final String type;
     private final String description;
     private final List<ProductDescriptionPhoto> descriptionPhotos;
@@ -30,11 +30,10 @@ public class DescriptionResponse {
                 .price(product.getPrice())
                 .type(product.getType())
                 .description(product.getProductDetail().getDescription())
-                .descriptionPhotos(product.getProductDescriptionPhotos())
+                .descriptionPhotos(null)//TODO 2024 03 21 16:33:40 : 추후 수정 필요
                 .productName(product.getProductDetail().getProductName())
-                .productThumbnails(product.getProductThumbnails())
-                .options(product.getOptions())
-                .brandName(product.getBrand().getName())
+                .options(null)//TODO 2024 03 21 16:33:50 : 추후 수정 필요
+                .brandName(product.getBrandName())
                 .build();
     }
 }
