@@ -3,6 +3,7 @@ package org.kakaoshare.backend.domain.funding.dto;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+
 import java.util.Optional;
 
 @Getter
@@ -13,6 +14,7 @@ public class ProgressResponse {
     private static final int SCALE = 4;
     private static final double DEFAULT_PROGRESS_RATE = 0.0;
     private static final double PERCENT_MULTIPLIER = 100.0;
+
     private final Long fundingId;
     private final double progressRate;
     private final Long remainAmount;
@@ -28,8 +30,8 @@ public class ProgressResponse {
                          divide(accumulateAmount,goalAmountValue, SCALE)
                                 * PERCENT_MULTIPLIER)
                 .orElse(DEFAULT_PROGRESS_RATE);
+        Long remainAmount = goalAmount-accumulateAmount;
 
-      Long remainAmount = subtract(goalAmount,accumulateAmount);
         return ProgressResponse.builder()
                 .fundingId(funding.getFundingId())
                 .progressRate(progressRate)
@@ -48,9 +50,5 @@ public class ProgressResponse {
             rawResult += 1;
         }
         return rawResult / Math.pow(10, scale);
-    }
-    
-    public static long subtract(long minuend, long subtrahend) {
-        return minuend - subtrahend;
     }
 }
