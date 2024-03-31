@@ -27,6 +27,9 @@ public class Payment extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PaymentMethod method = KAKAO_PAY;
 
+    @Column(nullable = false)
+    private String paymentNumber;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private Long totalPrice;
 
@@ -41,7 +44,8 @@ public class Payment extends BaseTimeEntity {
     }
 
     @Builder
-    public Payment(final Long totalPrice, final Long purchasePrice) {
+    public Payment(final String paymentNumber, final Long totalPrice, final Long purchasePrice) {
+        this.paymentNumber = paymentNumber;
         this.totalPrice = totalPrice;
         this.purchasePrice = purchasePrice;
     }

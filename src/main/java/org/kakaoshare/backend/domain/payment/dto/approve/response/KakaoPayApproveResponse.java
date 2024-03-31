@@ -23,6 +23,7 @@ public record KakaoPayApproveResponse(
 ) {
     public Payment toEntity() {
         return Payment.builder()
+                .paymentNumber(tid)
                 .totalPrice(Long.valueOf(amount.total()))
                 .purchasePrice((long) (amount.total() - amount.discount()))
                 .build();
