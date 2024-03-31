@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.order.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,14 +11,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
-import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
-import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 
 import static org.kakaoshare.backend.domain.order.entity.OrderStatus.COMPLETE_PAYMENT;
 
@@ -31,56 +32,40 @@ public class Order extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ordersId;
 
-    @Column(nullable = false)
-    private Integer stockQuantity;
-
-    @Column(nullable = false, length = 10)
-    private String orderNumber;
-
     @Builder.Default
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status = COMPLETE_PAYMENT;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funding_detail_id")
     private FundingDetail fundingDetail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "receipt_id", nullable = false)
+    private Receipt receipt;
 
     protected Order() {
     }
 
     @Builder
-    public Order(final Integer stockQuantity, final String orderNumber, final Member member, final Product product, final Payment payment) {
-        this.stockQuantity = stockQuantity;
-        this.orderNumber = orderNumber;
-        this.member = member;
-        this.product = product;
+    public Order(final Payment payment, final Receipt receipt) {
         this.payment = payment;
+        this.receipt = receipt;
     }
 
     @Override
     public String toString() {
         return "Order{" +
                 "ordersId=" + ordersId +
-                ", stockQuantity=" + stockQuantity +
-                ", orderNumber='" + orderNumber + '\'' +
                 ", status=" + status +
-                ", member=" + member +
                 ", fundingDetail=" + fundingDetail +
                 ", payment=" + payment +
-                ", product=" + product +
+                ", receipt=" + receipt +
                 '}';
     }
 }
