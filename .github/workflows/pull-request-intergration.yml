@@ -1,13 +1,13 @@
 name: Integrate Pull Request with Test
 
 on:
-  # push:
-  #   branches:
-  #     - 'feature/*'
+  push:
+    branches:
+      - 'deploy'
   pull_request:
     branches:
       - 'develop'
-      - 'main'
+      - 'deploy'
     types:
       - auto_merge_enabled
 
