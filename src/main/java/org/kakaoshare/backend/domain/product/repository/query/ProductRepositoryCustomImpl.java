@@ -131,7 +131,17 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         
         return toPage(pageable, content, countQuery);
     }
-    
+
+    @Override
+    public Map<Long, Long> findAllPriceByIdsGroupById(final List<Long> productIds) {
+        return queryFactory.selectFrom(product)
+                .where(containsExpression(product.productId, productIds))
+                .transform(
+                        groupBy(product.productId)
+                                .as(product.price)
+                );
+    }
+
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
         return Stream.concat(
