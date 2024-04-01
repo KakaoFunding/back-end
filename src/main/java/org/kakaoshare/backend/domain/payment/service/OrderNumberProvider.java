@@ -7,11 +7,8 @@ import java.util.UUID;
 
 @Component
 public class OrderNumberProvider {
-    private static final int ORDER_DETAIL_KEY_LENGTH = 10;
-
     public String createOrderDetailKey() {
-        return UUID.randomUUID().toString()
-                .substring(0, ORDER_DETAIL_KEY_LENGTH);
+        return UUID.randomUUID().toString();
     }
 
     public String createOrderNumber() {
