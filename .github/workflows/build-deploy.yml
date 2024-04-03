@@ -12,9 +12,9 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   AWS_S3_BUCKET: app-release-files
-  AWS_CODE_BUCKET_NAME: kakao-funding-bucket
-  AWS_CODE_DEPLOY_APPLICATION: funding_cicd
-  AWS_CODE_DEPLOY_GROUP: funding_instance
+  AWS_CODE_BUCKET_NAME: funding-cicd
+  AWS_CODE_DEPLOY_APPLICATION: funding-cd
+  AWS_CODE_DEPLOY_GROUP: funding-publish
 
 jobs:
   build-with-gradle:
