@@ -7,7 +7,10 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.error.GlobalErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
@@ -51,6 +54,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     private static final int PRODUCT_SIZE_GROUP_BY_BRAND = 9;
 
     private final JPAQueryFactory queryFactory;
+    private final BusinessException businessException;
 
     @Override
     public Page<Product4DisplayDto> findAllByCategoryId(final Long categoryId,
@@ -158,14 +162,12 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     @Override
     public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
         // 제품 기본 정보 조회
-        Product product = queryFactory
-                .selectFrom(QProduct.product)
-                .where(QProduct.product.productId.eq(productId))
-                .fetchOne();
+        Product product = Optional.ofNullable(queryFactory
+                        .selectFrom(QProduct.product)
+                        .where(QProduct.product.productId.eq(productId))
+                        .fetchOne())
+                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
 
-        if (product == null) {
-            return null;
-        }
 
         List<String> descriptionPhotosUrls = queryFactory
                 .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
