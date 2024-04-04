@@ -3,11 +3,7 @@ run-name: Running
 on:
   push:
     branches:
-      - deploy
-
-  pull_request:
-    branches:
-      - deploy
+      - deploy    # deploy 브런치로 푸쉬했을 때 실행
 
 env:
   AWS_REGION: ap-northeast-2
@@ -18,7 +14,7 @@ env:
 
 jobs:
   build-with-gradle:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-20.04   # ubuntu ver
     steps:
       - name: deploy 브랜치로 이동
         uses: actions/checkout@v3
@@ -42,4 +38,4 @@ jobs:
       - name: S3에 업로드
         run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://${{ env.AWS_CODE_BUCKET_NAME }}/cicdDir/$GITHUB_SHA.zip --source .
       - name: EC2에 배포
-        run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=${{ env.AWS_S3_BUCKET }},key=cicdDir/$GITHUB_SHA.zip,bundleType=zip
+        run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=${{ env.AWS_CODE_BUCKET_NAME }},key=cicdDir/$GITHUB_SHA.zip,bundleType=zip
