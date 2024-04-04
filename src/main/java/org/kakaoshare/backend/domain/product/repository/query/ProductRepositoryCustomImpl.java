@@ -55,7 +55,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     private static final int PRODUCT_SIZE_GROUP_BY_BRAND = 9;
 
     private final JPAQueryFactory queryFactory;
-    private final BusinessException businessException;
 
     @Override
     public Page<Product4DisplayDto> findAllByCategoryId(final Long categoryId,
