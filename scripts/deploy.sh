@@ -1,22 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-REPOSITORY=/home/ec2-user/back-end
-cd $REPOSITORY
+ROOT_PATH="/home/ec2-user/back-end"
+JAR="$ROOT_PATH/application.jar"
 
-APP_NAME=back-end
+APP_LOG="$ROOT_PATH/application.log"
+ERROR_LOG="$ROOT_PATH/error.log"
+START_LOG="$ROOT_PATH/start.log"
 
-JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT.jar' | tail -n 1)
-JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
+NOW=$(date +%c)
 
-CURRENT_PID=$(pgrep -fl $APP_NAME | grep java | awk '{print $1}')
+echo "[$NOW] $JAR 복사" >> $START_LOG
+cp $ROOT_PATH/build/libs/*.jar $JAR
 
-if [ -z "$CURRENT_PID" ]; then
-  echo "> 종료할 애플리케이션이 없습니다."
-else
-  echo "> kill -15 $CURRENT_PID"
-  kill -15 $CURRENT_PID
-  sleep 5
-fi
+echo "[$NOW] > $JAR 실행" >> $START_LOG
+nohup java -jar $JAR > $APP_LOG 2> $ERROR_LOG &
 
-echo "> Deploy - $JAR_PATH "
-nohup java -jar $JAR_PATH > back-end.log 2>&1 < /dev/null &
+SERVICE_PID=$(pgrep -f $JAR)
+echo "[$NOW] > 서비스 PID: $SERVICE_PID" >> $START_LOG
