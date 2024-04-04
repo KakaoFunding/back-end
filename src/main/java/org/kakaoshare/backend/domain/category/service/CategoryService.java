@@ -18,11 +18,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    
     //TODO 2024 03 31 21:33:04 : 캐싱 구현 후 캐싱된 쿼리 사용
     public List<CategoryDto> getParentCategories() {
         List<Category> categories = categoryRepository.findAllParentCategories();
-        return categories.stream().map(CategoryDto::from).toList();
+        return categories.stream()
+                .map(CategoryDto::from)
+                .toList();
     }
+    
     //TODO 2024 03 31 21:32:45 : 캐싱 구현 후 캐싱된 쿼리 사용
     public CategoryDto getParentCategory(final Long categoryId) {
         Category category = categoryRepository.findParentCategoryWithChildren(categoryId)
@@ -35,8 +39,9 @@ public class CategoryService {
                 .orElseThrow(() -> new CategoryException(CategoryErrorCode.INVALID_SUB_CATEGORY_ID));
         return CategoryDto.from(category);
     }
+    
     //TODO 2024 03 31 21:32:16 : 캐싱 구현 후 캐싱된 쿼리 사용
-    public CategoryHeaderResponse getHeaderResponse(final Long categoryId){
+    public CategoryHeaderResponse getHeaderResponse(final Long categoryId) {
         Long brandCount = categoryRepository.countBrand(categoryId);
         Long productCount = categoryRepository.countProduct(categoryId);
         List<SimpleCategoryDto> list = categoryRepository.findParentCategoryWithChildren(categoryId)
@@ -45,6 +50,6 @@ public class CategoryService {
                 .stream()
                 .map(SimpleCategoryDto::from)
                 .toList();
-        return CategoryHeaderResponse.of(brandCount,productCount,list);
+        return CategoryHeaderResponse.of(brandCount, productCount, list);
     }
 }
