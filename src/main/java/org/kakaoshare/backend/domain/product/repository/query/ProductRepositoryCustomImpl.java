@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
@@ -130,7 +131,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .orderBy(createOrderSpecifiers(brand, pageable))
                 .offset(pageable.getOffset())
                 .transform(groupBy(brand.brandId)
-                        .list(new QSimpleBrandProductDto(getSimpleBrandDto(), GroupBy.list(getProduct4DisplayDto())))
+                        .list(new QSimpleBrandProductDto(getSimpleBrandDto(), list(getProduct4DisplayDto())))
                 );
 
         // TODO: 3/21/24 일단은 메모리에서 페이징하는 것으로 구현
@@ -176,31 +177,23 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .fetch();
 
         List<OptionResponse> optionsResponses = queryFactory
-                .select(Projections.constructor(
-                        OptionResponse.class,
-                        QOption.option.optionsId,
-                        QOption.option.name
-                ))
                 .from(QOption.option)
+                .leftJoin(QOptionDetail.optionDetail).on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
                 .where(QOption.option.product.productId.eq(productId))
-                .fetch();
-
-        // 각 옵션에 대한 상세 정보 조회 및 설정
-        for (OptionResponse optionResponse : optionsResponses) {
-            List<OptionDetailResponse> detailsResponses = queryFactory
-                    .select(Projections.constructor(
-                            OptionDetailResponse.class,
-                            QOptionDetail.optionDetail.optionDetailId,
-                            QOptionDetail.optionDetail.name,
-                            QOptionDetail.optionDetail.additionalPrice,
-                            QOptionDetail.optionDetail.photo
-                    ))
-                    .from(QOptionDetail.optionDetail)
-                    .where(QOptionDetail.optionDetail.option.optionsId.eq(optionResponse.getOptionsId()))
-                    .fetch();
-
-            optionResponse.setOptionDetails(detailsResponses);
-        }
+                .transform(
+                        groupBy(QOption.option.optionsId).list(Projections.constructor(
+                                OptionResponse.class,
+                                QOption.option.optionsId,
+                                QOption.option.name,
+                                list(Projections.constructor(
+                                        OptionDetailResponse.class,
+                                        QOptionDetail.optionDetail.optionDetailId,
+                                        QOptionDetail.optionDetail.name,
+                                        QOptionDetail.optionDetail.additionalPrice,
+                                        QOptionDetail.optionDetail.photo
+                                )).as("optionDetails")
+                        ))
+                );
         List<String> productThumbnailsUrls = queryFactory
                 .select(QProductThumbnail.productThumbnail.thumbnailUrl)
                 .from(QProductThumbnail.productThumbnail)
