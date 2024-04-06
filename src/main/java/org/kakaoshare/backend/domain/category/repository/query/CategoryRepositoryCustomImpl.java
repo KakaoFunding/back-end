@@ -8,7 +8,9 @@ import org.kakaoshare.backend.domain.category.entity.Category;
 import java.util.List;
 import java.util.Optional;
 
+import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
+import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 
 @RequiredArgsConstructor
 public class CategoryRepositoryCustomImpl implements CategoryRepositoryCustom {
@@ -45,6 +47,22 @@ public class CategoryRepositoryCustomImpl implements CategoryRepositoryCustom {
                 .fetchJoin()
                 .where(hasNoParent())
                 .fetch();
+    }
+    
+    @Override
+    public Long countBrand(final Long categoryId) {
+        return queryFactory.select(brand.countDistinct())
+                .from(brand)
+                .where(brand.products.any().category.parent.categoryId.eq(categoryId))
+                .fetchOne();
+    }
+    
+    @Override
+    public Long countProduct(final Long categoryId) {
+        return queryFactory.select(product.countDistinct())
+                .from(product)
+                .where(product.category.parent.categoryId.eq(categoryId))
+                .fetchOne();
     }
     
     private static BooleanExpression equalCategoryId(final Long categoryId) {
