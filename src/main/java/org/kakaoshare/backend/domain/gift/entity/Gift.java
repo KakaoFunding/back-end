@@ -30,7 +30,7 @@ public class Gift extends BaseTimeEntity {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "varchar(255)")
     private GiftStatus status = NOT_USED;
 
     @Column
@@ -38,7 +38,7 @@ public class Gift extends BaseTimeEntity {
 
     @Column
     private String messagePhoto;
-
+    
     @Column(nullable = false)
     private LocalDateTime expiredAt;
 
