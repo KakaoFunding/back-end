@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductRepositoryCustom {
     Page<Product4DisplayDto> findAllByCategoryId(Long categoryId, Pageable pageable);
@@ -17,4 +18,5 @@ public interface ProductRepositoryCustom {
     DetailResponse findProductDetail(Long productId);
     Page<Product4DisplayDto> findBySearchConditions(final String keyword, final Integer minPrice, final Integer maxPrice, final List<String> categories, final Pageable pageable);
     Page<SimpleBrandProductDto> findBySearchConditionsGroupByBrand(final String keyword, final Pageable pageable);
+    Map<Long, Long> findAllPriceByIdsGroupById(List<Long> productIds);
 }
