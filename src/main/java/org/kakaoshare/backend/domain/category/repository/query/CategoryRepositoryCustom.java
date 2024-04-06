@@ -13,5 +13,7 @@ public interface CategoryRepositoryCustom {
     
     
     List<Category> findAllParentCategories();
+    Long countBrand(Long categoryId);
+    Long countProduct(Long categoryId);
     
 }
