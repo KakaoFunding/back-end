@@ -2,6 +2,8 @@ package org.kakaoshare.backend.domain.category.repository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.domain.category.entity.Category;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +103,24 @@ class CategoryRepositoryTest {
         assertThat(child.getParent()).isNotNull();
         assertThat(child.getChildren()).isEmpty();
         System.out.println(stopWatch.prettyPrint());
+    }
+    
+    @Test
+    @DisplayName("부모 카테고리를 통해 브랜드 갯수 조회")
+    void testCountBrand() {
+        // given
+        Long brandCount = categoryRepository.countBrand(PARENT_ID);
+        // then
+        assertThat(brandCount).isEqualTo(50);
+    }
+    @ParameterizedTest
+    @ValueSource(longs = {1,2,3,4,5})
+    @DisplayName("부모 카테고리를 통해 상품 갯수 조회")
+    void testCountProduct(Long id) {
+        // given
+        Long productCount = categoryRepository.countProduct(id);
+        // then
+        assertThat(productCount).isEqualTo(2000);
     }
     
     private List<Category> getParentCategories() {// 부모 카테고리만 반환

@@ -1,17 +1,23 @@
 package org.kakaoshare.backend.domain.gift.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.order.entity.Order;
-import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.receipt.entity.Receipt;
+
+import java.time.LocalDateTime;
+
+import static org.kakaoshare.backend.domain.gift.entity.GiftStatus.NOT_USED;
 
 
 @Entity
@@ -22,8 +28,10 @@ public class Gift extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long giftId;
 
-    @Column(nullable = false, length = 50)
-    private String status;
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GiftStatus status = NOT_USED;
 
     @Column
     private String message;
@@ -31,11 +39,30 @@ public class Gift extends BaseTimeEntity {
     @Column
     private String messagePhoto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orders_id", nullable = false)
-    private Order order;
+    @Column(nullable = false)
+    private LocalDateTime expiredAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Receipt receipt;
+
+    protected Gift() {
+    }
+
+    @Builder
+    public Gift(final LocalDateTime expiredAt, final Receipt receipt) {
+        this.expiredAt = expiredAt;
+        this.receipt = receipt;
+    }
+
+    @Override
+    public String toString() {
+        return "Gift{" +
+                "giftId=" + giftId +
+                ", status=" + status +
+                ", message='" + message + '\'' +
+                ", messagePhoto='" + messagePhoto + '\'' +
+                ", expiredAt=" + expiredAt +
+                ", receipt=" + receipt +
+                '}';
+    }
 }

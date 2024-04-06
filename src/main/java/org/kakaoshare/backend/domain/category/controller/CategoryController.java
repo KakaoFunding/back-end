@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.category.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.category.dto.CategoryDto;
+import org.kakaoshare.backend.domain.category.dto.CategoryHeaderResponse;
 import org.kakaoshare.backend.domain.category.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +45,11 @@ public class CategoryController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+    
+    @GetMapping("/{categoryId}/header")
+    public ResponseEntity<?> getCategoryHeader(@PathVariable Long categoryId) {
+        CategoryHeaderResponse headerResponse = categoryService.getHeaderResponse(categoryId);
+        return ResponseEntity.ok(headerResponse);
     }
 }

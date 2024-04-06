@@ -1,5 +1,7 @@
 package org.kakaoshare.backend.domain.payment.dto.approve.response;
 
+import org.kakaoshare.backend.domain.payment.entity.Payment;
+
 import java.time.LocalDateTime;
 
 public record KakaoPayApproveResponse(
@@ -19,4 +21,11 @@ public record KakaoPayApproveResponse(
         LocalDateTime approved_at,
         String payload
 ) {
+    public Payment toEntity() {
+        return Payment.builder()
+                .paymentNumber(tid)
+                .totalPrice(Long.valueOf(amount.total()))
+                .purchasePrice((long) (amount.total() - amount.discount()))
+                .build();
+    }
 }
