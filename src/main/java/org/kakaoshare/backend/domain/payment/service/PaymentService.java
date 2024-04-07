@@ -7,7 +7,9 @@ import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
+import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
+import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
@@ -39,6 +41,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
+import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_OPTION;
 
 @RequiredArgsConstructor
 @Service
@@ -46,6 +49,7 @@ import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.I
 public class PaymentService {
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
+    private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final OrderRepository orderRepository;
     private final OrderNumberProvider orderNumberProvider;
@@ -57,6 +61,7 @@ public class PaymentService {
     public PaymentReadyResponse ready(final String providerId,
                                       final List<PaymentReadyRequest> paymentReadyRequests) {
         validateTotalAmount(paymentReadyRequests);
+        validateOptionDetailIds(paymentReadyRequests);
         final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
         final OrderDetails orderDetails = getOrderDetails(paymentReadyRequests);
         final List<PaymentReadyProductDto> paymentProductReadyRequests = getPaymentProductReadyRequests(paymentReadyRequests);
@@ -96,6 +101,33 @@ public class PaymentService {
         return paymentReadyRequests.stream()
                 .map(paymentReadyRequest -> new PaymentReadyProductDto(nameById.get(paymentReadyRequest.productId()), paymentReadyRequest.quantity(), paymentReadyRequest.totalAmount()))
                 .toList();
+    }
+
+    private void validateOptionDetailIds(final List<PaymentReadyRequest> paymentReadyRequests) {
+        final boolean isAllMatch = paymentReadyRequests.stream()
+                .anyMatch(this::matchesOptionsWithProduct);
+        if (!isAllMatch) {
+            throw new PaymentException(INVALID_OPTION);
+        }
+    }
+
+    private boolean matchesOptionsWithProduct(final PaymentReadyRequest paymentReadyRequest) {
+        final Long productId = paymentReadyRequest.productId();
+        final List<Long> optionDetailIds = paymentReadyRequest.optionDetailIds();
+        if (optionDetailIds == null || optionDetailIds.isEmpty()) {
+            return true;
+        }
+
+        final List<Option> options = optionRepository.findByOptionDetailIds(optionDetailIds);
+        if (options.size() != optionDetailIds.size()) {
+            return false;
+        }
+
+        final List<Long> productIds = options.stream()
+                .map(option -> option.getProduct().getProductId())
+                .distinct()
+                .toList();
+        return productIds.size() == 1 && productIds.get(0).equals(productId);
     }
 
     private OrderDetails getOrderDetails(final List<PaymentReadyRequest> paymentReadyRequests) {
