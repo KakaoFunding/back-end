@@ -32,11 +32,11 @@ public class KakaoPayRequestProvider {
     }
 
     public KakaoPayReadyRequest createReadyRequest(final String providerId,
-                                                   final List<PaymentReadyProductDto> paymentProductReadyRequests,
+                                                   final List<PaymentReadyProductDto> paymentReadyProductDtos,
                                                    final String orderNumber) {
-        final int totalAmount = getTotalAmount(paymentProductReadyRequests);
-        final int quantity = getQuantity(paymentProductReadyRequests);
-        final String productName = getProductName(paymentProductReadyRequests);
+        final int totalAmount = getTotalAmount(paymentReadyProductDtos);
+        final int quantity = getQuantity(paymentReadyProductDtos);
+        final String productName = getProductName(paymentReadyProductDtos);
         return new KakaoPayReadyRequest(cid, cidSecret, orderNumber, providerId, productName, quantity, totalAmount, 0, approvalUrl, cancelUrl, failUrl);
     }
 
@@ -48,24 +48,24 @@ public class KakaoPayRequestProvider {
         return new KakaoPayApproveRequest(cid, cidSecret, tid, orderNumber, providerId, pgToken);
     }
 
-    private int getTotalAmount(final List<PaymentReadyProductDto> paymentProductReadyRequests) {
-        return paymentProductReadyRequests.stream()
+    private int getTotalAmount(final List<PaymentReadyProductDto> paymentReadyProductDtos) {
+        return paymentReadyProductDtos.stream()
                 .mapToInt(PaymentReadyProductDto::totalAmount)
                 .sum();
     }
 
-    private int getQuantity(final List<PaymentReadyProductDto> paymentProductReadyRequests) {
-        return paymentProductReadyRequests.stream()
+    private int getQuantity(final List<PaymentReadyProductDto> paymentReadyProductDtos) {
+        return paymentReadyProductDtos.stream()
                 .mapToInt(PaymentReadyProductDto::quantity)
                 .sum();
     }
 
-    private String getProductName(final List<PaymentReadyProductDto> paymentProductReadyRequests) {
-        final String firstProductName = paymentProductReadyRequests.get(0).name();
+    private String getProductName(final List<PaymentReadyProductDto> paymentReadyProductDtos) {
+        final String firstProductName = paymentReadyProductDtos.get(0).name();
         final StringBuilder stringBuilder = new StringBuilder(firstProductName);
-        if (paymentProductReadyRequests.size() > 1) {
+        if (paymentReadyProductDtos.size() > 1) {
             stringBuilder.append(PRODUCT_NAME_SEPARATOR);
-            stringBuilder.append(paymentProductReadyRequests.size() - 1);
+            stringBuilder.append(paymentReadyProductDtos.size() - 1);
             stringBuilder.append(PRODUCT_NAME_SUFFIX);
         }
 
