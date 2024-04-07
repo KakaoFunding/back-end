@@ -5,6 +5,7 @@ import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
 import org.kakaoshare.backend.domain.option.entity.Option;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_OPTION;
 
@@ -207,6 +209,6 @@ public class PaymentService {
 
     private Member findMemberByProviderId(final String providerId) {
         return memberRepository.findByProviderId(providerId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new MemberException(NOT_FOUND));
     }
 }
