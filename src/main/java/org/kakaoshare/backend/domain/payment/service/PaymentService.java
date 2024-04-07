@@ -151,7 +151,7 @@ public class PaymentService {
                 .map(orderDetail -> new Receipt(
                         orderDetail.orderNumber(),
                         productRepository.getReferenceById(orderDetail.productId()),
-                        orderDetail.stockQuantity(),
+                        orderDetail.quantity(),
                         recipient,
                         receiver,
                         getReceiptOptions(orderDetail.optionDetailIds())))
@@ -189,7 +189,7 @@ public class PaymentService {
 
     private OrderSummaryResponse getOrderSummary(final OrderDetail orderDetail) {
         final ProductSummaryResponse productSummaryResponse = productRepository.findAllProductSummaryById(orderDetail.productId());
-        return new OrderSummaryResponse(productSummaryResponse, orderDetail.stockQuantity(), getOptionSummaryResponses(orderDetail.optionDetailIds()));
+        return new OrderSummaryResponse(productSummaryResponse, orderDetail.quantity(), getOptionSummaryResponses(orderDetail.optionDetailIds()));
     }
 
     private List<OptionSummaryResponse> getOptionSummaryResponses(final List<Long> optionDetailIds) {
