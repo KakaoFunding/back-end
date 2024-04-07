@@ -14,6 +14,7 @@ import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
@@ -58,7 +59,8 @@ public class PaymentService {
         validateTotalAmount(paymentReadyRequests);
         final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
         final OrderDetails orderDetails = getOrderDetails(paymentReadyRequests);
-        final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentReadyRequests, orderDetailKey);
+        final List<PaymentReadyProductDto> paymentProductReadyRequests = getPaymentProductReadyRequests(paymentReadyRequests);
+        final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentProductReadyRequests, orderDetailKey);
         redisUtils.save(orderDetailKey, orderDetails);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), kakaoPayReadyResponse.next_redirect_pc_url(), orderDetailKey);
     }
@@ -82,10 +84,18 @@ public class PaymentService {
         final List<Long> productIds = extractedProductIds(paymentReadyRequests, PaymentReadyRequest::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
         final boolean isAllMatch = paymentReadyRequests.stream()
-                .anyMatch(paymentReadyRequest -> paymentReadyRequest.stockQuantity() * priceByIds.get(paymentReadyRequest.productId()) != paymentReadyRequest.totalAmount());
+                .anyMatch(paymentReadyRequest -> paymentReadyRequest.quantity() * priceByIds.get(paymentReadyRequest.productId()) == paymentReadyRequest.totalAmount());
         if (!isAllMatch) {
             throw new PaymentException(INVALID_AMOUNT);
         }
+    }
+
+    private List<PaymentReadyProductDto> getPaymentProductReadyRequests(final List<PaymentReadyRequest> paymentReadyRequests) {
+        final List<Long> productIds = extractedProductIds(paymentReadyRequests, PaymentReadyRequest::productId);
+        final Map<Long, String> nameById = productRepository.findAllNameByIdsGroupById(productIds);
+        return paymentReadyRequests.stream()
+                .map(paymentReadyRequest -> new PaymentReadyProductDto(nameById.get(paymentReadyRequest.productId()), paymentReadyRequest.quantity(), paymentReadyRequest.totalAmount()))
+                .toList();
     }
 
     private OrderDetails getOrderDetails(final List<PaymentReadyRequest> paymentReadyRequests) {

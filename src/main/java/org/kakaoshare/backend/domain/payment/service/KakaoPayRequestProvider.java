@@ -1,8 +1,8 @@
 package org.kakaoshare.backend.domain.payment.service;
 
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.approve.request.KakaoPayApproveRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.KakaoPayReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,11 +32,11 @@ public class KakaoPayRequestProvider {
     }
 
     public KakaoPayReadyRequest createReadyRequest(final String providerId,
-                                                   final List<PaymentReadyRequest> paymentRequests,
+                                                   final List<PaymentReadyProductDto> paymentProductReadyRequests,
                                                    final String orderNumber) {
-        final int totalAmount = getTotalAmount(paymentRequests);
-        final int quantity = getQuantity(paymentRequests);
-        final String productName = getProductName(paymentRequests);
+        final int totalAmount = getTotalAmount(paymentProductReadyRequests);
+        final int quantity = getQuantity(paymentProductReadyRequests);
+        final String productName = getProductName(paymentProductReadyRequests);
         return new KakaoPayReadyRequest(cid, cidSecret, orderNumber, providerId, productName, quantity, totalAmount, 0, approvalUrl, cancelUrl, failUrl);
     }
 
@@ -48,24 +48,24 @@ public class KakaoPayRequestProvider {
         return new KakaoPayApproveRequest(cid, cidSecret, tid, orderNumber, providerId, pgToken);
     }
 
-    private int getTotalAmount(final List<PaymentReadyRequest> paymentRequests) {
-        return paymentRequests.stream()
-                .mapToInt(PaymentReadyRequest::totalAmount)
+    private int getTotalAmount(final List<PaymentReadyProductDto> paymentProductReadyRequests) {
+        return paymentProductReadyRequests.stream()
+                .mapToInt(PaymentReadyProductDto::totalAmount)
                 .sum();
     }
 
-    private int getQuantity(final List<PaymentReadyRequest> paymentRequests) {
-        return paymentRequests.stream()
-                .mapToInt(PaymentReadyRequest::stockQuantity)
+    private int getQuantity(final List<PaymentReadyProductDto> paymentProductReadyRequests) {
+        return paymentProductReadyRequests.stream()
+                .mapToInt(PaymentReadyProductDto::quantity)
                 .sum();
     }
 
-    private String getProductName(final List<PaymentReadyRequest> paymentRequests) {
-        final String firstProductName = paymentRequests.get(0).name();
+    private String getProductName(final List<PaymentReadyProductDto> paymentProductReadyRequests) {
+        final String firstProductName = paymentProductReadyRequests.get(0).name();
         final StringBuilder stringBuilder = new StringBuilder(firstProductName);
-        if (paymentRequests.size() > 1) {
+        if (paymentProductReadyRequests.size() > 1) {
             stringBuilder.append(PRODUCT_NAME_SEPARATOR);
-            stringBuilder.append(paymentRequests.size() - 1);
+            stringBuilder.append(paymentProductReadyRequests.size() - 1);
             stringBuilder.append(PRODUCT_NAME_SUFFIX);
         }
 
