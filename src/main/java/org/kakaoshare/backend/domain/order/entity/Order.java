@@ -33,7 +33,7 @@ public class Order extends BaseTimeEntity {
     private Long ordersId;
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private OrderStatus status = COMPLETE_PAYMENT;
 

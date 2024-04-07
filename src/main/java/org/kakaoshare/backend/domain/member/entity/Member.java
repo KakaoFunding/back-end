@@ -22,7 +22,7 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
@@ -36,7 +36,7 @@ public class Member extends BaseTimeEntity {
     private String providerId;
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Role role = USER;
 

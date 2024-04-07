@@ -23,7 +23,7 @@ public class Payment extends BaseTimeEntity {
     private Long paymentId;
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private PaymentMethod method = KAKAO_PAY;
 
