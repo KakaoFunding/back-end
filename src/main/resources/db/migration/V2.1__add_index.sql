@@ -17,6 +17,6 @@ CALL CreateUniqueIndexIfNotExists('receipt', 'product_id', 'idx_receipt_product_
 CALL CreateIndexIfNotExists('receipt', 'order_number', 'idx_receipt_order_number');
 CALL CreateUniqueIndexIfNotExists('receipt', 'receiver_id', 'idx_receipt_receiver_id');
 CALL CreateUniqueIndexIfNotExists('receipt', 'recipient_id', 'idx_receipt_recipient_id');
-CALL CreateUniqueIndexIfNotExists('wish', 'product_id', 'idx_wish_product_id');
+CALL CreateIndexIfNotExists('wish', 'product_id', 'idx_wish_product_id');
 
 
