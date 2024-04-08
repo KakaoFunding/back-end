@@ -1,1 +1,0 @@
-ALTER TABLE receipt CHANGE COLUMN stock_quantity quantity INT;
