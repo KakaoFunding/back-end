@@ -17,33 +17,33 @@ import static org.kakaoshare.backend.domain.member.entity.Role.USER;
 @Entity
 @Getter
 public class Member extends BaseTimeEntity {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
-
-    @Column(nullable = false)
+    
+    @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Gender gender;
-
+    
     @Column(nullable = false)
     private String name;
-
+    
     @Column(nullable = false, length = 20)
     private String phoneNumber;
-
+    
     @Column(nullable = false)
     private String providerId;
-
+    
     @Builder.Default
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Role role = USER;
-
+    
     protected Member() {
-
+    
     }
-
+    
     @Builder
     public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId) {
         this.memberId = memberId;
@@ -52,7 +52,7 @@ public class Member extends BaseTimeEntity {
         this.phoneNumber = phoneNumber;
         this.providerId = providerId;
     }
-
+    
     @Override
     public String toString() {
         return "Member{" +
