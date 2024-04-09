@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
+import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +29,14 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
                         gift.receipt.product.brandName))
                 .from(gift)
                 .leftJoin(gift.receipt).fetchJoin()
+                .where(gift.status.eq(GiftStatus.NOT_USED))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         long total = queryFactory
                 .selectFrom(gift)
+                .where(gift.status.eq(GiftStatus.NOT_USED))
                 .fetchCount();
 
         return new PageImpl<>(content, pageable, total);
