@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
     private final JPAQueryFactory queryFactory;
     @Override
-    public Page<GiftResponse> findGifts(Pageable pageable) {
+    public Page<GiftResponse> findGiftsByMemberId(Long memberId, Pageable pageable) {
         List<GiftResponse> content = queryFactory
                 .select(Projections.constructor(GiftResponse.class,
                         gift.giftId,
@@ -29,14 +29,16 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
                         gift.receipt.product.brandName))
                 .from(gift)
                 .leftJoin(gift.receipt).fetchJoin()
-                .where(gift.status.eq(GiftStatus.NOT_USED))
+                .where(gift.status.eq(GiftStatus.NOT_USED)
+                        .and(gift.receipt.recipient.memberId.eq(memberId)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         long total = queryFactory
                 .selectFrom(gift)
-                .where(gift.status.eq(GiftStatus.NOT_USED))
+                .where(gift.status.eq(GiftStatus.NOT_USED)
+                        .and(gift.receipt.recipient.memberId.eq(memberId)))
                 .fetchCount();
 
         return new PageImpl<>(content, pageable, total);

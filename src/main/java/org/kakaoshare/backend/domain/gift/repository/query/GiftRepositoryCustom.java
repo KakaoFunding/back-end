@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface GiftRepositoryCustom {
-    Page<GiftResponse> findGifts(Pageable pageable);
+    Page<GiftResponse> findGiftsByMemberId(Long memberId, Pageable pageable);
 }
