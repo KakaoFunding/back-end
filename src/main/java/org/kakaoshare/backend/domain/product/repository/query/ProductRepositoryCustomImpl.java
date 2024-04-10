@@ -17,6 +17,7 @@ import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.option.dto.OptionDetailResponse;
 import org.kakaoshare.backend.domain.option.dto.OptionResponse;
+import org.kakaoshare.backend.domain.option.dto.ProductOptionDetailResponse;
 import org.kakaoshare.backend.domain.option.entity.OptionDetail;
 import org.kakaoshare.backend.domain.option.entity.QOption;
 import org.kakaoshare.backend.domain.option.entity.QOptionDetail;
@@ -194,7 +195,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                 QOption.option.optionsId,
                                 QOption.option.name,
                                 list(Projections.constructor(
-                                        OptionDetailResponse.class,
+                                        ProductOptionDetailResponse.class,
                                         QOptionDetail.optionDetail.optionDetailId,
                                         QOptionDetail.optionDetail.name,
                                         QOptionDetail.optionDetail.additionalPrice,
