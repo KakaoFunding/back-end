@@ -50,6 +50,7 @@ import static org.kakaoshare.backend.domain.option.entity.QOption.option;
 import static org.kakaoshare.backend.domain.option.entity.QOptionDetail.optionDetail;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto.productDescriptionPhoto;
+import static org.kakaoshare.backend.domain.product.entity.QProductDetail.productDetail;
 
 @RequiredArgsConstructor
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, SortableRepository {
@@ -161,6 +162,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                 .as(product.price)
                 );
     }
+
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(final Pageable pageable) {
         return Stream.concat(
@@ -178,31 +180,13 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                         .fetchOne())
                 .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
 
-
         List<String> descriptionPhotosUrls = queryFactory
                 .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
                 .from(QProductDescriptionPhoto.productDescriptionPhoto)
                 .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(productId))
                 .fetch();
 
-        List<OptionResponse> optionsResponses = queryFactory
-                .from(QOption.option)
-                .leftJoin(QOptionDetail.optionDetail).on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
-                .where(QOption.option.product.productId.eq(productId))
-                .transform(
-                        groupBy(QOption.option.optionsId).list(Projections.constructor(
-                                OptionResponse.class,
-                                QOption.option.optionsId,
-                                QOption.option.name,
-                                list(Projections.constructor(
-                                        ProductOptionDetailResponse.class,
-                                        QOptionDetail.optionDetail.optionDetailId,
-                                        QOptionDetail.optionDetail.name,
-                                        QOptionDetail.optionDetail.additionalPrice,
-                                        QOptionDetail.optionDetail.photo
-                                )).as("optionDetails")
-                        ))
-                );
+        List<OptionResponse> optionsResponses = findOptions(productId);
         List<String> productThumbnailsUrls = queryFactory
                 .select(QProductThumbnail.productThumbnail.thumbnailUrl)
                 .from(QProductThumbnail.productThumbnail)
@@ -213,31 +197,21 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
 
-
     @Override
     public DetailResponse findProductDetail(Long productId) {
-        return null;
-//        return queryFactory
-//                .select(Projections.constructor(DetailResponse.class,
-//                        product.productId,
-//                        product.name,
-//                        product.price,
-//                        product.type,
-//                        product.productDetail.hasPhoto,
-//                        product.productDetail.productName,
-//                        product.productDetail.origin,
-//                        product.productDetail.manufacturer,
-//                        product.productDetail.tel,
-//                        product.productDetail.deliverDescription,
-//                        product.productDetail.billingNotice,
-//                        product.productDetail.caution,
-//                        product.options.any(),
-//                        product.brand))
-//                .from(product)
-//                .leftJoin(product.productDetail, productDetail)
-//                .where(product.productId.eq(productId))
-//                .fetchOne();
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
+                .fetchOne();
+
+        if (product == null) {
+            throw new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND);
+        }
+
+        List<OptionResponse> optionsResponses = findOptions(productId);
+        return DetailResponse.from(product, optionsResponses);
     }
+
 
     private QSimpleBrandDto getSimpleBrandDto() {
         return new QSimpleBrandDto(
@@ -290,4 +264,29 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .from(product)
                 .where(categoryIdEqualTo(categoryId));
     }
+
+    private List<OptionResponse> findOptions(Long productId) {
+
+        // 옵션과 옵션 상세 정보를 조회합니다.
+        return queryFactory
+                .from(QOption.option)
+                .leftJoin(QOptionDetail.optionDetail)
+                .on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
+                .where(QOption.option.product.productId.eq(productId))
+                .transform(
+                        groupBy(QOption.option.optionsId).list(Projections.constructor(
+                                OptionResponse.class,
+                                QOption.option.optionsId,
+                                QOption.option.name,
+                                list(Projections.constructor(
+                                        ProductOptionDetailResponse.class,
+                                        QOptionDetail.optionDetail.optionDetailId,
+                                        QOptionDetail.optionDetail.name,
+                                        QOptionDetail.optionDetail.additionalPrice,
+                                        QOptionDetail.optionDetail.photo
+                                )).as("optionDetails")
+                        ))
+                );
+    }
+
 }
