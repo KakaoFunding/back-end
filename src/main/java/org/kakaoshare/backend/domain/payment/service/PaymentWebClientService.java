@@ -1,9 +1,9 @@
 package org.kakaoshare.backend.domain.payment.service;
 
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.approve.request.KakaoPayApproveRequest;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.KakaoPayReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,9 +36,9 @@ public class PaymentWebClientService {
     }
 
     public KakaoPayReadyResponse ready(final String providerId,
-                                       final List<PaymentReadyRequest> paymentReadyRequests,
+                                       final List<PaymentReadyProductDto> paymentReadyProductDtos,
                                        final String orderNumber) {
-        final KakaoPayReadyRequest kakaoPayReadyRequest = requestProvider.createReadyRequest(providerId, paymentReadyRequests, orderNumber);
+        final KakaoPayReadyRequest kakaoPayReadyRequest = requestProvider.createReadyRequest(providerId, paymentReadyProductDtos, orderNumber);
         return webClient.post()
                 .uri(readyUrl)
                 .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + secretKey)
