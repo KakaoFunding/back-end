@@ -7,9 +7,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +29,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
+@Table(
+        indexes = {
+                @Index(name = "idx_product_category_id",columnList = "category_id"),
+                @Index(name = "idx_product_brand_id",columnList = "brand_id"),
+                @Index(name = "idx_product_product_detail_id",columnList = "product_detail_id",unique = true),
+                @Index(name = "idx_product_price",columnList = "price")
+        }
+)
 public class Product extends BaseTimeEntity {
 
     @Id
