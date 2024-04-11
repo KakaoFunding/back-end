@@ -38,7 +38,7 @@ public class Gift extends BaseTimeEntity {
 
     @Column
     private String messagePhoto;
-
+    
     @Column(nullable = false)
     private LocalDateTime expiredAt;
 

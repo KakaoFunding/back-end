@@ -9,12 +9,14 @@ import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
+import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.Amount;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
@@ -62,6 +64,9 @@ class PaymentServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
+    private OptionRepository optionRepository;
+
+    @Mock
     private OptionDetailRepository optionDetailRepository;
 
     @Mock
@@ -76,7 +81,6 @@ class PaymentServiceTest {
     @InjectMocks
     private PaymentService paymentService;
 
-
     @Test
     @DisplayName("결제 준비")
     public void ready() throws Exception {
@@ -84,21 +88,28 @@ class PaymentServiceTest {
         final String orderDetailsKey = "12345678";
 
         final Product cake = CAKE.생성(1L);
-        final int cakeStockQuantity = 1;
+        final int cakeQuantity = 1;
 
         final Product coffee = COFFEE.생성(2L);
-        final int coffeeStockQuantity = 2;
+        final int coffeeQuantity = 2;
 
         final List<PaymentReadyRequest> readyRequests = List.of(
-                createPaymentReadyRequest(cake, cakeStockQuantity),
-                createPaymentReadyRequest(coffee, coffeeStockQuantity)
+                createPaymentReadyRequest(cake, cakeQuantity),
+                createPaymentReadyRequest(coffee, coffeeQuantity)
         );
 
-        final Map<Long, Long> pricesGroupByIds = Map.of(cake.getProductId(), cake.getPrice(), coffee.getProductId(), coffee.getPrice());
+        final List<PaymentReadyProductDto> paymentReadyProductDtos = List.of(
+                new PaymentReadyProductDto(cake.getName(), cakeQuantity, cake.getPrice().intValue()),
+                new PaymentReadyProductDto(coffee.getName(), coffeeQuantity, coffee.getPrice().intValue())
+        );
+
+        final Map<Long, Long> pricesByIds = Map.of(cake.getProductId(), cake.getPrice(), coffee.getProductId(), coffee.getPrice());
+        final Map<Long, String> namesByIds = Map.of(cake.getProductId(), cake.getName(), coffee.getProductId(), coffee.getName());
         final KakaoPayReadyResponse readyResponse = createReadyResponse();
         doReturn(orderDetailsKey).when(orderNumberProvider).createOrderDetailKey();
-        doReturn(pricesGroupByIds).when(productRepository).findAllPriceByIdsGroupById(List.of(cake.getProductId(), coffee.getProductId()));
-        doReturn(readyResponse).when(webClientService).ready(providerId, readyRequests, orderDetailsKey);
+        doReturn(pricesByIds).when(productRepository).findAllPriceByIdsGroupById(List.of(cake.getProductId(), coffee.getProductId()));
+        doReturn(namesByIds).when(productRepository).findAllNameByIdsGroupById(List.of(cake.getProductId(), coffee.getProductId()));
+        doReturn(readyResponse).when(webClientService).ready(providerId, paymentReadyProductDtos, orderDetailsKey);
 
         final PaymentReadyResponse expect = new PaymentReadyResponse(
                 readyResponse.tid(),
@@ -178,13 +189,12 @@ class PaymentServiceTest {
     }
 
     private PaymentReadyRequest createPaymentReadyRequest(final Product product,
-                                                          final int stockQuantity) {
+                                                          final int quantity) {
         return new PaymentReadyRequest(
                 product.getProductId(),
-                product.getName(),
                 product.getPrice().intValue(),
                 0,
-                stockQuantity,
+                quantity,
                 null
         );
     }
