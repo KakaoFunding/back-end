@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 
 @Entity
 @Getter
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
         indexes = {@Index(name = "idx_receipt_option_receipt_id",columnList = "receipt_id",unique = true)}
 )
 public class ReceiptOption {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long receipt_option_id;

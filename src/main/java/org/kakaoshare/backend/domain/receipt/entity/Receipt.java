@@ -7,11 +7,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
@@ -23,14 +21,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Table(
-        indexes = {
-                @Index(name = "idx_receipt_order_number",columnList = "order_number"),
-                @Index(name = "idx_receipt_product_id",columnList = "product_id"),
-                @Index(name = "idx_receipt_receiver_id",columnList = "receiver_id"),
-                @Index(name = "idx_receipt_recipient_id",columnList = "recipient_id")
-        }
-)
 public class Receipt extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

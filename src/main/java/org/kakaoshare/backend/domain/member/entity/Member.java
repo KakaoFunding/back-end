@@ -41,6 +41,7 @@ public class Member extends BaseTimeEntity {
     private String providerId;
     
     @Builder.Default
+
     @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Role role = USER;
