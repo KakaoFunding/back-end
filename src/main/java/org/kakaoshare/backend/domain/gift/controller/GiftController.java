@@ -1,10 +1,11 @@
 package org.kakaoshare.backend.domain.gift.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.gift.dto.GiftSliceResponse;
+import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.service.GiftService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class GiftController {
     public ResponseEntity<?> getGiftBox(@LoggedInMember final String providerId,
                                         @PageableDefault(size = 20) Pageable pageable,
                                         @RequestParam(name = "status", required = false, defaultValue = "NOT_USED") GiftStatus status) {
-        GiftSliceResponse giftSliceResponse = giftService.getMyGiftBox(providerId, pageable, status);
+        Page<GiftResponse> giftSliceResponse = giftService.getMyGiftBox(providerId, pageable, status);
         return ResponseEntity.ok(giftSliceResponse);
     }
 

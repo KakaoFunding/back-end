@@ -3,8 +3,6 @@ package org.kakaoshare.backend.domain.gift.service;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
-import org.kakaoshare.backend.domain.gift.dto.GiftSliceResponse;
-import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -21,7 +19,7 @@ public class GiftService {
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
 
-    public GiftSliceResponse getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
+    public Page<GiftResponse> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
         Member member = findMemberByProviderId(providerId);
         Page<GiftResponse> giftResponses;
 
@@ -31,11 +29,8 @@ public class GiftService {
             giftResponses = giftRepository.findGiftsByMemberIdAndOtherStatuses(member.getMemberId(), pageable);
         }
 
-        PageResponse<GiftResponse> pageResponse = (PageResponse<GiftResponse>) PageResponse.from(giftResponses);
 
-        return GiftSliceResponse.builder()
-                .pageResponse(pageResponse)
-                .build();
+        return giftResponses;
     }
 
     private Member findMemberByProviderId(String providerId) {
