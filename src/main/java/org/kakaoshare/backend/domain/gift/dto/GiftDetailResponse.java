@@ -1,6 +1,5 @@
 package org.kakaoshare.backend.domain.gift.dto;
 
-import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Getter
 @Builder
-public class DetailResponse {
+public class GiftDetailResponse {
     private final Long giftId;
     private final String message;
     private final String messagePhoto;
@@ -20,8 +19,8 @@ public class DetailResponse {
     private final Long price;
     private final String giftThumbnail;
 
-    public static DetailResponse of(Gift gift, Product product) {
-        return DetailResponse.builder()
+    public static GiftDetailResponse of(Gift gift, Product product) {
+        return GiftDetailResponse.builder()
                 .giftId(gift.getGiftId())
                 .message(gift.getMessage())
                 .messagePhoto(gift.getMessagePhoto())
