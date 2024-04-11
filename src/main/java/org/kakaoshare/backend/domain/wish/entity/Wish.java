@@ -11,7 +11,11 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.entity.Product;
@@ -22,6 +26,9 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 @Table(
         indexes = {@Index(name = "idx_wish_product_id",columnList = "product_id",unique = true)}
 )
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Wish extends BaseTimeEntity {
 
     @Id
@@ -35,7 +42,7 @@ public class Wish extends BaseTimeEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
     
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 }
