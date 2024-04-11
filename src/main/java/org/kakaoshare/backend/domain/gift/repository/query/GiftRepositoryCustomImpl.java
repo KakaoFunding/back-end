@@ -44,6 +44,31 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
         return new PageImpl<>(content, pageable, total);
     }
 
+    @Override
+    public Page<GiftResponse> findGiftsByMemberIdAndOtherStatuses(Long memberId, Pageable pageable) {
+        List<GiftResponse> content = queryFactory
+                .select(Projections.constructor(GiftResponse.class,
+                        gift.giftId,
+                        gift.expiredAt,
+                        gift.receipt.recipient.name.as("recipientName"),
+                        gift.receipt.product.name.as("productName"),
+                        gift.receipt.product.productThumbnails.any().thumbnailUrl.as("productThumbnail"),
+                        gift.receipt.product.brandName))
+                .from(gift)
+                .leftJoin(gift.receipt).fetchJoin()
+                .where(gift.status.ne(GiftStatus.NOT_USED)
+                        .and(gift.receipt.recipient.memberId.eq(memberId)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
+        long total = queryFactory
+                .selectFrom(gift)
+                .where(gift.status.ne(GiftStatus.NOT_USED)
+                        .and(gift.receipt.recipient.memberId.eq(memberId)))
+                .fetchCount();
+
+        return new PageImpl<>(content, pageable, total);
+    }
 
 }
