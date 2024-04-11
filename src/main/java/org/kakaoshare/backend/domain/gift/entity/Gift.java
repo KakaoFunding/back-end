@@ -9,9 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
@@ -24,9 +22,6 @@ import static org.kakaoshare.backend.domain.gift.entity.GiftStatus.NOT_USED;
 
 @Entity
 @Getter
-@Table(
-        indexes = {@Index(name = "idx_gift_receipt_receipt_id",columnList = "receipt_receipt_id",unique = true)}
-)
 public class Gift extends BaseTimeEntity {
 
     @Id
