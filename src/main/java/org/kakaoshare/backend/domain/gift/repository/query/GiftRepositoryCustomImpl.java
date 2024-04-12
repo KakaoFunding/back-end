@@ -2,8 +2,12 @@ package org.kakaoshare.backend.domain.gift.repository.query;
 
 import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
 import static org.kakaoshare.backend.domain.gift.entity.QGift.gift;
+import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
+import static org.kakaoshare.backend.domain.product.entity.QProductThumbnail.productThumbnail;
+import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -25,14 +29,19 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
                 .select(Projections.constructor(GiftResponse.class,
                         gift.giftId,
                         gift.expiredAt,
-                        gift.receipt.recipient.name.as("recipientName"),
-                        gift.receipt.product.name.as("productName"),
-                        gift.receipt.product.productThumbnails.any().thumbnailUrl.as("productThumbnail"),
-                        gift.receipt.product.brandName))
+                        receipt.recipient.name,
+                        JPAExpressions.select(product.name)
+                                .from(product)
+                                .where(product.productId.eq(receipt.product.productId)),
+                        JPAExpressions.select(productThumbnail.thumbnailUrl)
+                                .from(productThumbnail)
+                                .where(productThumbnail.product.productId.eq(receipt.product.productId))
+                                .limit(1),
+                        receipt.product.brandName))
                 .from(gift)
-                .leftJoin(gift.receipt).fetchJoin()
+                .leftJoin(gift.receipt, receipt)
                 .where(gift.status.eq(status)
-                        .and(gift.receipt.recipient.memberId.eq(memberId)))
+                        .and(receipt.recipient.memberId.eq(memberId)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
 
@@ -40,10 +49,10 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
                 .select(gift.count())
                 .from(gift)
                 .where(gift.status.eq(status)
-                        .and(gift.receipt.recipient.memberId.eq(memberId)));
-
+                        .and(receipt.recipient.memberId.eq(memberId)));
 
         return toPage(pageable, contentQuery, countQuery);
+
     }
 
     @Override
