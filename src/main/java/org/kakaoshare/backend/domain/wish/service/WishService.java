@@ -2,8 +2,14 @@ package org.kakaoshare.backend.domain.wish.service;
 
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.wish.dto.WishEvent;
+import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
+import org.kakaoshare.backend.domain.member.repository.MemberRepository;
+import org.kakaoshare.backend.domain.wish.dto.WishReservationEvent;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
+import org.kakaoshare.backend.domain.wish.error.WishErrorCode;
+import org.kakaoshare.backend.domain.wish.error.exception.WishException;
 import org.kakaoshare.backend.domain.wish.repository.WishRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +27,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class WishService {
     private final WishRepository wishRepository;
+    private final MemberRepository memberRepository;
     
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)//TODO 2024 04 11 18:57:19 : 성능 저하 가능성 있음
@@ -31,7 +38,35 @@ public class WishService {
             TransactionSystemException.class,
             PersistenceException.class
     }, maxAttempts = 2, backoff = @Backoff(delay = 5000))
-    public void handleWishReservation(WishEvent wishEvent) {
-        wishRepository.save((Wish) wishEvent.getSource());
+    public void handleWishReservation(WishReservationEvent event) {
+        Member member = getMember(event.getProviderId());
+        
+        if (isAlreadyRegistered(event, member)) {
+            throw new WishException(WishErrorCode.DUPLICATED_WISH);
+        }
+        
+        Wish wish = createWish(event, member);
+        
+        wishRepository.save(wish);
+    }
+    
+    private boolean isAlreadyRegistered(final WishReservationEvent event, final Member member) {
+        return member.getWishes().stream()
+                .anyMatch(wish -> wish.getProduct()
+                        .getProductId()
+                        .equals(event.getProduct().getProductId()));
+    }
+    
+    private Wish createWish(final WishReservationEvent event, final Member member) {
+        return Wish.builder()
+                .member(member)
+                .product(event.getProduct())
+                .isPublic(event.getType().isPublic())
+                .build();
+    }
+    
+    private Member getMember(final String providerId) {
+        return memberRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
     }
 }

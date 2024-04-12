@@ -4,9 +4,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
 import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
-import org.kakaoshare.backend.domain.member.entity.Member;
-import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
-import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
@@ -17,8 +14,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.error.ProductErrorCode;
 import org.kakaoshare.backend.domain.product.error.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
-import org.kakaoshare.backend.domain.wish.dto.WishEvent;
-import org.kakaoshare.backend.domain.wish.entity.Wish;
+import org.kakaoshare.backend.domain.wish.dto.WishReservationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,28 +63,19 @@ public class ProductService {
         return productDtos;
     }
     
+    /**
+     * 위시 추가시 위시 서비스에서 비동기적으로 위시 리스트에 등록
+     * @see org.kakaoshare.backend.domain.wish.service.WishService
+     */
     @Transactional
     public Integer resistProductInWishList(final String providerId, final Long productId, final WishType type) {
-        Member member = getMember(providerId);
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
         
         Integer wishCount = product.increaseWish();
         
-        Wish wish = Wish.builder()
-                .member(member)
-                .product(product)
-                .isPublic(WishType.OTHERS.equals(type))
-                .build();
-        
-        eventPublisher.publishEvent(new WishEvent(wish));
+        eventPublisher.publishEvent(WishReservationEvent.of(providerId,type,product));
         return wishCount;
-    }
-    
-    private Member getMember(final String providerId) {
-        Member member = memberRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
-        return member;
     }
 }
