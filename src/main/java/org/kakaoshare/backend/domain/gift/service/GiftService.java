@@ -2,6 +2,9 @@ package org.kakaoshare.backend.domain.gift.service;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.GlobalErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
@@ -27,6 +30,6 @@ public class GiftService {
 
     private Member findMemberByProviderId(String providerId) {
         return memberRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
+                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
     }
 }
