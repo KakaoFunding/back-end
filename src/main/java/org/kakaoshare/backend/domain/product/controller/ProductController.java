@@ -6,12 +6,14 @@ import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
+import org.kakaoshare.backend.domain.product.dto.WishReservationResponse;
 import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,8 +62,7 @@ public class ProductController {
     public ResponseEntity<?> resistWishingProduct(@LoggedInMember String providerId,
                                                   @PathVariable("productId") Long productId,
                                                   @RequestParam(name = "type") WishType type) {
-        //TODO 2024 04 10 23:39:56 : 위시 등록
-        Integer id = productService.resistProductInWishList(providerId,productId,type);
-        return ResponseEntity.ok(id);
+        WishReservationResponse response = productService.resistProductInWishList(providerId, productId, type);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

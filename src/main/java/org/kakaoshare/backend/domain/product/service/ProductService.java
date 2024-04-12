@@ -9,6 +9,7 @@ import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
+import org.kakaoshare.backend.domain.product.dto.WishReservationResponse;
 import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.error.ProductErrorCode;
@@ -68,7 +69,7 @@ public class ProductService {
      * @see org.kakaoshare.backend.domain.wish.service.WishService
      */
     @Transactional
-    public Integer resistProductInWishList(final String providerId, final Long productId, final WishType type) {
+    public WishReservationResponse resistProductInWishList(final String providerId, final Long productId, final WishType type) {
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
@@ -76,6 +77,6 @@ public class ProductService {
         Integer wishCount = product.increaseWish();
         
         eventPublisher.publishEvent(WishReservationEvent.of(providerId,type,product));
-        return wishCount;
+        return WishReservationResponse.of(product.getProductId(),wishCount);
     }
 }
