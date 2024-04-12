@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GiftController {
     private final GiftService giftService;
 
-    @GetMapping("giftBox")
+    @GetMapping("/giftBox")
     public ResponseEntity<?> getGiftBox(@LoggedInMember final String providerId,
                                         @PageableDefault(size = 20) Pageable pageable,
                                         @RequestParam(name = "status", required = false, defaultValue = "NOT_USED") GiftStatus status) {
