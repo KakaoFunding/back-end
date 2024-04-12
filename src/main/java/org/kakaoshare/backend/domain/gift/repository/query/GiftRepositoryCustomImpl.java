@@ -1,8 +1,10 @@
 package org.kakaoshare.backend.domain.gift.repository.query;
 
+import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
 import static org.kakaoshare.backend.domain.gift.entity.QGift.gift;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
     private final JPAQueryFactory queryFactory;
     @Override
     public Page<GiftResponse> findGiftsByMemberIdAndStatus(Long memberId, GiftStatus status, Pageable pageable) {
-        List<GiftResponse> content = queryFactory
+        JPAQuery<GiftResponse> contentQuery = queryFactory
                 .select(Projections.constructor(GiftResponse.class,
                         gift.giftId,
                         gift.expiredAt,
@@ -32,16 +34,16 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom{
                 .where(gift.status.eq(status)
                         .and(gift.receipt.recipient.memberId.eq(memberId)))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .limit(pageable.getPageSize());
 
-        long total = queryFactory
-                .selectFrom(gift)
-                .where(gift.status.eq(GiftStatus.NOT_USED)
-                        .and(gift.receipt.recipient.memberId.eq(memberId)))
-                .fetchCount();
+        JPAQuery<Long> countQuery = queryFactory
+                .select(gift.count())
+                .from(gift)
+                .where(gift.status.eq(status)
+                        .and(gift.receipt.recipient.memberId.eq(memberId)));
 
-        return new PageImpl<>(content, pageable, total);
+
+        return toPage(pageable, contentQuery, countQuery);
     }
 
     @Override
