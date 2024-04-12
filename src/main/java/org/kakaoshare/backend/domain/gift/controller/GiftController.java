@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -18,8 +19,15 @@ public class GiftController {
     private final GiftService giftService;
 
     @GetMapping("/giftBox/detail/{giftId}")
-    public ResponseEntity<?> readGiftDetail(@PathVariable Long giftId){
-        GiftDetailResponse detailResponse = giftService.getGiftDetail(giftId);
-        return ResponseEntity.ok(detailResponse);
+    public ResponseEntity<?> readGiftDetail(@PathVariable Long giftId,
+                                            @RequestParam(name = "tab", required = false, defaultValue = "giftInfo") String tab) {
+        if ("detail".equals(tab)) {
+
+        }
+        if ("giftInfo".equals(tab)){
+            GiftDetailResponse detailResponse = giftService.getGiftDetail(giftId);
+            return ResponseEntity.ok(detailResponse);
+        }
+        return ResponseEntity.badRequest().body("Invalid tab value");
     }
 }
