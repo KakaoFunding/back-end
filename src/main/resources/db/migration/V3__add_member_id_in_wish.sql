@@ -1,8 +1,0 @@
-ALTER TABLE wish
-    ADD member_id BIGINT NULL;
-
-ALTER TABLE wish
-    MODIFY member_id BIGINT NOT NULL;
-
-ALTER TABLE wish
-    ADD CONSTRAINT FK_WISH_ON_MEMBER FOREIGN KEY (member_id) REFERENCES member (member_id);
