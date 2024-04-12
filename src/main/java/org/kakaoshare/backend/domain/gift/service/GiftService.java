@@ -21,16 +21,8 @@ public class GiftService {
 
     public Page<GiftResponse> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
         Member member = findMemberByProviderId(providerId);
-        Page<GiftResponse> giftResponses;
-
-        if (status == null || status == GiftStatus.NOT_USED) {
-            giftResponses = giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), GiftStatus.NOT_USED, pageable);
-        } else {
-            giftResponses = giftRepository.findGiftsByMemberIdAndOtherStatuses(member.getMemberId(), pageable);
-        }
-
-
-        return giftResponses;
+        return giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), status,
+                pageable);
     }
 
     private Member findMemberByProviderId(String providerId) {
