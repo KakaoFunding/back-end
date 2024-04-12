@@ -5,12 +5,15 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.error.GlobalErrorCode;
 import org.kakaoshare.backend.common.error.exception.BusinessException;
+import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.entity.QGift;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 import org.kakaoshare.backend.domain.product.entity.QProduct;
+import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
 
 @RequiredArgsConstructor
 public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
@@ -18,10 +21,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
 
     @Override
     public GiftDetailResponse findGiftDetail(Long giftId) {
-        Gift gift = Optional.ofNullable(queryFactory
-                        .selectFrom(QGift.gift)
-                        .where(QGift.gift.giftId.eq(giftId)).fetchOne())
-                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+        Gift gift = findGiftById(giftId);
 
         Product product = Optional.ofNullable(queryFactory
                         .selectFrom(QProduct.product)
@@ -30,5 +30,31 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                 .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
 
         return GiftDetailResponse.of(gift, product);
+    }
+
+    @Override
+    public GiftDescriptionResponse findGiftDescription(Long giftId) {
+        Gift gift = findGiftById(giftId);
+
+        Product product = Optional.ofNullable(queryFactory
+                        .selectFrom(QProduct.product)
+                        .where(QProduct.product.productId.eq(gift.getReceipt().getProduct().getProductId()))
+                        .fetchOne())
+                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+
+        ProductThumbnail productThumbnail = Optional.ofNullable(queryFactory
+                        .selectFrom(QProductThumbnail.productThumbnail)
+                        .where(QProductThumbnail.productThumbnail.product.productId.eq(product.getProductId()))
+                        .fetchOne())
+                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+
+        return GiftDescriptionResponse.of(product, productThumbnail);
+    }
+
+    private Gift findGiftById(Long giftId) {
+        return Optional.ofNullable(queryFactory
+                        .selectFrom(QGift.gift)
+                        .where(QGift.gift.giftId.eq(giftId)).fetchOne())
+                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
     }
 }
