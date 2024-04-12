@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.gift.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import org.kakaoshare.backend.domain.gift.service.GiftService;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,8 @@ public class GiftController {
     public ResponseEntity<?> readGiftDetail(@PathVariable Long giftId,
                                             @RequestParam(name = "tab", required = false, defaultValue = "giftInfo") String tab) {
         if ("detail".equals(tab)) {
-
+            GiftDescriptionResponse descriptionResponse = giftService.getGiftDescription(giftId);
+            return ResponseEntity.ok(descriptionResponse);
         }
         if ("giftInfo".equals(tab)){
             GiftDetailResponse detailResponse = giftService.getGiftDetail(giftId);
