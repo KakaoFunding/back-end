@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.gift.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,13 @@ public class GiftService {
             throw new EntityNotFoundException("Gift not found with id: " + giftId);
         }
         return giftDetailResponse;
+    }
+
+    public GiftDescriptionResponse getGiftDescription(Long giftId){
+        GiftDescriptionResponse giftDescriptionResponse = giftRepository.findGiftDescription(giftId);
+        if (giftDescriptionResponse == null){
+            throw  new EntityNotFoundException("Gift not found with id: " + giftId);
+        }
+        return giftDescriptionResponse;
     }
 }
