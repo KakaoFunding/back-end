@@ -4,12 +4,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
 import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
-import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
-import org.kakaoshare.backend.domain.product.dto.WishReservationResponse;
+import org.kakaoshare.backend.domain.product.dto.WishCancelEvent;
+import org.kakaoshare.backend.domain.product.dto.WishResponse;
 import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.error.ProductErrorCode;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProductService {
     private final ProductRepository productRepository;
-    private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
     
     
@@ -69,14 +68,31 @@ public class ProductService {
      * @see org.kakaoshare.backend.domain.wish.service.WishService
      */
     @Transactional
-    public WishReservationResponse resistProductInWishList(final String providerId, final Long productId, final WishType type) {
+    public WishResponse resisterProductInWishList(final String providerId, final Long productId, final WishType type) {
+        Product product = getProduct(productId);
         
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
-        
-        Integer wishCount = product.increaseWish();
+        Integer wishCount = product.increaseWishCount();
         
         eventPublisher.publishEvent(WishReservationEvent.of(providerId,type,product));
-        return WishReservationResponse.of(product.getProductId(),wishCount);
+        return WishResponse.of(product.getProductId(),wishCount);
+    }
+    
+    /**
+     * 위시 취소시 위시 서비스에서 비동기적으로 위시 리스트에서 제거
+     * @see org.kakaoshare.backend.domain.wish.service.WishService
+     */
+    @Transactional
+    public WishResponse removeWishlist(final String providerId, final Long productId) {
+        Product product = getProduct(productId);
+        
+        Integer wishCount=product.decreaseWishCount();
+        
+        eventPublisher.publishEvent(WishCancelEvent.of(providerId,product));
+        return WishResponse.of(product.getProductId(),wishCount);
+    }
+    
+    private Product getProduct(final Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
     }
 }

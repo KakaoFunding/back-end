@@ -6,7 +6,7 @@ import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
-import org.kakaoshare.backend.domain.product.dto.WishReservationResponse;
+import org.kakaoshare.backend.domain.product.dto.WishResponse;
 import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,7 +63,14 @@ public class ProductController {
     public ResponseEntity<?> resistWishingProduct(@LoggedInMember String providerId,
                                                   @PathVariable("productId") Long productId,
                                                   @RequestParam(name = "type") WishType type) {
-        WishReservationResponse response = productService.resistProductInWishList(providerId, productId, type);
+        WishResponse response = productService.resisterProductInWishList(providerId, productId, type);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @DeleteMapping("/{productId}/wishes")
+    public ResponseEntity<?> cancelWisingProduct(@LoggedInMember String providerId,
+                                                 @PathVariable("productId") Long productId) {
+        WishResponse response=productService.removeWishlist(providerId,productId);
+        return ResponseEntity.ok(response);
     }
 }
