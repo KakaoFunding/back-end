@@ -79,8 +79,12 @@ public class Product extends BaseTimeEntity {
     @OneToMany(mappedBy = "product",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<ProductThumbnail> productThumbnails;
     
-    public Integer increaseWish(){
+    public Integer increaseWishCount(){
         this.wishCount++;
+        return this.wishCount;
+    }
+    public Integer decreaseWishCount() {
+        this.wishCount--;
         return this.wishCount;
     }
     @Override
