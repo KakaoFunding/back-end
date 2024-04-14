@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
+    public static final int PAGE_DEFAULT_SIZE = 20;
     private final ProductService productService;
     
     @GetMapping("/{productId}")
@@ -46,14 +47,14 @@ public class ProductController {
     
     @GetMapping
     public ResponseEntity<?> getSimpleProductsInPage(@RequestParam("categoryId") Long categoryId,
-                                                     @PageableDefault(size = 20) Pageable pageable) {
+                                                     @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
         Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
         return ResponseEntity.ok(simpleProductsPage);
     }
     
     @GetMapping("/brands/{brandId}")
     public ResponseEntity<?> getBrandsProducts(@PathVariable("brandId") Long brandId,
-                                               @PageableDefault(size = 20) Pageable pageable) {
+                                               @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
         Page<ProductDto> simpleProductPage = productService.getSimpleProductsByBrandId(brandId, pageable);
         return ResponseEntity.ok(simpleProductPage);
     }
