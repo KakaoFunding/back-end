@@ -68,7 +68,7 @@
 //        Funding funding = FundingFixture.SAMPLE_FUNDING.생성(member, product);
 //
 //        given(productRepository.findById(productId)).willReturn(Optional.of(product));
-//        given(memberRepository.findByProviderId(providerId)).willReturn(Optional.of(member));
+//        given(memberRepository.findMemberByProductId(providerId)).willReturn(Optional.of(member));
 //        given(fundingRepository.findByIdAndMemberId(any(), any())).willReturn(Optional.empty());
 //        given(fundingRepository.save(any(Funding.class))).willReturn(funding);
 //
@@ -86,14 +86,14 @@
 //        Product product = ProductFixture.TEST_PRODUCT.생성();
 //        Funding funding = FundingFixture.SAMPLE_FUNDING.생성(member, product);
 //
-//        given(memberRepository.findByProviderId(member.getProviderId())).willReturn(Optional.of(member));
+//        given(memberRepository.findMemberByProductId(member.getProviderId())).willReturn(Optional.of(member));
 //        given(fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())).willReturn(Optional.of(funding));
 //
 //        ProgressResponse response = fundingService.getFundingProgress(fundingId, member.getProviderId());
 //
 //        assertThat(response).isNotNull();
 //
-//        verify(memberRepository).findByProviderId(member.getProviderId());
+//        verify(memberRepository).findMemberByProductId(member.getProviderId());
 //        verify(fundingRepository).findByIdAndMemberId(fundingId, member.getMemberId());
 //    }
 //
@@ -108,7 +108,7 @@
 //                FundingFixture.SAMPLE_FUNDING2.생성(member, product));
 //        Slice<Funding> fundingSlice = new SliceImpl<>(fundingList, pageable, false);
 //
-//        when(memberRepository.findByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
+//        when(memberRepository.findMemberByProductId(member.getProviderId())).thenReturn(Optional.of(member));
 //        when(fundingRepository.findAllByMemberId(member.getMemberId())).thenReturn(fundingList);
 //        when(fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(), pageable)).thenReturn(fundingSlice);
 //

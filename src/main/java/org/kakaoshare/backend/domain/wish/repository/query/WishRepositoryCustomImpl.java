@@ -18,7 +18,7 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     
     @Override
-    public List<WishDetail> findWishesByProviderId(final String providerId) {
+    public List<WishDetail> findWishDetailsByProviderId(final String providerId) {
         return queryFactory
                 .select(
                         Projections.constructor(

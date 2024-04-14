@@ -44,7 +44,7 @@
 //        wishRepository.saveAll(wishes);
 //
 //        // when
-////        List<WishDetail> wishDetails = wishRepository.findWishesByProviderId(savedMember.getProviderId());
+////        List<WishDetail> wishDetails = wishRepository.findWishDetailsByProviderId(savedMember.getProviderId());
 //        List<WishDetail> wishDetails = wishRepository.findByMember_ProviderId(savedMember.getProviderId())
 //                .stream()
 //                .map(wish ->

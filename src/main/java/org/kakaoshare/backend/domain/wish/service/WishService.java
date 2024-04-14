@@ -101,12 +101,12 @@ public class WishService {
     
     @Transactional(readOnly = true)
     public Member getMember(final String providerId) {
-        return memberRepository.findByProviderId(providerId)
+        return memberRepository.findMemberByProductId(providerId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
     }
     
     public List<WishDetail> getMembersWishList(final String providerId) {
-        return wishRepository.findWishesByProviderId(providerId);
+        return wishRepository.findWishDetailsByProviderId(providerId);
     }
     
     private boolean isRegistered(final WishEvent event, final Member member) {

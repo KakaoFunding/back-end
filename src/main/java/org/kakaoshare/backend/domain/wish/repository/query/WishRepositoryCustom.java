@@ -5,5 +5,5 @@ import org.kakaoshare.backend.domain.wish.dto.WishDetail;
 import java.util.List;
 
 public interface WishRepositoryCustom {
-    List<WishDetail> findWishesByProviderId(final String providerId);
+    List<WishDetail> findWishDetailsByProviderId(final String providerId);
 }
