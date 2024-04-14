@@ -9,6 +9,8 @@ import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,6 @@ public class GiftService {
 
     private Member findMemberByProviderId(String providerId) {
         return memberRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
     }
 }
