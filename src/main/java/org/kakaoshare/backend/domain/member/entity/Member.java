@@ -14,6 +14,7 @@ import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.kakaoshare.backend.domain.member.entity.Role.USER;
@@ -60,6 +61,7 @@ public class Member extends BaseTimeEntity {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.providerId = providerId;
+        this.wishes=new ArrayList<>();
     }
     
     @Override
