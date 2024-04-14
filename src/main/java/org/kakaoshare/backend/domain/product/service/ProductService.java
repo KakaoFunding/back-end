@@ -69,12 +69,12 @@ public class ProductService {
      */
     @Transactional
     public WishResponse resisterProductInWishList(final String providerId, final Long productId, final WishType type) {
-        Product product = getProduct(productId);
+        Product product = findProductById(productId);
         
-        Integer wishCount = product.increaseWishCount();
+        product.increaseWishCount();
         
         eventPublisher.publishEvent(WishReservationEvent.of(providerId,type,product));
-        return WishResponse.of(product.getProductId(),wishCount);
+        return WishResponse.from(product);
     }
     
     /**
@@ -83,15 +83,15 @@ public class ProductService {
      */
     @Transactional
     public WishResponse removeWishlist(final String providerId, final Long productId) {
-        Product product = getProduct(productId);
+        Product product = findProductById(productId);
         
-        Integer wishCount=product.decreaseWishCount();
+        product.decreaseWishCount();
         
         eventPublisher.publishEvent(WishCancelEvent.of(providerId,product));
-        return WishResponse.of(product.getProductId(),wishCount);
+        return WishResponse.from(product);
     }
     
-    private Product getProduct(final Long productId) {
+    private Product findProductById(final Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
     }
