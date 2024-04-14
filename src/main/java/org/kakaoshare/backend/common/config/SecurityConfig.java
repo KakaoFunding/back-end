@@ -1,12 +1,14 @@
 package org.kakaoshare.backend.common.config;
 
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
@@ -14,10 +16,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private static final String ORIGIN_PATTERN = "*";
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
-    
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     public static final String API_V_1 = "/api/v1/";
     
     @Bean
@@ -32,11 +35,16 @@ public class SecurityConfig {
                 .requestMatchers(API_V_1 + "oauth/logout").authenticated()
                 .requestMatchers(API_V_1 + "categories/**").permitAll()
                 .requestMatchers(API_V_1 + "products/**").permitAll()
+                .requestMatchers(API_V_1 + "products/*/wishes").authenticated()
                 .requestMatchers(API_V_1 + "brands/**").permitAll()
                 .requestMatchers(API_V_1 + "search/**").permitAll()
-                .requestMatchers(PathRequest.toH2Console()).permitAll()//TODO 2024 03 02 19:39:16 : 개발단계 이후 제거 요망
+                .requestMatchers(API_V_1 + "wishes/**").authenticated()
                 .anyRequest().authenticated()
                 .and()
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .headers().frameOptions().disable()
                 .and()
                 .cors();
