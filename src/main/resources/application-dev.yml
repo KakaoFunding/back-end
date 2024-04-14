@@ -19,8 +19,9 @@ spring:
     password:
     driver-class-name: org.h2.Driver
   flyway:
-    enabled: true
-    baseline-on-migrate: true
+    enabled: false
+    locations: "classpath:db/migration,filesystem:/opt/migration"
+    baseline-on-migrate: false
   security:
     oauth2:
       client:
