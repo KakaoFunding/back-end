@@ -28,6 +28,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class WishService {
     private final WishRepository wishRepository;
@@ -50,8 +51,8 @@ public class WishService {
             throw new WishException(WishErrorCode.DUPLICATED_WISH);
         }
         
-        Wish wish = createWish(event, member)
-                .checkIsPublic(event.getType());
+        Wish wish = createWish(event, member);
+        wish.checkIsPublic(event.getType());
         
         try {
             wishRepository.save(wish);
@@ -87,25 +88,35 @@ public class WishService {
     }
     
     @Recover
-    @Transactional
     public void recoverReservation(RuntimeException e, WishReservationEvent event) {
         log.error("wish reservation failed: {}", e.getMessage());
         event.getProduct().decreaseWishCount();
     }
     
     @Recover
-    @Transactional
     public void recoverCancel(RuntimeException e, WishCancelEvent event) {
         log.error("wish cancel failed: {}", e.getMessage());
         event.getProduct().increaseWishCount();
     }
     
+    @Transactional(readOnly = true)
+    public Member getMember(final String providerId) {
+        return memberRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
+    }
+    
+    public List<WishDetail> getMembersWishList(final String providerId) {
+        return wishRepository.findWishesByProviderId(providerId);
+    }
+    
     private boolean isRegistered(final WishEvent event, final Member member) {
+        if (member.isWishEmpty()) {
+            return false;
+        }
         List<Wish> wishes = member.getWishes();
+        Long productId = event.getProduct().getProductId();
         return wishes != null && wishes.stream()
-                .anyMatch(wish -> wish.getProduct()
-                        .getProductId()
-                        .equals(event.getProduct().getProductId()));
+                .anyMatch(wish -> wish.equalProductId(productId));
     }
     
     private Wish createWish(final WishEvent event, final Member member) {
@@ -115,14 +126,4 @@ public class WishService {
                 .build();
     }
     
-    @Transactional(readOnly = true)
-    public Member getMember(final String providerId) {
-        return memberRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
-    }
-    
-    @Transactional
-    public List<WishDetail> getMembersWishList(final String providerId) {
-        return wishRepository.findWishesByProviderId(providerId);
-    }
 }
