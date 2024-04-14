@@ -1,13 +1,11 @@
 package org.kakaoshare.backend.domain.product.repository.query;
 
-import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.error.GlobalErrorCode;
 import org.kakaoshare.backend.common.error.exception.BusinessException;
@@ -17,15 +15,9 @@ import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.option.dto.OptionDetailResponse;
 import org.kakaoshare.backend.domain.option.dto.OptionResponse;
-import org.kakaoshare.backend.domain.option.entity.OptionDetail;
 import org.kakaoshare.backend.domain.option.entity.QOption;
 import org.kakaoshare.backend.domain.option.entity.QOptionDetail;
-import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
-import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
-import org.kakaoshare.backend.domain.product.dto.ProductDto;
-import org.kakaoshare.backend.domain.product.dto.QProduct4DisplayDto;
-import org.kakaoshare.backend.domain.product.dto.QProductDto;
+import org.kakaoshare.backend.domain.product.dto.*;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.QProduct;
 import org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto;
@@ -37,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,10 +38,7 @@ import static com.querydsl.core.group.GroupBy.list;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
-import static org.kakaoshare.backend.domain.option.entity.QOption.option;
-import static org.kakaoshare.backend.domain.option.entity.QOptionDetail.optionDetail;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
-import static org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto.productDescriptionPhoto;
 
 @RequiredArgsConstructor
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, SortableRepository {
@@ -86,6 +76,21 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
         JPAQuery<Long> countQuery = countBrand(brandId);
         return toPage(pageable, fetch, countQuery);
+    }
+
+    @Override
+    public Page<ProductDto> findAllByIds(final List<Long> ids, final Pageable pageable) {
+        final JPAQuery<Long> countQuery = queryFactory.select(product.productId.count())
+                .from(product)
+                .where(containsExpression(product.productId, ids));
+
+        final JPAQuery<ProductDto> contentQuery = queryFactory.select(getProductDto())
+                .from(product)
+                .where(containsExpression(product.productId, ids))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        return toPage(pageable, contentQuery, countQuery);
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.Map;
 public interface ProductRepositoryCustom {
     Page<Product4DisplayDto> findAllByCategoryId(Long categoryId, Pageable pageable);
     Page<ProductDto> findAllByBrandId(final Long brandId, final Pageable pageable);
+    Page<ProductDto> findAllByIds(final List<Long> ids, final Pageable pageable);
     DescriptionResponse findProductWithDetailsAndPhotos(Long productId);
     DetailResponse findProductDetail(Long productId);
     Page<Product4DisplayDto> findBySearchConditions(final String keyword, final Integer minPrice, final Integer maxPrice, final List<String> categories, final Pageable pageable);
