@@ -42,13 +42,13 @@ public class Member extends BaseTimeEntity {
     private String providerId;
     
     @Builder.Default
-
     @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Role role = USER;
-
+    
+    @Builder.Default
     @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)
-    private List<Wish> wishes;
+    private List<Wish> wishes=new ArrayList<>();
     
     protected Member() {
     
@@ -61,7 +61,6 @@ public class Member extends BaseTimeEntity {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.providerId = providerId;
-        this.wishes=new ArrayList<>();
     }
     
     @Override
