@@ -74,4 +74,8 @@ public class Member extends BaseTimeEntity {
                 ", role=" + role +
                 '}';
     }
+    
+    public boolean isWishEmpty() {
+        return wishes == null || wishes.isEmpty();
+    }
 }

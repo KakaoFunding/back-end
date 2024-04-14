@@ -47,8 +47,10 @@ public class Wish extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
     
-    public Wish checkIsPublic(final WishType type) {
+    public void checkIsPublic(final WishType type) {
         this.isPublic = type.isPublic();
-        return this;
+    }
+    public boolean equalProductId(final Long productId) {
+        return this.product.getProductId() == productId;
     }
 }
