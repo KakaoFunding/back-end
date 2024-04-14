@@ -67,8 +67,7 @@ public class PaymentService {
 
     public PaymentPreviewResponse preview(final List<PaymentPreviewRequest> paymentPreviewRequests) {
         final List<String> methodNames = PaymentMethod.getNames();
-        final List<Long> productIds = extractedProductIds(paymentPreviewRequests, PaymentPreviewRequest::productId);
-        final Long totalProductAmount = getTotalProductAmount(productIds);
+        final Long totalProductAmount = getTotalProductAmount(paymentPreviewRequests);
         return new PaymentPreviewResponse(0L, methodNames, totalProductAmount);  // TODO: 3/26/24 쇼핑포인트는 0으로 고정
     }
 
@@ -99,13 +98,16 @@ public class PaymentService {
         return new PaymentSuccessResponse(Receiver.from(receiver), orderSummaries);
     }
 
-    private Long getTotalProductAmount(final List<Long> productIds) {
-        final Long totalProductAmount = productRepository.findTotalPriceByIds(productIds);
-        if (totalProductAmount == null) {
+    private long getTotalProductAmount(final List<PaymentPreviewRequest> paymentPreviewRequests) {
+        final List<Long> productIds = extractedProductIds(paymentPreviewRequests, PaymentPreviewRequest::productId);
+        final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
+        if (priceByIds == null || priceByIds.isEmpty()) {
             throw new ProductException(ProductErrorCode.NOT_FOUND);
         }
 
-        return totalProductAmount;
+        return paymentPreviewRequests.stream()
+                .mapToLong(paymentPreviewRequest -> priceByIds.get(paymentPreviewRequest.productId()) * paymentPreviewRequest.quantity())
+                .sum();
     }
 
     private void validateTotalAmount(final List<PaymentReadyRequest> paymentReadyRequests) {
