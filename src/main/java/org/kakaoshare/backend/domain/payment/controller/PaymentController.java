@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.payment.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.service.PaymentService;
@@ -18,6 +19,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
+
+    @PostMapping("/preview")
+    public ResponseEntity<?> preview(@RequestBody final List<PaymentPreviewRequest> paymentPreviewRequests) {
+        return ResponseEntity.ok(paymentService.preview(paymentPreviewRequests));
+    }
 
     @PostMapping("/ready")
     public ResponseEntity<?> ready(@LoggedInMember final String providerId,
