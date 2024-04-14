@@ -8,6 +8,7 @@ import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.dto.WishCancelEvent;
 import org.kakaoshare.backend.domain.product.dto.WishEvent;
+import org.kakaoshare.backend.domain.wish.dto.WishDetail;
 import org.kakaoshare.backend.domain.wish.dto.WishReservationEvent;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.kakaoshare.backend.domain.wish.error.WishErrorCode;
@@ -118,5 +119,10 @@ public class WishService {
     public Member getMember(final String providerId) {
         return memberRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
+    }
+    
+    @Transactional
+    public List<WishDetail> getMembersWishList(final String providerId) {
+        return wishRepository.findWishesByProviderId(providerId);
     }
 }
