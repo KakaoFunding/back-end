@@ -231,7 +231,7 @@ public class PaymentService {
     }
 
     private Member findMemberByProviderId(final String providerId) {
-        return memberRepository.findByProviderId(providerId)
+        return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new MemberException(NOT_FOUND));
     }
 }
