@@ -1,10 +1,20 @@
 package org.kakaoshare.backend.domain.gift.service;
 
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
+import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
+import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
-import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.fixture.MemberFixture;
@@ -19,12 +29,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
-class GiftServiceTest {
+public class GiftServiceTest {
 
     @Mock
     private GiftRepository giftRepository;
@@ -41,6 +48,76 @@ class GiftServiceTest {
     }
 
     @Test
+    @DisplayName("선물 상세 정보 조회 - 선물이 존재할 때")
+    void getGiftDetail_ReturnDetail() {
+        Long giftId = 1L;
+        GiftDetailResponse expectedResponse = GiftDetailResponse.builder()
+                .giftId(giftId)
+                .message("Happy Birthday")
+                .messagePhoto("url_to_photo")
+                .expiredAt(null)
+                .createdAt(null)
+                .status(null)
+                .price(100L)
+                .giftThumbnail("url_to_thumbnail")
+                .build();
+
+        when(giftRepository.findGiftDetailById(giftId)).thenReturn(expectedResponse);
+
+        GiftDetailResponse actualResponse = giftService.getGiftDetail(giftId);
+
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse, actualResponse);
+        verify(giftRepository).findGiftDetailById(giftId);
+    }
+
+    @Test
+    @DisplayName("선물 상세 정보 조회 - 선물이 존재하지 않을 때 예외 발생")
+    void getGiftDetail_ThrowException() {
+        Long giftId = 1L;
+        when(giftRepository.findGiftDetailById(giftId)).thenReturn(null);
+
+        assertThrows(EntityNotFoundException.class, () -> giftService.getGiftDetail(giftId));
+    }
+
+    @Test
+    @DisplayName("선물 설명 정보 조회 - 선물이 존재할 때")
+    void getGiftDescription_ReturnDescription() {
+        Long giftId = 1L;
+        GiftDescriptionResponse expectedResponse = GiftDescriptionResponse.builder()
+                .productId(giftId)
+                .name("Gift Name")
+                .price(200L)
+                .type("Type")
+                .productName("Product Name")
+                .brandName("Brand Name")
+                .origin("Origin")
+                .manufacturer("Manufacturer")
+                .tel("Telephone")
+                .deliverDescription("Delivery Info")
+                .billingNotice("Billing Info")
+                .caution("Caution Info")
+                .giftThumbnail("url_to_thumbnail")
+                .build();
+
+        when(giftRepository.findGiftDescriptionById(giftId)).thenReturn(expectedResponse);
+
+        GiftDescriptionResponse actualResponse = giftService.getGiftDescription(giftId);
+
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse, actualResponse);
+        verify(giftRepository).findGiftDescriptionById(giftId);
+    }
+
+    @Test
+    @DisplayName("선물 설명 정보 조회 - 선물이 존재하지 않을 때 예외 발생")
+    void getGiftDescription_ThrowException() {
+        Long giftId = 1L;
+        when(giftRepository.findGiftDescriptionById(giftId)).thenReturn(null);
+
+        assertThrows(EntityNotFoundException.class, () -> giftService.getGiftDescription(giftId));
+    }@Test
+    @DisplayName("선물함 조회 테스트")
     void getMyGiftBoxTest() {
         String providerId = "providerId";
         Pageable pageable = Pageable.unpaged();
