@@ -17,13 +17,13 @@ import java.util.List;
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
-    private static final int DEFAULT_PRODUCT_SIZE = 2;
+    private static final int DEFAULT_PAGE_SIZE = 2;
 
     private final OrderService orderService;
 
     @PostMapping("/preview")
     public ResponseEntity<?> preview(@RequestBody final List<OrderPreviewRequest> orders,
-                                     @PageableDefault(size = DEFAULT_PRODUCT_SIZE) final Pageable pageable) {
+                                     @PageableDefault(size = DEFAULT_PAGE_SIZE) final Pageable pageable) {
         return ResponseEntity.ok(orderService.preview(orders, pageable));
     }
 }
