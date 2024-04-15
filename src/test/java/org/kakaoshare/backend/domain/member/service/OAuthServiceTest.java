@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.IssuedTokenResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -116,6 +117,24 @@ class OAuthServiceTest {
         final OAuthLoginResult expect = OAuthLoginResult.of(accessToken, refreshToken.getValue(), oAuthProfile);
         final OAuthLoginResult actual = oAuthService.login(request);
         assertThat(expect).isEqualTo(actual);
+    }
+
+    @Test
+    @DisplayName("토큰 재발급")
+    public void reissue() throws Exception {
+        final String refreshTokenValue = refreshToken.getValue();
+        final RefreshToken newRefreshToken = RefreshToken.from(providerId, "newRefreshToken", 100L);
+
+        doReturn(Optional.of(refreshToken)).when(refreshTokenRepository).findByValue(refreshTokenValue);
+        doReturn(Optional.of(userDetails)).when(memberRepository).findDetailsByProviderId(providerId);
+        doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
+        doReturn(newRefreshToken).when(refreshTokenProvider).createToken(providerId);
+        doReturn(newRefreshToken).when(refreshTokenRepository).save(newRefreshToken);
+
+        final IssuedTokenResult actual = oAuthService.reissue(refreshTokenValue);
+        final IssuedTokenResult expect = IssuedTokenResult.of(accessToken, newRefreshToken);
+
+        assertThat(actual).isEqualTo(expect);
     }
 
     private ClientRegistration getClientRegistration(final String registrationId) {
