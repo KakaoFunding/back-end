@@ -116,8 +116,8 @@ public class GiftServiceTest {
         when(giftRepository.findGiftDescriptionById(giftId)).thenReturn(null);
 
         assertThrows(EntityNotFoundException.class, () -> giftService.getGiftDescription(giftId));
-    }
-}
+    }@Test
+    @DisplayName("선물함 조회 테스트")
     void getMyGiftBoxTest() {
         String providerId = "providerId";
         Pageable pageable = Pageable.unpaged();
