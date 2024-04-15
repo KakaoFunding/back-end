@@ -38,6 +38,7 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-mysql'
 	testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:4.0.4")
+	implementation 'org.springframework.retry:spring-retry'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
