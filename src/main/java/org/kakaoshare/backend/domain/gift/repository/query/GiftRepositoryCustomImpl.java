@@ -29,7 +29,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         .selectFrom(QProduct.product)
                         .where(QProduct.product.productId.eq(gift.getReceipt().getProduct().getProductId()))
                         .fetchOne())
-                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_ERROR));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
 
         return GiftDetailResponse.of(gift, product);
     }
@@ -42,13 +42,13 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         .selectFrom(QProduct.product)
                         .where(QProduct.product.productId.eq(gift.getReceipt().getProduct().getProductId()))
                         .fetchOne())
-                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_ERROR));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
 
         ProductThumbnail productThumbnail = Optional.ofNullable(queryFactory
                         .selectFrom(QProductThumbnail.productThumbnail)
                         .where(QProductThumbnail.productThumbnail.product.productId.eq(product.getProductId()))
                         .fetchOne())
-                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_THUMBNAIL_ERROR));
 
         return GiftDescriptionResponse.of(product, productThumbnail);
     }
