@@ -1,6 +1,11 @@
 package org.kakaoshare.backend.jwt.util;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
@@ -12,7 +17,10 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.*;
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.EXPIRED;
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.INVALID;
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.NOT_FOUND;
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.UNSUPPORTED;
 
 @Component
 public class JwtProvider {
