@@ -31,9 +31,9 @@ public class OAuthService {
     private final OAuthWebClientService webClientService;
 
     @Transactional
-    public OAuthLoginResult login(final OAuthLoginRequest request) {
-        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(request.provider());
-        final OAuthProfile oAuthProfile = getProfile(request, registration);
+    public OAuthLoginResult login(final OAuthLoginRequest oAuthLoginRequest) {
+        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(oAuthLoginRequest.provider());
+        final OAuthProfile oAuthProfile = getProfile(oAuthLoginRequest, registration);
         final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
         final String accessToken = jwtProvider.createAccessToken(userDetails);
         final RefreshToken refreshToken = refreshTokenProvider.createToken(userDetails.getUsername());
@@ -43,7 +43,7 @@ public class OAuthService {
     }
 
     private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {
-        final Map<String, Object> attributes = webClientService.getSocialProfile(registration, request.code());
+        final Map<String, Object> attributes = webClientService.getSocialProfile(registration, request.socialAccessToken());
         return OAuthProfileFactory.of(attributes, request.provider());
     }
 
