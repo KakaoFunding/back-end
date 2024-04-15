@@ -7,4 +7,3 @@ public record IssuedTokenResult(String accessToken, String refreshToken) {
         return new IssuedTokenResult(accessToken, refreshToken.getValue());
     }
 }
-가
