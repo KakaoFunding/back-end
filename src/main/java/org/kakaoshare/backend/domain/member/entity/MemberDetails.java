@@ -1,6 +1,8 @@
 package org.kakaoshare.backend.domain.member.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@EqualsAndHashCode
+@ToString
 @RequiredArgsConstructor
 public class MemberDetails implements UserDetails {
     private final String providerId;
@@ -52,13 +56,5 @@ public class MemberDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return "MemberDetails{" +
-                "providerId='" + providerId + '\'' +
-                ", role=" + role +
-                '}';
     }
 }
