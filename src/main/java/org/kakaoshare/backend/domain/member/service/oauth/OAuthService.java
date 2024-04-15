@@ -35,7 +35,7 @@ public class OAuthService {
         final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(request.provider());
         final OAuthProfile oAuthProfile = getProfile(request, registration);
         final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
-        final String accessToken = jwtProvider.createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
+        final String accessToken = jwtProvider.createAccessToken(userDetails);
         final RefreshToken refreshToken = refreshTokenProvider.createToken(userDetails.getUsername());
         refreshTokenRepository.save(refreshToken);
 

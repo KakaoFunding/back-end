@@ -1,21 +1,15 @@
 package org.kakaoshare.backend.jwt.util;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import org.kakaoshare.backend.jwt.exception.JwtException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Collection;
 import java.util.Date;
 
 import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.*;
@@ -59,14 +53,14 @@ public class JwtProvider {
                 .getSubject();
     }
 
-    public String createAccessToken(final String username, final Collection<? extends GrantedAuthority> authorities) {
+    public String createAccessToken(final UserDetails userDetails) {
         return Jwts.builder()
                 .setHeaderParam(ALGORITHM_HEADER_KEY, SignatureAlgorithm.HS256.getValue())
                 .setHeaderParam(TYPE_HEADER_KEY, TYPE_HEADER_VALUE)
-                .setSubject(username)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(getExpiration())
-                .claim(CLAIM_AUTH_KEY, authorities)
+                .claim(CLAIM_AUTH_KEY, userDetails.getAuthorities())
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
