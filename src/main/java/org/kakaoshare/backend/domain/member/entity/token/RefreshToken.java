@@ -14,8 +14,8 @@ import org.springframework.data.redis.core.TimeToLive;
 @RedisHash("refresh_token")
 public class RefreshToken {
     @Id
-    @Column(name = "refresh_token_id", nullable = false)
-    private String refreshTokenId;
+    @Column(name = "id", nullable = false)
+    private String providerId;
 
     @Column(unique = true)
     private String value;
@@ -24,15 +24,15 @@ public class RefreshToken {
     private Long expiration;
 
     @Builder
-    private RefreshToken(final String refreshTokenId, final String value, final Long expiration) {
-        this.refreshTokenId = refreshTokenId;
+    private RefreshToken(final String providerId, final String value, final Long expiration) {
+        this.providerId = providerId;
         this.value = value;
         this.expiration = expiration;
     }
 
     public static RefreshToken from(final String providerId, final String value, final Long expiration) {
         return RefreshToken.builder()
-                .refreshTokenId(providerId)
+                .providerId(providerId)
                 .value(value)
                 .expiration(expiration)
                 .build();
