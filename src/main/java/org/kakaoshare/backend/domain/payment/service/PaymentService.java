@@ -102,7 +102,7 @@ public class PaymentService {
         final List<Long> productIds = extractedProductIds(paymentPreviewRequests, PaymentPreviewRequest::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
         if (priceByIds == null || priceByIds.isEmpty()) {
-            throw new ProductException(ProductErrorCode.NOT_FOUND);
+            throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR);
         }
 
         return paymentPreviewRequests.stream()
