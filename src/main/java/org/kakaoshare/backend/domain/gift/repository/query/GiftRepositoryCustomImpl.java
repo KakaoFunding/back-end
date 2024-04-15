@@ -1,5 +1,11 @@
 package org.kakaoshare.backend.domain.gift.repository.query;
 
+import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
+import static org.kakaoshare.backend.domain.gift.entity.QGift.gift;
+import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
+import static org.kakaoshare.backend.domain.product.entity.QProductThumbnail.productThumbnail;
+import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -66,9 +72,10 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
 
     private Gift findGiftById(Long giftId) {
         return Optional.ofNullable(queryFactory
-                        .selectFrom(QGift.gift)
-                        .where(QGift.gift.giftId.eq(giftId)).fetchOne())
+                        .selectFrom(gift)
+                        .where(gift.giftId.eq(giftId)).fetchOne())
                 .orElseThrow(() -> new GiftException(GiftErrorCode.NOT_FOUND_GIFT));
+    }
 
     @Override
     public Page<GiftResponse> findGiftsByMemberIdAndStatus(Long memberId, GiftStatus status, Pageable pageable) {
