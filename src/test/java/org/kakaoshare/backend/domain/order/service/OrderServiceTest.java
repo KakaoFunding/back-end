@@ -59,7 +59,7 @@ class OrderServiceTest {
         final List<Long> productIds = List.of(cake.getProductId(), coffee.getProductId());
 
         doReturn(Collections.emptyList()).when(optionDetailRepository).findNamesByIds(Collections.emptyList());
-        doReturn(pageProductDtos).when(productRepository).findAllByIds(productIds, pageable);
+        doReturn(pageProductDtos).when(productRepository).findAllByProductIds(productIds, pageable);
 
         final Page<OrderPreviewResponse> page = new PageImpl<>(
                 List.of(

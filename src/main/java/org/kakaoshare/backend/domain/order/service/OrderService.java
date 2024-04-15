@@ -40,7 +40,7 @@ public class OrderService {
 
     private Page<ProductDto> getProductDtos(final List<OrderPreviewRequest> orderPreviewRequests, final Pageable pageable) {
         final List<Long> productIds = extractedProductIds(orderPreviewRequests);
-        return productRepository.findAllByIds(productIds, pageable);
+        return productRepository.findAllByProductIds(productIds, pageable);
     }
 
     private Map<Long, Integer> getQuantityGroupByProductId(final List<OrderPreviewRequest> orderPreviewRequests) {

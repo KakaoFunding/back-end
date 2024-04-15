@@ -13,10 +13,8 @@ import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
-import org.kakaoshare.backend.domain.option.dto.OptionDetailResponse;
 import org.kakaoshare.backend.domain.option.dto.OptionResponse;
 import org.kakaoshare.backend.domain.option.dto.ProductOptionDetailResponse;
-import org.kakaoshare.backend.domain.option.entity.OptionDetail;
 import org.kakaoshare.backend.domain.option.entity.QOption;
 import org.kakaoshare.backend.domain.option.entity.QOptionDetail;
 import org.kakaoshare.backend.domain.product.dto.*;
@@ -41,8 +39,6 @@ import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
-import static org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto.productDescriptionPhoto;
-import static org.kakaoshare.backend.domain.product.entity.QProductDetail.productDetail;
 
 @RequiredArgsConstructor
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, SortableRepository {
@@ -83,14 +79,14 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     @Override
-    public Page<ProductDto> findAllByIds(final List<Long> ids, final Pageable pageable) {
+    public Page<ProductDto> findAllByProductIds(final List<Long> productIds, final Pageable pageable) {
         final JPAQuery<Long> countQuery = queryFactory.select(product.productId.count())
                 .from(product)
-                .where(containsExpression(product.productId, ids));
+                .where(containsExpression(product.productId, productIds));
 
         final JPAQuery<ProductDto> contentQuery = queryFactory.select(getProductDto())
                 .from(product)
-                .where(containsExpression(product.productId, ids))
+                .where(containsExpression(product.productId, productIds))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
 
