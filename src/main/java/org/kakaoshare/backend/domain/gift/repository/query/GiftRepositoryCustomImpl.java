@@ -9,6 +9,8 @@ import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.entity.QGift;
+import org.kakaoshare.backend.domain.gift.exception.GiftErrorCode;
+import org.kakaoshare.backend.domain.gift.exception.GiftException;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
@@ -57,6 +59,6 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
         return Optional.ofNullable(queryFactory
                         .selectFrom(QGift.gift)
                         .where(QGift.gift.giftId.eq(giftId)).fetchOne())
-                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new GiftException(GiftErrorCode.NOT_FOUND_GIFT));
     }
 }
