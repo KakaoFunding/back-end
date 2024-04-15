@@ -53,4 +53,12 @@ public class MemberDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "MemberDetails{" +
+                "providerId='" + providerId + '\'' +
+                ", role=" + role +
+                '}';
+    }
 }
