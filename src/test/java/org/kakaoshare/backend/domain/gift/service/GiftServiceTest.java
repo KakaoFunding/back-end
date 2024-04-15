@@ -1,11 +1,5 @@
 package org.kakaoshare.backend.domain.gift.service;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
@@ -21,8 +15,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 class GiftServiceTest {
 
@@ -58,7 +58,7 @@ class GiftServiceTest {
         List<GiftResponse> giftResponseList = List.of(mockGiftResponse);
         Page<GiftResponse> mockGiftResponses = new PageImpl<>(giftResponseList, pageable, giftResponseList.size());
 
-        when(memberRepository.findByProviderId(providerId)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(mockMember));
         when(giftRepository.findGiftsByMemberIdAndStatus(eq(mockMember.getMemberId()), eq(GiftStatus.NOT_USED), eq(pageable))).thenReturn(mockGiftResponses);
 
         Page<GiftResponse> result = giftService.getMyGiftBox(providerId, pageable, status);
