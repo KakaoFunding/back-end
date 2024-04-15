@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -19,17 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class GiftController {
     private final GiftService giftService;
 
+    @GetMapping("/giftBox/giftInfo/{giftId}")
+    public ResponseEntity<GiftDetailResponse> readGiftInfo(@PathVariable Long giftId) {
+        GiftDetailResponse detailResponse = giftService.getGiftDetail(giftId);
+        return ResponseEntity.ok(detailResponse);
+    }
+
     @GetMapping("/giftBox/detail/{giftId}")
-    public ResponseEntity<?> readGiftDetail(@PathVariable Long giftId,
-                                            @RequestParam(name = "tab", required = false, defaultValue = "giftInfo") String tab) {
-        if ("detail".equals(tab)) {
-            GiftDescriptionResponse descriptionResponse = giftService.getGiftDescription(giftId);
-            return ResponseEntity.ok(descriptionResponse);
-        }
-        if ("giftInfo".equals(tab)){
-            GiftDetailResponse detailResponse = giftService.getGiftDetail(giftId);
-            return ResponseEntity.ok(detailResponse);
-        }
-        return ResponseEntity.badRequest().body("Invalid tab value");
+    public ResponseEntity<GiftDescriptionResponse> readGiftDetail(@PathVariable Long giftId) {
+        GiftDescriptionResponse descriptionResponse = giftService.getGiftDescription(giftId);
+        return ResponseEntity.ok(descriptionResponse);
     }
 }
