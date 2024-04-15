@@ -16,6 +16,8 @@ import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.Amount;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
@@ -24,6 +26,7 @@ import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessR
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
+import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
@@ -80,6 +83,30 @@ class PaymentServiceTest {
 
     @InjectMocks
     private PaymentService paymentService;
+
+    @Test
+    @DisplayName("주문 페이지에서 결제 금액 조회")
+    public void preview() throws Exception {
+        final Product cake = CAKE.생성(1L);
+        final int cakeQuantity = 1;
+
+        final Product coffee = COFFEE.생성(2L);
+        final int coffeeQuantity = 2;
+
+        final List<PaymentPreviewRequest> paymentPreviewRequests = List.of(
+                new PaymentPreviewRequest(cake.getProductId(), cakeQuantity),
+                new PaymentPreviewRequest(coffee.getProductId(), coffeeQuantity)
+        );
+
+        final long totalAmount = cake.getPrice() * cakeQuantity + coffee.getPrice() * coffeeQuantity;
+        final List<Long> productIds = List.of(cake.getProductId(), coffee.getProductId());
+        doReturn(Map.of(cake.getProductId(), cake.getPrice(), coffee.getProductId(), coffee.getPrice())).when(productRepository).findAllPriceByIdsGroupById(productIds);
+
+        final PaymentPreviewResponse expect = new PaymentPreviewResponse(0L, PaymentMethod.getNames(), totalAmount);
+        final PaymentPreviewResponse actual = paymentService.preview(paymentPreviewRequests);
+
+        assertThat(actual).isEqualTo(expect);
+    }
 
     @Test
     @DisplayName("결제 준비")
