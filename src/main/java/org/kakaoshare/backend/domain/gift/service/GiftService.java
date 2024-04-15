@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class GiftService {
     private final GiftRepository giftRepository;
+    private final MemberRepository memberRepository;
 
     public GiftDetailResponse getGiftDetail(Long giftId) {
         GiftDetailResponse giftDetailResponse = giftRepository.findGiftDetailById(giftId);
@@ -31,14 +32,13 @@ public class GiftService {
         return giftDetailResponse;
     }
 
-    public GiftDescriptionResponse getGiftDescription(Long giftId){
+    public GiftDescriptionResponse getGiftDescription(Long giftId) {
         GiftDescriptionResponse giftDescriptionResponse = giftRepository.findGiftDescriptionById(giftId);
-        if (giftDescriptionResponse == null){
-            throw  new EntityNotFoundException("Gift not found with id: " + giftId);
+        if (giftDescriptionResponse == null) {
+            throw new EntityNotFoundException("Gift not found with id: " + giftId);
         }
         return giftDescriptionResponse;
-    private final MemberRepository memberRepository;
-
+    }
     public Page<GiftResponse> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
         Member member = findMemberByProviderId(providerId);
         return giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), status,
