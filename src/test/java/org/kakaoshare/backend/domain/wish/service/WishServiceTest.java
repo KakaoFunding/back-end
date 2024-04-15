@@ -108,9 +108,9 @@ class WishServiceTest {
         
         given(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .willReturn(Optional.of(member));
-        doThrow(new WishException(WishErrorCode.SAVING_FAILED))
-                .when(wishRepository)
-                .save(any(Wish.class));
+        when(wishRepository.save(any(Wish.class)))
+                .thenThrow(new WishException(WishErrorCode.SAVING_FAILED));
+        
         // when
         productService.resisterProductInWishList(member.getProviderId(), product.getProductId(), WishType.ME);
         WishReservationEvent event = events.stream(WishReservationEvent.class)
@@ -133,9 +133,10 @@ class WishServiceTest {
         
         given(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .willReturn(Optional.of(member));
-        doThrow(new WishException(WishErrorCode.SAVING_FAILED))
+        doThrow(new WishException(WishErrorCode.REMOVING_FAILED))
                 .when(wishRepository)
                 .delete(any(Wish.class));
+        
         // when
         productService.removeWishlist(member.getProviderId(), product.getProductId());
         WishCancelEvent event = events.stream(WishCancelEvent.class)
