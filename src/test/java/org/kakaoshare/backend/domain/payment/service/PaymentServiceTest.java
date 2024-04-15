@@ -158,7 +158,7 @@ class PaymentServiceTest {
         doReturn(orderDetails).when(redisUtils).remove(orderDetailKey, OrderDetails.class);
         doReturn(approveResponse).when(webClientService).approve(providerId, paymentSuccessRequest);
         doReturn(payment).when(paymentRepository).save(any());  // TODO: 3/16/24 save() 에서 new로 다른 객체가 생성되므로 any()로 대체
-        doReturn(Optional.of(member)).when(memberRepository).findMemberByProductId(providerId);
+        doReturn(Optional.of(member)).when(memberRepository).findMemberByProviderId(providerId);
         doReturn(cake).when(productRepository).getReferenceById(cake.getProductId());
         doReturn(coffee).when(productRepository).getReferenceById(coffee.getProductId());
         doReturn(null).when(giftRepository).saveAll(any());

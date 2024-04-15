@@ -106,7 +106,7 @@ class WishServiceTest {
         given(productRepository.findById(product.getProductId()))
                 .willReturn(Optional.of(product));
         
-        given(memberRepository.findMemberByProductId(member.getProviderId()))
+        given(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .willReturn(Optional.of(member));
         doThrow(new WishException(WishErrorCode.SAVING_FAILED))
                 .when(wishRepository)
@@ -131,7 +131,7 @@ class WishServiceTest {
         given(productRepository.findById(product.getProductId()))
                 .willReturn(Optional.of(product));
         
-        given(memberRepository.findMemberByProductId(member.getProviderId()))
+        given(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .willReturn(Optional.of(member));
         doThrow(new WishException(WishErrorCode.SAVING_FAILED))
                 .when(wishRepository)

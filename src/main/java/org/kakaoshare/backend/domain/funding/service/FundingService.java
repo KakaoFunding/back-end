@@ -69,7 +69,7 @@ public class FundingService {
     }
 
     private Member findMemberByProviderId(String providerId) {
-        return memberRepository.findMemberByProductId(providerId)
+        return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
     }
 

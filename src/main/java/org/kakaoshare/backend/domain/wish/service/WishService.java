@@ -101,7 +101,7 @@ public class WishService {
     
     @Transactional(readOnly = true)
     public Member getMember(final String providerId) {
-        return memberRepository.findMemberByProductId(providerId)
+        return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
     }
     
