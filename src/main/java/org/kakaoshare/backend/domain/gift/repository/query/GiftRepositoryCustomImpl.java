@@ -20,7 +20,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public GiftDetailResponse findGiftDetail(Long giftId) {
+    public GiftDetailResponse findGiftDetailById(Long giftId) {
         Gift gift = findGiftById(giftId);
 
         Product product = Optional.ofNullable(queryFactory
@@ -33,7 +33,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
     }
 
     @Override
-    public GiftDescriptionResponse findGiftDescription(Long giftId) {
+    public GiftDescriptionResponse findGiftDescriptionById(Long giftId) {
         Gift gift = findGiftById(giftId);
 
         Product product = Optional.ofNullable(queryFactory

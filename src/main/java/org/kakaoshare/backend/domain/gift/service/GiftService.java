@@ -15,7 +15,7 @@ public class GiftService {
     private final GiftRepository giftRepository;
 
     public GiftDetailResponse getGiftDetail(Long giftId) {
-        GiftDetailResponse giftDetailResponse = giftRepository.findGiftDetail(giftId);
+        GiftDetailResponse giftDetailResponse = giftRepository.findGiftDetailById(giftId);
         if (giftDetailResponse == null) {
             throw new EntityNotFoundException("Gift not found with id: " + giftId);
         }
@@ -23,7 +23,7 @@ public class GiftService {
     }
 
     public GiftDescriptionResponse getGiftDescription(Long giftId){
-        GiftDescriptionResponse giftDescriptionResponse = giftRepository.findGiftDescription(giftId);
+        GiftDescriptionResponse giftDescriptionResponse = giftRepository.findGiftDescriptionById(giftId);
         if (giftDescriptionResponse == null){
             throw  new EntityNotFoundException("Gift not found with id: " + giftId);
         }

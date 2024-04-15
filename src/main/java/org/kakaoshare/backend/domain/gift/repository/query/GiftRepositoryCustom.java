@@ -4,6 +4,6 @@ import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 
 public interface GiftRepositoryCustom {
-    GiftDetailResponse findGiftDetail(Long giftId);
-    GiftDescriptionResponse findGiftDescription(Long giftId);
+    GiftDetailResponse findGiftDetailById(Long giftId);
+    GiftDescriptionResponse findGiftDescriptionById(Long giftId);
 }
