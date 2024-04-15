@@ -4,7 +4,16 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
+import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
+import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
+import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
+import org.kakaoshare.backend.domain.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,5 +37,16 @@ public class GiftService {
             throw  new EntityNotFoundException("Gift not found with id: " + giftId);
         }
         return giftDescriptionResponse;
+    private final MemberRepository memberRepository;
+
+    public Page<GiftResponse> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
+        Member member = findMemberByProviderId(providerId);
+        return giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), status,
+                pageable);
+    }
+
+    private Member findMemberByProviderId(String providerId) {
+        return memberRepository.findMemberByProviderId(providerId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
     }
 }

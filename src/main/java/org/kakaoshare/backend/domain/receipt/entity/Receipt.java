@@ -42,7 +42,7 @@ public class Receipt extends BaseTimeEntity {
     private Member receiver;
 
     @Column(nullable = false)
-    private Integer stockQuantity;
+    private Integer quantity;
 
     @Builder.Default
     @OneToMany(mappedBy = "receipt", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -55,13 +55,13 @@ public class Receipt extends BaseTimeEntity {
     @Builder
     public Receipt(final String orderNumber,
                    final Product product,
-                   final Integer stockQuantity,
+                   final Integer quantity,
                    final Member recipient,
                    final Member receiver,
                    final List<ReceiptOption> options) {
         this.orderNumber = orderNumber;
         this.product = product;
-        this.stockQuantity = stockQuantity;
+        this.quantity = quantity;
         this.recipient = recipient;
         this.receiver = receiver;
         this.options = options;
@@ -76,7 +76,7 @@ public class Receipt extends BaseTimeEntity {
                 ", product=" + product +
                 ", recipient=" + recipient +
                 ", receiver=" + receiver +
-                ", stockQuantity=" + stockQuantity +
+                ", stockQuantity=" + quantity +
                 '}';
     }
 }

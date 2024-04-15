@@ -27,7 +27,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.5.2.RELEASE'
@@ -36,7 +35,10 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
 	testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:4.0.4")
+	implementation 'org.springframework.retry:spring-retry'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -51,7 +53,6 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-	systemProperty "jasypt.encryptor.password", System.getProperties().get("jasypt.encryptor.password")
 }
 
 def querydslDir = "$buildDir/generated/querydsl"

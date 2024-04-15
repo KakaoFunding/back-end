@@ -27,37 +27,38 @@ import static org.kakaoshare.backend.domain.order.entity.OrderStatus.COMPLETE_PA
 @Getter
 @Table(name = "orders")
 public class Order extends BaseTimeEntity {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ordersId;
-
+    
     @Builder.Default
-    @Column(nullable = false,columnDefinition = "varchar(255)")
+    @Column(nullable = false, columnDefinition = "varchar(255)")
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status = COMPLETE_PAYMENT;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funding_detail_id")
     private FundingDetail fundingDetail;
-
+    
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "payment_id")
     private Payment payment;
-
+    
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "receipt_id", nullable = false)
     private Receipt receipt;
-
+    
     protected Order() {
     }
-
+    
     @Builder
     public Order(final Payment payment, final Receipt receipt) {
         this.payment = payment;
         this.receipt = receipt;
     }
-
+    
     @Override
     public String toString() {
         return "Order{" +
