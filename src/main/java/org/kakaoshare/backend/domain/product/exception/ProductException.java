@@ -1,11 +1,9 @@
 package org.kakaoshare.backend.domain.product.exception;
 
-import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
-
 public class ProductException extends RuntimeException {
-    private final PaymentErrorCode errorCode;
+    private final ProductErrorCode errorCode;
 
-    public ProductException(PaymentErrorCode errorCode) {
+    public ProductException(ProductErrorCode errorCode) {
         this.errorCode = errorCode;
     }
 }

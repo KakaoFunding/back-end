@@ -14,6 +14,8 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 import org.kakaoshare.backend.domain.product.entity.QProduct;
 import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
+import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
+import org.kakaoshare.backend.domain.product.exception.ProductException;
 
 @RequiredArgsConstructor
 public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
@@ -27,7 +29,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         .selectFrom(QProduct.product)
                         .where(QProduct.product.productId.eq(gift.getReceipt().getProduct().getProductId()))
                         .fetchOne())
-                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_ERROR));
 
         return GiftDetailResponse.of(gift, product);
     }
@@ -40,7 +42,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         .selectFrom(QProduct.product)
                         .where(QProduct.product.productId.eq(gift.getReceipt().getProduct().getProductId()))
                         .fetchOne())
-                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_ERROR));
 
         ProductThumbnail productThumbnail = Optional.ofNullable(queryFactory
                         .selectFrom(QProductThumbnail.productThumbnail)
