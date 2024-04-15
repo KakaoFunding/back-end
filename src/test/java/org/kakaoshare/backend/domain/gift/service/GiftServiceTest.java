@@ -41,20 +41,20 @@ public class GiftServiceTest {
                 .giftThumbnail("url_to_thumbnail")
                 .build();
 
-        when(giftRepository.findGiftDetail(giftId)).thenReturn(expectedResponse);
+        when(giftRepository.findGiftDetailById(giftId)).thenReturn(expectedResponse);
 
         GiftDetailResponse actualResponse = giftService.getGiftDetail(giftId);
 
         assertNotNull(actualResponse);
         assertEquals(expectedResponse, actualResponse);
-        verify(giftRepository).findGiftDetail(giftId);
+        verify(giftRepository).findGiftDetailById(giftId);
     }
 
     @Test
     @DisplayName("선물 상세 정보 조회 - 선물이 존재하지 않을 때 예외 발생")
     void getGiftDetail_ThrowException() {
         Long giftId = 1L;
-        when(giftRepository.findGiftDetail(giftId)).thenReturn(null);
+        when(giftRepository.findGiftDetailById(giftId)).thenReturn(null);
 
         assertThrows(EntityNotFoundException.class, () -> giftService.getGiftDetail(giftId));
     }
@@ -79,20 +79,20 @@ public class GiftServiceTest {
                 .giftThumbnail("url_to_thumbnail")
                 .build();
 
-        when(giftRepository.findGiftDescription(giftId)).thenReturn(expectedResponse);
+        when(giftRepository.findGiftDescriptionById(giftId)).thenReturn(expectedResponse);
 
         GiftDescriptionResponse actualResponse = giftService.getGiftDescription(giftId);
 
         assertNotNull(actualResponse);
         assertEquals(expectedResponse, actualResponse);
-        verify(giftRepository).findGiftDescription(giftId);
+        verify(giftRepository).findGiftDescriptionById(giftId);
     }
 
     @Test
     @DisplayName("선물 설명 정보 조회 - 선물이 존재하지 않을 때 예외 발생")
     void getGiftDescription_ThrowException() {
         Long giftId = 1L;
-        when(giftRepository.findGiftDescription(giftId)).thenReturn(null);
+        when(giftRepository.findGiftDescriptionById(giftId)).thenReturn(null);
 
         assertThrows(EntityNotFoundException.class, () -> giftService.getGiftDescription(giftId));
     }
