@@ -17,6 +17,8 @@ import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
@@ -25,9 +27,12 @@ import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessR
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
+import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
 import org.kakaoshare.backend.domain.payment.exception.PaymentException;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
+import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
+import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 import org.kakaoshare.backend.domain.receipt.entity.ReceiptOption;
@@ -60,6 +65,12 @@ public class PaymentService {
     private final ProductRepository productRepository;
     private final RedisUtils redisUtils;
 
+    public PaymentPreviewResponse preview(final List<PaymentPreviewRequest> paymentPreviewRequests) {
+        final List<String> methodNames = PaymentMethod.getNames();
+        final Long totalProductAmount = getTotalProductAmount(paymentPreviewRequests);
+        return new PaymentPreviewResponse(0L, methodNames, totalProductAmount);  // TODO: 3/26/24 쇼핑포인트는 0으로 고정
+    }
+
     public PaymentReadyResponse ready(final String providerId,
                                       final List<PaymentReadyRequest> paymentReadyRequests) {
         validateTotalAmount(paymentReadyRequests);
@@ -85,6 +96,18 @@ public class PaymentService {
         saveOrders(payment, receipts);
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
         return new PaymentSuccessResponse(Receiver.from(receiver), orderSummaries);
+    }
+
+    private long getTotalProductAmount(final List<PaymentPreviewRequest> paymentPreviewRequests) {
+        final List<Long> productIds = extractedProductIds(paymentPreviewRequests, PaymentPreviewRequest::productId);
+        final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
+        if (priceByIds == null || priceByIds.isEmpty()) {
+            throw new ProductException(ProductErrorCode.NOT_FOUND);
+        }
+
+        return paymentPreviewRequests.stream()
+                .mapToLong(paymentPreviewRequest -> priceByIds.get(paymentPreviewRequest.productId()) * paymentPreviewRequest.quantity())
+                .sum();
     }
 
     private void validateTotalAmount(final List<PaymentReadyRequest> paymentReadyRequests) {
