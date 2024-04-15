@@ -39,4 +39,13 @@ public class RefreshToken {
                 .expiration(expiration)
                 .build();
     }
+
+    @Override
+    public String toString() {
+        return "RefreshToken{" +
+                "providerId='" + providerId + '\'' +
+                ", value='" + value + '\'' +
+                ", expiration=" + expiration +
+                '}';
+    }
 }
