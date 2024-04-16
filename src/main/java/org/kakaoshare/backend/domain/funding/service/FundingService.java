@@ -28,6 +28,7 @@ public class FundingService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
         Product product = findProductById(productId);
         Member member = findMemberByProviderId(providerId);
