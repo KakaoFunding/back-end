@@ -31,9 +31,9 @@ public class DescriptionResponse {
                 .name(product.getName())
                 .price(product.getPrice())
                 .type(product.getType())
-                .description(product.getProductDetail().getDescription())
+                .description(product.getProductDetail() != null ? product.getProductDetail().getDescription() : "기본 설명") //todo 추후 변경할로직
                 .descriptionPhotos(descriptionPhotosUrls)
-                .productName(product.getProductDetail().getProductName())
+                .productName(product.getName())
                 .options(optionsResponses)
                 .productThumbnails(productThumbnailsUrls)
                 .brandName(product.getBrand().getName())

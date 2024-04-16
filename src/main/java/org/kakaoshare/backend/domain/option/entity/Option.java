@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -16,7 +17,9 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Entity
 @Getter
-@Table(name = "options")
+@Table(name = "options",
+        indexes = @Index(name = "idx_options_product_id",columnList = "product_id",unique = true)
+)
 public class Option extends BaseTimeEntity {
 
     @Id

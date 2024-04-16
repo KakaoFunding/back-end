@@ -5,15 +5,21 @@ import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
+import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
+import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
@@ -21,9 +27,12 @@ import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessR
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
+import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
 import org.kakaoshare.backend.domain.payment.exception.PaymentException;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
+import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
+import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 import org.kakaoshare.backend.domain.receipt.entity.ReceiptOption;
@@ -37,7 +46,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
+import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_OPTION;
 
 @RequiredArgsConstructor
 @Service
@@ -45,6 +56,7 @@ import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.I
 public class PaymentService {
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
+    private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final OrderRepository orderRepository;
     private final OrderNumberProvider orderNumberProvider;
@@ -53,12 +65,20 @@ public class PaymentService {
     private final ProductRepository productRepository;
     private final RedisUtils redisUtils;
 
+    public PaymentPreviewResponse preview(final List<PaymentPreviewRequest> paymentPreviewRequests) {
+        final List<String> methodNames = PaymentMethod.getNames();
+        final Long totalProductAmount = getTotalProductAmount(paymentPreviewRequests);
+        return new PaymentPreviewResponse(0L, methodNames, totalProductAmount);  // TODO: 3/26/24 쇼핑포인트는 0으로 고정
+    }
+
     public PaymentReadyResponse ready(final String providerId,
                                       final List<PaymentReadyRequest> paymentReadyRequests) {
         validateTotalAmount(paymentReadyRequests);
+        validateOptionDetailIds(paymentReadyRequests);
         final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
         final OrderDetails orderDetails = getOrderDetails(paymentReadyRequests);
-        final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentReadyRequests, orderDetailKey);
+        final List<PaymentReadyProductDto> paymentProductReadyRequests = getPaymentProductReadyRequests(paymentReadyRequests);
+        final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentProductReadyRequests, orderDetailKey);
         redisUtils.save(orderDetailKey, orderDetails);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), kakaoPayReadyResponse.next_redirect_pc_url(), orderDetailKey);
     }
@@ -78,14 +98,61 @@ public class PaymentService {
         return new PaymentSuccessResponse(Receiver.from(receiver), orderSummaries);
     }
 
+    private long getTotalProductAmount(final List<PaymentPreviewRequest> paymentPreviewRequests) {
+        final List<Long> productIds = extractedProductIds(paymentPreviewRequests, PaymentPreviewRequest::productId);
+        final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
+        if (priceByIds == null || priceByIds.isEmpty()) {
+            throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR);
+        }
+
+        return paymentPreviewRequests.stream()
+                .mapToLong(paymentPreviewRequest -> priceByIds.get(paymentPreviewRequest.productId()) * paymentPreviewRequest.quantity())
+                .sum();
+    }
+
     private void validateTotalAmount(final List<PaymentReadyRequest> paymentReadyRequests) {
         final List<Long> productIds = extractedProductIds(paymentReadyRequests, PaymentReadyRequest::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
         final boolean isAllMatch = paymentReadyRequests.stream()
-                .anyMatch(paymentReadyRequest -> paymentReadyRequest.stockQuantity() * priceByIds.get(paymentReadyRequest.productId()) != paymentReadyRequest.totalAmount());
+                .anyMatch(paymentReadyRequest -> paymentReadyRequest.quantity() * priceByIds.get(paymentReadyRequest.productId()) == paymentReadyRequest.totalAmount());
         if (!isAllMatch) {
             throw new PaymentException(INVALID_AMOUNT);
         }
+    }
+
+    private List<PaymentReadyProductDto> getPaymentProductReadyRequests(final List<PaymentReadyRequest> paymentReadyRequests) {
+        final List<Long> productIds = extractedProductIds(paymentReadyRequests, PaymentReadyRequest::productId);
+        final Map<Long, String> nameById = productRepository.findAllNameByIdsGroupById(productIds);
+        return paymentReadyRequests.stream()
+                .map(paymentReadyRequest -> new PaymentReadyProductDto(nameById.get(paymentReadyRequest.productId()), paymentReadyRequest.quantity(), paymentReadyRequest.totalAmount()))
+                .toList();
+    }
+
+    private void validateOptionDetailIds(final List<PaymentReadyRequest> paymentReadyRequests) {
+        final boolean isAllMatch = paymentReadyRequests.stream()
+                .anyMatch(this::matchesOptionsWithProduct);
+        if (!isAllMatch) {
+            throw new PaymentException(INVALID_OPTION);
+        }
+    }
+
+    private boolean matchesOptionsWithProduct(final PaymentReadyRequest paymentReadyRequest) {
+        final Long productId = paymentReadyRequest.productId();
+        final List<Long> optionDetailIds = paymentReadyRequest.optionDetailIds();
+        if (optionDetailIds == null || optionDetailIds.isEmpty()) {
+            return true;
+        }
+
+        final List<Option> options = optionRepository.findByOptionDetailIds(optionDetailIds);
+        if (options.size() != optionDetailIds.size()) {
+            return false;
+        }
+
+        final List<Long> productIds = options.stream()
+                .map(option -> option.getProduct().getProductId())
+                .distinct()
+                .toList();
+        return productIds.size() == 1 && productIds.get(0).equals(productId);
     }
 
     private OrderDetails getOrderDetails(final List<PaymentReadyRequest> paymentReadyRequests) {
@@ -109,7 +176,7 @@ public class PaymentService {
                 .map(orderDetail -> new Receipt(
                         orderDetail.orderNumber(),
                         productRepository.getReferenceById(orderDetail.productId()),
-                        orderDetail.stockQuantity(),
+                        orderDetail.quantity(),
                         recipient,
                         receiver,
                         getReceiptOptions(orderDetail.optionDetailIds())))
@@ -147,7 +214,7 @@ public class PaymentService {
 
     private OrderSummaryResponse getOrderSummary(final OrderDetail orderDetail) {
         final ProductSummaryResponse productSummaryResponse = productRepository.findAllProductSummaryById(orderDetail.productId());
-        return new OrderSummaryResponse(productSummaryResponse, orderDetail.stockQuantity(), getOptionSummaryResponses(orderDetail.optionDetailIds()));
+        return new OrderSummaryResponse(productSummaryResponse, orderDetail.quantity(), getOptionSummaryResponses(orderDetail.optionDetailIds()));
     }
 
     private List<OptionSummaryResponse> getOptionSummaryResponses(final List<Long> optionDetailIds) {
@@ -164,7 +231,7 @@ public class PaymentService {
     }
 
     private Member findMemberByProviderId(final String providerId) {
-        return memberRepository.findByProviderId(providerId)
-                .orElseThrow(IllegalArgumentException::new);
+        return memberRepository.findMemberByProviderId(providerId)
+                .orElseThrow(() -> new MemberException(NOT_FOUND));
     }
 }

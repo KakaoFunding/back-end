@@ -9,12 +9,16 @@ import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
+import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.Amount;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
@@ -22,6 +26,7 @@ import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessR
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
+import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
@@ -62,6 +67,9 @@ class PaymentServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
+    private OptionRepository optionRepository;
+
+    @Mock
     private OptionDetailRepository optionDetailRepository;
 
     @Mock
@@ -76,6 +84,29 @@ class PaymentServiceTest {
     @InjectMocks
     private PaymentService paymentService;
 
+    @Test
+    @DisplayName("주문 페이지에서 결제 금액 조회")
+    public void preview() throws Exception {
+        final Product cake = CAKE.생성(1L);
+        final int cakeQuantity = 1;
+
+        final Product coffee = COFFEE.생성(2L);
+        final int coffeeQuantity = 2;
+
+        final List<PaymentPreviewRequest> paymentPreviewRequests = List.of(
+                new PaymentPreviewRequest(cake.getProductId(), cakeQuantity),
+                new PaymentPreviewRequest(coffee.getProductId(), coffeeQuantity)
+        );
+
+        final long totalAmount = cake.getPrice() * cakeQuantity + coffee.getPrice() * coffeeQuantity;
+        final List<Long> productIds = List.of(cake.getProductId(), coffee.getProductId());
+        doReturn(Map.of(cake.getProductId(), cake.getPrice(), coffee.getProductId(), coffee.getPrice())).when(productRepository).findAllPriceByIdsGroupById(productIds);
+
+        final PaymentPreviewResponse expect = new PaymentPreviewResponse(0L, PaymentMethod.getNames(), totalAmount);
+        final PaymentPreviewResponse actual = paymentService.preview(paymentPreviewRequests);
+
+        assertThat(actual).isEqualTo(expect);
+    }
 
     @Test
     @DisplayName("결제 준비")
@@ -84,21 +115,28 @@ class PaymentServiceTest {
         final String orderDetailsKey = "12345678";
 
         final Product cake = CAKE.생성(1L);
-        final int cakeStockQuantity = 1;
+        final int cakeQuantity = 1;
 
         final Product coffee = COFFEE.생성(2L);
-        final int coffeeStockQuantity = 2;
+        final int coffeeQuantity = 2;
 
         final List<PaymentReadyRequest> readyRequests = List.of(
-                createPaymentReadyRequest(cake, cakeStockQuantity),
-                createPaymentReadyRequest(coffee, coffeeStockQuantity)
+                createPaymentReadyRequest(cake, cakeQuantity),
+                createPaymentReadyRequest(coffee, coffeeQuantity)
         );
 
-        final Map<Long, Long> pricesGroupByIds = Map.of(cake.getProductId(), cake.getPrice(), coffee.getProductId(), coffee.getPrice());
+        final List<PaymentReadyProductDto> paymentReadyProductDtos = List.of(
+                new PaymentReadyProductDto(cake.getName(), cakeQuantity, cake.getPrice().intValue()),
+                new PaymentReadyProductDto(coffee.getName(), coffeeQuantity, coffee.getPrice().intValue())
+        );
+
+        final Map<Long, Long> pricesByIds = Map.of(cake.getProductId(), cake.getPrice(), coffee.getProductId(), coffee.getPrice());
+        final Map<Long, String> namesByIds = Map.of(cake.getProductId(), cake.getName(), coffee.getProductId(), coffee.getName());
         final KakaoPayReadyResponse readyResponse = createReadyResponse();
         doReturn(orderDetailsKey).when(orderNumberProvider).createOrderDetailKey();
-        doReturn(pricesGroupByIds).when(productRepository).findAllPriceByIdsGroupById(List.of(cake.getProductId(), coffee.getProductId()));
-        doReturn(readyResponse).when(webClientService).ready(providerId, readyRequests, orderDetailsKey);
+        doReturn(pricesByIds).when(productRepository).findAllPriceByIdsGroupById(List.of(cake.getProductId(), coffee.getProductId()));
+        doReturn(namesByIds).when(productRepository).findAllNameByIdsGroupById(List.of(cake.getProductId(), coffee.getProductId()));
+        doReturn(readyResponse).when(webClientService).ready(providerId, paymentReadyProductDtos, orderDetailsKey);
 
         final PaymentReadyResponse expect = new PaymentReadyResponse(
                 readyResponse.tid(),
@@ -147,7 +185,7 @@ class PaymentServiceTest {
         doReturn(orderDetails).when(redisUtils).remove(orderDetailKey, OrderDetails.class);
         doReturn(approveResponse).when(webClientService).approve(providerId, paymentSuccessRequest);
         doReturn(payment).when(paymentRepository).save(any());  // TODO: 3/16/24 save() 에서 new로 다른 객체가 생성되므로 any()로 대체
-        doReturn(Optional.of(member)).when(memberRepository).findByProviderId(providerId);
+        doReturn(Optional.of(member)).when(memberRepository).findMemberByProviderId(providerId);
         doReturn(cake).when(productRepository).getReferenceById(cake.getProductId());
         doReturn(coffee).when(productRepository).getReferenceById(coffee.getProductId());
         doReturn(null).when(giftRepository).saveAll(any());
@@ -178,13 +216,12 @@ class PaymentServiceTest {
     }
 
     private PaymentReadyRequest createPaymentReadyRequest(final Product product,
-                                                          final int stockQuantity) {
+                                                          final int quantity) {
         return new PaymentReadyRequest(
                 product.getProductId(),
-                product.getName(),
                 product.getPrice().intValue(),
                 0,
-                stockQuantity,
+                quantity,
                 null
         );
     }
