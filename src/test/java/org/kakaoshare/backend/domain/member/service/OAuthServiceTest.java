@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.IssuedTokenResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -59,7 +60,7 @@ class OAuthServiceTest {
     OAuthService oAuthService;
 
     private String accessToken;
-    private String code;
+    private String socialAccessToken;
     private Member member;
     private String providerId;
     private RefreshToken refreshToken;
@@ -68,7 +69,7 @@ class OAuthServiceTest {
     @BeforeEach
     public void setUp() {
         accessToken = "accessToken";
-        code = "code";
+        socialAccessToken = "socialAccessToken";
         member = KAKAO.생성();
         providerId = member.getProviderId();
         refreshToken = getRefreshToken();
@@ -82,20 +83,19 @@ class OAuthServiceTest {
         final ClientRegistration registration = getClientRegistration(registrationId);
         final Map<String, Object> attributes = kakaoAttributes();
         final OAuthProfile oAuthProfile = OAuthProfileFactory.of(attributes, registrationId);
-        final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, code);
+        final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, socialAccessToken);
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
-        doReturn(attributes).when(webClientService).getSocialProfile(registration, code);
+        doReturn(attributes).when(webClientService).getSocialProfile(registration, socialAccessToken);
         doReturn(Optional.empty()).when(memberRepository).findDetailsByProviderId(providerId);
         doReturn(member).when(memberRepository).save(any());
-        doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
+        doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
         doReturn(refreshToken).when(refreshTokenRepository).save(any());
 
         final OAuthLoginResult expect = OAuthLoginResult.of(accessToken, refreshToken.getValue(), oAuthProfile);
         final OAuthLoginResult actual = oAuthService.login(request);
-        assertThat(expect).usingRecursiveComparison()
-                .isEqualTo(actual);
+        assertThat(expect).isEqualTo(actual);
     }
 
     @Test
@@ -105,19 +105,36 @@ class OAuthServiceTest {
         final ClientRegistration registration = getClientRegistration(registrationId);
         final Map<String, Object> attributes = kakaoAttributes();
         final OAuthProfile oAuthProfile = OAuthProfileFactory.of(attributes, registrationId);
-        final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, code);
+        final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, socialAccessToken);
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
-        doReturn(attributes).when(webClientService).getSocialProfile(registration, code);
+        doReturn(attributes).when(webClientService).getSocialProfile(registration, socialAccessToken);
         doReturn(Optional.of(userDetails)).when(memberRepository).findDetailsByProviderId(providerId);
-        doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
+        doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
         doReturn(refreshToken).when(refreshTokenRepository).save(any());
 
         final OAuthLoginResult expect = OAuthLoginResult.of(accessToken, refreshToken.getValue(), oAuthProfile);
         final OAuthLoginResult actual = oAuthService.login(request);
-        assertThat(expect).usingRecursiveComparison()
-                .isEqualTo(actual);
+        assertThat(expect).isEqualTo(actual);
+    }
+
+    @Test
+    @DisplayName("토큰 재발급")
+    public void reissue() throws Exception {
+        final String refreshTokenValue = refreshToken.getValue();
+        final RefreshToken newRefreshToken = RefreshToken.from(providerId, "newRefreshToken", 100L);
+
+        doReturn(Optional.of(refreshToken)).when(refreshTokenRepository).findByValue(refreshTokenValue);
+        doReturn(Optional.of(userDetails)).when(memberRepository).findDetailsByProviderId(providerId);
+        doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
+        doReturn(newRefreshToken).when(refreshTokenProvider).createToken(providerId);
+        doReturn(newRefreshToken).when(refreshTokenRepository).save(newRefreshToken);
+
+        final IssuedTokenResult actual = oAuthService.reissue(refreshTokenValue);
+        final IssuedTokenResult expect = IssuedTokenResult.of(accessToken, newRefreshToken);
+
+        assertThat(actual).isEqualTo(expect);
     }
 
     private ClientRegistration getClientRegistration(final String registrationId) {

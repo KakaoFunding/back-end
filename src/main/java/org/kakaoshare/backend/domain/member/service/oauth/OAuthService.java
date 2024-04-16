@@ -3,10 +3,15 @@ package org.kakaoshare.backend.domain.member.service.oauth;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.IssuedTokenResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.entity.token.RefreshToken;
+import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
+import org.kakaoshare.backend.domain.member.exception.token.RefreshTokenErrorCode;
+import org.kakaoshare.backend.domain.member.exception.token.RefreshTokenException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.member.repository.token.RefreshTokenRepository;
 import org.kakaoshare.backend.jwt.util.JwtProvider;
@@ -31,24 +36,47 @@ public class OAuthService {
     private final OAuthWebClientService webClientService;
 
     @Transactional
-    public OAuthLoginResult login(final OAuthLoginRequest request) {
-        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(request.provider());
-        final OAuthProfile oAuthProfile = getProfile(request, registration);
+    public OAuthLoginResult login(final OAuthLoginRequest oAuthLoginRequest) {
+        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(oAuthLoginRequest.provider());
+        final OAuthProfile oAuthProfile = getProfile(oAuthLoginRequest, registration);
         final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
-        final String accessToken = jwtProvider.createAccessToken(userDetails.getUsername(), userDetails.getAuthorities());
+        final String accessToken = jwtProvider.createAccessToken(userDetails);
         final RefreshToken refreshToken = refreshTokenProvider.createToken(userDetails.getUsername());
         refreshTokenRepository.save(refreshToken);
 
         return OAuthLoginResult.of(accessToken, refreshToken.getValue(), oAuthProfile);
     }
 
+    @Transactional
+    public IssuedTokenResult reissue(final String refreshTokenValue) {
+        final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
+        final String providerId = refreshToken.getProviderId();
+        final UserDetails userDetails = findUserDetailsByProviderId(providerId);
+        final String accessToken = jwtProvider.createAccessToken(userDetails);
+        final RefreshToken newRefreshToken = refreshTokenProvider.createToken(providerId);
+        refreshTokenRepository.save(newRefreshToken);
+        refreshTokenRepository.delete(refreshToken);
+
+        return IssuedTokenResult.of(accessToken, newRefreshToken);
+    }
+
     private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {
-        final Map<String, Object> attributes = webClientService.getSocialProfile(registration, request.code());
+        final Map<String, Object> attributes = webClientService.getSocialProfile(registration, request.socialAccessToken());
         return OAuthProfileFactory.of(attributes, request.provider());
     }
 
     private UserDetails addOrFindByProfile(final OAuthProfile oAuthProfile) {
         return memberRepository.findDetailsByProviderId(oAuthProfile.getProviderId())
                 .orElseGet(() -> MemberDetails.from(memberRepository.save(oAuthProfile.toEntity())));
+    }
+
+    private UserDetails findUserDetailsByProviderId(final String providerId) {
+        return memberRepository.findDetailsByProviderId(providerId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
+    }
+
+    private RefreshToken findRefreshTokenByValue(final String refreshTokenValue) {
+        return refreshTokenRepository.findByValue(refreshTokenValue)
+                .orElseThrow(() -> new RefreshTokenException(RefreshTokenErrorCode.NOT_FOUND));
     }
 }

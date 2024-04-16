@@ -1,6 +1,9 @@
 package org.kakaoshare.backend.domain.gift.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
+import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.service.GiftService;
@@ -20,6 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class GiftController {
     private final GiftService giftService;
 
+    @GetMapping("/giftBox/giftInfo/{giftId}")
+    public ResponseEntity<GiftDetailResponse> readGiftInfo(@PathVariable Long giftId) {
+        GiftDetailResponse detailResponse = giftService.getGiftDetail(giftId);
+        return ResponseEntity.ok(detailResponse);
+    }
+
+    @GetMapping("/giftBox/detail/{giftId}")
+    public ResponseEntity<GiftDescriptionResponse> readGiftDetail(@PathVariable Long giftId) {
+        GiftDescriptionResponse descriptionResponse = giftService.getGiftDescription(giftId);
+        return ResponseEntity.ok(descriptionResponse);
+    }
     @GetMapping("/giftBox")
     public ResponseEntity<?> getGiftBox(@LoggedInMember final String providerId,
                                         @PageableDefault(size = 20) Pageable pageable,

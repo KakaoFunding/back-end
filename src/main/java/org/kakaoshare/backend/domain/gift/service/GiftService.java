@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.domain.gift.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.common.dto.PageResponse;
-import org.kakaoshare.backend.common.error.ErrorCode;
-import org.kakaoshare.backend.common.error.GlobalErrorCode;
-import org.kakaoshare.backend.common.error.exception.BusinessException;
+import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
+import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
+import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
@@ -24,6 +24,21 @@ public class GiftService {
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
 
+    public GiftDetailResponse getGiftDetail(Long giftId) {
+        GiftDetailResponse giftDetailResponse = giftRepository.findGiftDetailById(giftId);
+        if (giftDetailResponse == null) {
+            throw new EntityNotFoundException("Gift not found with id: " + giftId);
+        }
+        return giftDetailResponse;
+    }
+
+    public GiftDescriptionResponse getGiftDescription(Long giftId) {
+        GiftDescriptionResponse giftDescriptionResponse = giftRepository.findGiftDescriptionById(giftId);
+        if (giftDescriptionResponse == null) {
+            throw new EntityNotFoundException("Gift not found with id: " + giftId);
+        }
+        return giftDescriptionResponse;
+    }
     public Page<GiftResponse> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
         Member member = findMemberByProviderId(providerId);
         return giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), status,
@@ -31,7 +46,7 @@ public class GiftService {
     }
 
     private Member findMemberByProviderId(String providerId) {
-        return memberRepository.findByProviderId(providerId)
+        return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
     }
 }

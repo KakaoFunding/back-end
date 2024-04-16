@@ -1,11 +1,8 @@
 package org.kakaoshare.backend.domain.funding.service;
 
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
-
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
@@ -19,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -69,7 +69,7 @@ public class FundingService {
     }
 
     private Member findMemberByProviderId(String providerId) {
-        return memberRepository.findByProviderId(providerId)
+        return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
     }
 

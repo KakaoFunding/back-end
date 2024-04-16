@@ -4,12 +4,18 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
+import org.kakaoshare.backend.domain.wish.entity.Wish;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.kakaoshare.backend.domain.member.entity.Role.USER;
 
@@ -36,10 +42,13 @@ public class Member extends BaseTimeEntity {
     private String providerId;
     
     @Builder.Default
-
     @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Role role = USER;
+    
+    @Builder.Default
+    @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)
+    private List<Wish> wishes=new ArrayList<>();
     
     protected Member() {
     
@@ -64,5 +73,9 @@ public class Member extends BaseTimeEntity {
                 ", providerId='" + providerId + '\'' +
                 ", role=" + role +
                 '}';
+    }
+    
+    public boolean isWishEmpty() {
+        return wishes == null || wishes.isEmpty();
     }
 }

@@ -43,6 +43,7 @@ public enum ProductFixture {
                 .category(category)
                 .price(price)
                 .type(type)
+                .wishCount(1)
                 .build();
     }
     
