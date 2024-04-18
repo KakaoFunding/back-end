@@ -49,7 +49,7 @@ public class WishService {
         Wish wish = createWish(event, member);
         wish.checkIsPublic(event.getType());
         
-        if(wishRepository.isContainInWishList(wish,member,event.getProduct().getProductId())){
+        if (wishRepository.isContainInWishList(wish, member, event.getProduct().getProductId())) {
             throw new WishException(WishErrorCode.SAVING_FAILED);
         }
         try {
@@ -109,4 +109,13 @@ public class WishService {
                 .build();
     }
     
+    public void changeWishType(final String providerId, final Long wishId) {
+        boolean exists = getMembersWishList(providerId).stream()
+                .anyMatch(wishDetail -> wishDetail.wishId().equals(wishId));
+        if (!exists) {
+            throw new WishException(WishErrorCode.NOT_FOUND);
+        }
+        Wish wish = wishRepository.findById(wishId).orElseThrow(() -> new WishException(WishErrorCode.NOT_FOUND));
+        wish.changeScopeOfDisclosure();
+    }
 }
