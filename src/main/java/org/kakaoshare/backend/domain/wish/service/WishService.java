@@ -46,14 +46,12 @@ public class WishService {
     )
     public void handleWishReservation(WishReservationEvent event) {
         Member member = getMember(event.getProviderId());
-        
-        if (isRegistered(event, member)) {
-            throw new WishException(WishErrorCode.DUPLICATED_WISH);
-        }
-        
         Wish wish = createWish(event, member);
         wish.checkIsPublic(event.getType());
         
+        if(wishRepository.isContainInWishList(wish,member,event.getProduct().getProductId())){
+            throw new WishException(WishErrorCode.SAVING_FAILED);
+        }
         try {
             wishRepository.save(wish);
         } catch (RuntimeException e) {
@@ -73,11 +71,6 @@ public class WishService {
     )
     public void handleWishCancel(WishCancelEvent event) {
         Member member = getMember(event.getProviderId());
-        
-        if (!isRegistered(event, member)) {
-            throw new WishException(WishErrorCode.NOT_FOUND);
-        }
-        
         Wish wish = createWish(event, member);
         
         try {
@@ -107,16 +100,6 @@ public class WishService {
     
     public List<WishDetail> getMembersWishList(final String providerId) {
         return wishRepository.findWishDetailsByProviderId(providerId);
-    }
-    
-    private boolean isRegistered(final WishEvent event, final Member member) {
-        if (member.isWishEmpty()) {
-            return false;
-        }
-        List<Wish> wishes = member.getWishes();
-        Long productId = event.getProduct().getProductId();
-        return wishes != null && wishes.stream()
-                .anyMatch(wish -> wish.equalProductId(productId));
     }
     
     private Wish createWish(final WishEvent event, final Member member) {
