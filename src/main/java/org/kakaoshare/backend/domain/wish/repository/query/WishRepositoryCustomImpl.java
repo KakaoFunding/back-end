@@ -28,6 +28,7 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                 .select(
                         Projections.constructor(
                                 WishDetail.class,
+                                wish.wishId,
                                 product.productId,
                                 product.name,
                                 product.price,
