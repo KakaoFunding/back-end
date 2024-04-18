@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.wish.repository;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -27,6 +28,7 @@ class WishRepositoryTest {
     private ProductRepository productRepository;
     
     @Test
+    @DisplayName("위시는 중복된 상품을 기준으로 제외하고 저장한다")
     void testSaveWishIfNotExists() {
         // given
         List<WishFixture> fixtures = Arrays.stream(WishFixture.values()).toList();
@@ -56,40 +58,4 @@ class WishRepositoryTest {
         // then
         
     }
-
-
-//    @Test
-//    void w() {
-//        // given
-//        Member member = MemberFixture.KAKAO.생성();
-//        Member savedMember = memberRepository.saveAndFlush(member);
-//        List<Product> products = productRepository.findAll()
-//                .stream()
-//                .limit(500)
-//                .toList();
-//
-//        List<Wish> wishes = products.stream()
-//                .map(product -> Wish.builder()
-//                        .member(savedMember)
-//                        .product(product)
-//                        .isPublic(true).build())
-//                .toList();
-//        wishRepository.saveAll(wishes);
-//
-//        // when
-////        List<WishDetail> wishDetails = wishRepository.findWishDetailsByProviderId(savedMember.getProviderId());
-//        List<WishDetail> wishDetails = wishRepository.findByMember_ProviderId(savedMember.getProviderId())
-//                .stream()
-//                .map(wish ->
-//                        new WishDetail(
-//                                wish.getProduct().getProductId(),
-//                                wish.getProduct().getName(),
-//                                wish.getProduct().getPrice(),
-//                                wish.getProduct().getPhoto(),
-//                                wish.getIsPublic()
-//                        ))
-//                .toList();
-//        // then
-//
-//    }
 }
