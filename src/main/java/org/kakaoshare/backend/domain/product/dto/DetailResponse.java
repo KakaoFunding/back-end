@@ -18,6 +18,8 @@ public class DetailResponse {
     private final String productName;
     private final List<OptionResponse> options;
     private final String brandName;
+    private final Long brandId;
+    private final String brandThumbnail;
     private final String origin;
     private final String manufacturer;
     private final String tel;
@@ -48,6 +50,8 @@ public class DetailResponse {
                 .productThumbnails(product.getProductThumbnails())
                 .options(optionsResponses)
                 .brandName(product.getBrandName())
+                .brandId(product.getBrand().getBrandId())
+                .brandThumbnail(product.getBrand().getIconPhoto())
                 .build();
     }
 }
