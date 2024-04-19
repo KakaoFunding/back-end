@@ -23,6 +23,8 @@ public class DescriptionResponse {
     private final List<OptionResponse> options;
     private final List<String> productThumbnails;
     private final String brandName;
+    private final Long brandId;
+    private final String brandThumbnail;
 
     public static DescriptionResponse from(final Product product, List<String> descriptionPhotosUrls,
                                            List<OptionResponse> optionsResponses, List<String> productThumbnailsUrls) {
@@ -37,6 +39,8 @@ public class DescriptionResponse {
                 .options(optionsResponses)
                 .productThumbnails(productThumbnailsUrls)
                 .brandName(product.getBrand().getName())
+                .brandId(product.getBrand().getBrandId())
+                .brandThumbnail(product.getBrand().getIconPhoto())
                 .build();
     }
 }
