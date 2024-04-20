@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.funding.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,16 +11,21 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
+import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.payment.entity.Payment;
 
 import java.math.BigDecimal;
 
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        indexes = {@Index(name = "idx_funding_detail_funding_id",columnList = "funding_id",unique = true)}
+        indexes = {@Index(name = "idx_funding_detail_funding_id", columnList = "funding_id")}
 )
 public class FundingDetail extends BaseTimeEntity {
 
@@ -27,8 +33,12 @@ public class FundingDetail extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fundingDetailId;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal amount;
+    @Column(nullable = false)
+    private Long amount;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal rate;
@@ -37,5 +47,35 @@ public class FundingDetail extends BaseTimeEntity {
     @JoinColumn(name = "funding_id", nullable = false)
     private Funding funding;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id", nullable = false)
+    private Payment payment;
 
+    public FundingDetail(final Member member,
+                         final Funding funding,
+                         final Payment payment) {
+        this.member = member;
+        this.amount = payment.getTotalPrice();
+        this.rate = BigDecimal.valueOf(100 * amount / funding.getGoalAmount());
+        this.funding = funding;
+        this.payment = payment;
+    }
+
+    public void increaseAmountAndRate(final Long amount) {
+        if (amount != null) {
+            this.rate = this.rate.add(BigDecimal.valueOf(100 * amount / funding.getGoalAmount()));
+            this.amount += amount;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "FundingDetail{" +
+                "fundingDetailId=" + fundingDetailId +
+                ", amount=" + amount +
+                ", rate=" + rate +
+                ", funding=" + funding +
+                ", payment=" + payment +
+                '}';
+    }
 }
