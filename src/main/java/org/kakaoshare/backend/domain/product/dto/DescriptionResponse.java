@@ -26,7 +26,7 @@ public class DescriptionResponse {
     private final Long brandId;
     private final String brandThumbnail;
 
-    public static DescriptionResponse from(final Product product, List<String> descriptionPhotosUrls,
+    public static DescriptionResponse of(final Product product, List<String> descriptionPhotosUrls,
                                            List<OptionResponse> optionsResponses, List<String> productThumbnailsUrls) {
         return DescriptionResponse.builder()
                 .productId(product.getProductId())
