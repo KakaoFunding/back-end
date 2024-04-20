@@ -2,6 +2,12 @@ package org.kakaoshare.backend.domain.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
+import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
+import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
+import org.kakaoshare.backend.domain.funding.exception.FundingException;
+import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
+import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -14,11 +20,13 @@ import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
+import org.kakaoshare.backend.domain.payment.dto.FundingOrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
@@ -54,6 +62,8 @@ import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.I
 @Service
 @Transactional(readOnly = true)
 public class PaymentService {
+    private final FundingRepository fundingRepository;
+    private final FundingDetailRepository fundingDetailRepository;
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
     private final OptionRepository optionRepository;
@@ -83,6 +93,19 @@ public class PaymentService {
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), kakaoPayReadyResponse.next_redirect_pc_url(), orderDetailKey);
     }
 
+    public PaymentReadyResponse readyFunding(final String providerId,
+                                             final PaymentFundingReadyRequest paymentFundingReadyRequest) {
+        final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
+        final FundingOrderDetail fundingOrderDetail = FundingOrderDetail.from(paymentFundingReadyRequest);
+        redisUtils.save(orderDetailKey, fundingOrderDetail);
+        final Long fundingId = paymentFundingReadyRequest.fundingId();
+        final Funding funding = findFundingById(fundingId);
+        final String name = funding.getProduct().getName();
+        final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, paymentFundingReadyRequest.amount());// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
+        final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, List.of(paymentReadyProductDto), orderDetailKey);
+        return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), kakaoPayReadyResponse.next_redirect_pc_url(), orderDetailKey);
+    }
+
     @Transactional
     public PaymentSuccessResponse approve(final String providerId,
                                           final PaymentSuccessRequest paymentSuccessRequest) {
@@ -90,12 +113,27 @@ public class PaymentService {
         final Payment payment = saveAndGetPayment(approveResponse);
         final Member recipient = findMemberByProviderId(providerId); // TODO: 3/30/24 토큰에 저장된 값이 PK가 아니라 Member 엔티티를 가져와야 함
         final Member receiver = findMemberByProviderId(providerId); // TODO: 3/28/24 친구목록이 구현되지 않아 나에게로 선물만 구현
-        final OrderDetails orderDetails = redisUtils.remove(paymentSuccessRequest.orderNumber(), OrderDetails.class);
+        final OrderDetails orderDetails = redisUtils.remove(approveResponse.partner_order_id(), OrderDetails.class);
         final Receipts receipts = getReceipts(recipient.getMemberId(), receiver, orderDetails);
         saveGifts(receipts);
         saveOrders(payment, receipts);
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
         return new PaymentSuccessResponse(Receiver.from(receiver), orderSummaries);
+    }
+
+    @Transactional
+    public PaymentSuccessResponse approveFunding(final String providerId,
+                                                 final PaymentSuccessRequest paymentSuccessRequest) {
+        final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
+        final Payment payment = approveResponse.toEntity();
+        final FundingOrderDetail fundingOrderDetail = redisUtils.remove(approveResponse.partner_order_id(), FundingOrderDetail.class);
+        final Funding funding = findFundingById(fundingOrderDetail.fundingId());
+        final Member member = findMemberByProviderId(providerId);
+        final Long amount = payment.getTotalPrice();
+        saveOrReflectFundingDetail(payment, funding, member, amount);
+        funding.increaseAccumulateAmount(amount);
+        final Receiver receiver = Receiver.from(funding.getMember());
+        return new PaymentSuccessResponse(receiver, Collections.emptyList());   // TODO: 4/20/24 펀딩 결제 완료 페이지 디자인이 없어 빈 리스트를 반환
     }
 
     private long getTotalProductAmount(final List<PaymentPreviewRequest> paymentPreviewRequests) {
@@ -233,5 +271,18 @@ public class PaymentService {
     private Member findMemberByProviderId(final String providerId) {
         return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new MemberException(NOT_FOUND));
+    }
+
+    private Funding findFundingById(final Long fundingId) {
+        return fundingRepository.findById(fundingId)
+                .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
+    }
+
+    private void saveOrReflectFundingDetail(final Payment payment, final Funding funding, final Member member, final Long amount) {
+        fundingDetailRepository.findByFundingAndMember(funding, member)
+                .ifPresentOrElse(
+                        fundingDetail -> fundingDetail.increaseAmountAndRate(amount),
+                        () -> fundingDetailRepository.save(new FundingDetail(member, funding, payment))
+                );
     }
 }
