@@ -65,4 +65,23 @@ public class Funding extends BaseTimeEntity {
         this.expiredAt = expiredAt;
         this.status = "ACTIVE"; // 초기 상태 설정
     }
+
+    public void increaseAccumulateAmount(final Long amount) {
+        if (amount != null) {
+            this.accumulateAmount += amount;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Funding{" +
+                "fundingId=" + fundingId +
+                ", status='" + status + '\'' +
+                ", expiredAt=" + expiredAt +
+                ", goalAmount=" + goalAmount +
+                ", accumulateAmount=" + accumulateAmount +
+                ", member=" + member +
+                ", product=" + product +
+                '}';
+    }
 }
