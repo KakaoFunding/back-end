@@ -9,7 +9,6 @@ import org.kakaoshare.backend.domain.wish.dto.WishDetail;
 import org.kakaoshare.backend.domain.wish.entity.QWish;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                 .from(QWish.wish)
                 .where(existsCondition)
                 .fetchOne();
-        Assert.notNull(count,"count query must not to be null!");
-        return count >0;
+
+        return count != null && count > 0;
     }
 }
