@@ -151,6 +151,10 @@ public class PaymentService {
     private void validateTotalAmount(final List<PaymentReadyRequest> paymentReadyRequests) {
         final List<Long> productIds = extractedProductIds(paymentReadyRequests, PaymentReadyRequest::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
+        if (priceByIds.isEmpty()) {
+            throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR);
+        }
+
         final boolean isAllMatch = paymentReadyRequests.stream()
                 .anyMatch(paymentReadyRequest -> paymentReadyRequest.quantity() * priceByIds.get(paymentReadyRequest.productId()) == paymentReadyRequest.totalAmount());
         if (!isAllMatch) {
