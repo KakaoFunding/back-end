@@ -19,3 +19,6 @@ ALTER TABLE funding_detail
     ADD COLUMN `member_id` bigint NOT NULL;
 ALTER TABLE funding_detail
     ADD CONSTRAINT FK_FUNDINGDETAIL_ON_MEMBER FOREIGN KEY (member_id) REFERENCES member (member_id);
+
+ALTER TABLE funding_detail
+    MODIFY `rate` DOUBLE;
