@@ -38,7 +38,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.readyFunding(providerId, paymentFundingReadyRequest));
     }
 
-    @PostMapping("/success")
+    @PostMapping("/payments/success")
     public ResponseEntity<?> success(@LoggedInMember final String providerId,
                                      @RequestBody final PaymentSuccessRequest paymentSuccessRequest) {
         return ResponseEntity.ok(paymentService.approve(providerId, paymentSuccessRequest));
