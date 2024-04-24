@@ -18,8 +18,6 @@ import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 
-import java.math.BigDecimal;
-
 
 @Entity
 @Getter
@@ -40,8 +38,8 @@ public class FundingDetail extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(nullable = false, precision = 7, scale = 2)
-    private BigDecimal rate;
+    @Column(nullable = false)
+    private Double rate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funding_id", nullable = false)
@@ -56,16 +54,20 @@ public class FundingDetail extends BaseTimeEntity {
                          final Payment payment) {
         this.member = member;
         this.amount = payment.getTotalPrice();
-        this.rate = BigDecimal.valueOf(100 * amount / funding.getGoalAmount());
+        this.rate = calculateRate(this.amount);
         this.funding = funding;
         this.payment = payment;
     }
 
     public void increaseAmountAndRate(final Long amount) {
         if (amount != null) {
-            this.rate = this.rate.add(BigDecimal.valueOf(100 * amount / funding.getGoalAmount()));
+            this.rate += calculateRate(amount);
             this.amount += amount;
         }
+    }
+
+    private double calculateRate(final Long amount) {
+        return 100. * amount / funding.getGoalAmount();
     }
 
     @Override
