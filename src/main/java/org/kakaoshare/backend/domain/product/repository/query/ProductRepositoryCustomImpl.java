@@ -3,6 +3,7 @@ package org.kakaoshare.backend.domain.product.repository.query;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -256,6 +257,9 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
     
     private BooleanExpression isInWishList(final String providerId) {
+        if(providerId==null){
+            return Expressions.FALSE;
+        }
         return JPAExpressions
                 .selectOne()
                 .from(wish)
