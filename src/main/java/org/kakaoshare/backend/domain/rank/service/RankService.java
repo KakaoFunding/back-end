@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RankService {
     private final OrderRepository orderRepository;
-
+    private static final int MONTH_VALUE = 6;
     public List<RankResponse> getTopRankedProducts() {
-        return orderRepository.findTopRankedProductsByOrders(LocalDateTime.now().minusMonths(6));
+        return orderRepository.findTopRankedProductsByOrders(LocalDateTime.now().minusMonths(MONTH_VALUE));
     }
 }
