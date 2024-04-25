@@ -9,10 +9,10 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
     private final JPAQueryFactory queryFactory;
-    public List<RankResponse> findTopRankedProductsByOrders(LocalDateTime term, Pageable pageable) {
+    public Page<RankResponse> findTopRankedProductsByOrders(LocalDateTime term, Pageable pageable) {
         var subQuery = JPAExpressions
                 .select(order.ordersId)
                 .from(order)
@@ -30,7 +30,8 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
 
         OrderSpecifier<?>[] orderSpecifiers = RepositoryUtils.createOrderSpecifiers(order, pageable);
 
-        return queryFactory
+        // Create the main query to fetch the content
+        var contentQuery = queryFactory
                 .select(Projections.constructor(RankResponse.class,
                         product.productId,
                         product.name,
@@ -40,8 +41,15 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
                 .join(order.receipt.product, product)
                 .where(order.ordersId.in(subQuery))
                 .groupBy(product.productId)
-                .orderBy(orderSpecifiers)
-                .limit(100)
-                .fetch();
+                .orderBy(orderSpecifiers);
+
+        // Create a query to count total results
+        var countQuery = queryFactory
+                .select(order.ordersId.count())
+                .from(order)
+                .where(order.ordersId.in(subQuery))
+                .groupBy(product.productId);
+
+        return RepositoryUtils.toPage(pageable, contentQuery, countQuery);
     }
 }
