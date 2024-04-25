@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
     private final JPAQueryFactory queryFactory;
     @Override
-    public List<RankResponse> findTopRankedProductsByOrders(LocalDateTime sixMonthsAgo) {
+    public List<RankResponse> findTopRankedProductsByOrders(LocalDateTime term) {
         return queryFactory
                 .select(Projections.constructor(RankResponse.class,
                         product.productId,
@@ -27,7 +27,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
                 .from(order)
                 .join(order.receipt, receipt)
                 .join(receipt.product, product)
-                .where(order.createdAt.after(sixMonthsAgo))
+                .where(order.createdAt.after(term))
                 .groupBy(product.productId)
                 .orderBy(product.price.multiply(order.receipt.quantity).sum().desc())
                 .limit(100)
