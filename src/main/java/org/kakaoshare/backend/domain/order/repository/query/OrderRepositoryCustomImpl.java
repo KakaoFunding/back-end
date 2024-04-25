@@ -4,27 +4,31 @@ import static org.kakaoshare.backend.domain.order.entity.QOrder.order;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
     private final JPAQueryFactory queryFactory;
-    @Override
-    public List<RankResponse> findTopRankedProductsByOrders(LocalDateTime term) {
+    public List<RankResponse> findTopRankedProductsByOrders(LocalDateTime term, Pageable pageable) {
         var subQuery = JPAExpressions
                 .select(order.ordersId)
                 .from(order)
                 .join(order.receipt, receipt)
                 .where(order.createdAt.after(term))
                 .fetch();
+
+        OrderSpecifier<?>[] orderSpecifiers = RepositoryUtils.createOrderSpecifiers(order, pageable);
 
         return queryFactory
                 .select(Projections.constructor(RankResponse.class,
@@ -36,7 +40,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
                 .join(order.receipt.product, product)
                 .where(order.ordersId.in(subQuery))
                 .groupBy(product.productId)
-                .orderBy(product.price.multiply(order.receipt.quantity).sum().desc())
+                .orderBy(orderSpecifiers)
                 .limit(100)
                 .fetch();
     }
