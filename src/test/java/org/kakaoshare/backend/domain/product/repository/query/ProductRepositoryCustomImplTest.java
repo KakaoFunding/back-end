@@ -1,15 +1,19 @@
 package org.kakaoshare.backend.domain.product.repository.query;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kakaoshare.backend.common.RepositoryTest;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.brand.repository.BrandRepository;
+import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
+import org.kakaoshare.backend.fixture.MemberFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +21,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +38,16 @@ class ProductRepositoryCustomImplTest {
     ProductRepository productRepository;
     @Autowired
     BrandRepository brandRepository;
-
+    @Autowired
+    MemberRepository memberRepository;
+    
+    Member member;
+    @BeforeEach
+    void setUp() {
+        member = MemberFixture.KAKAO.생성();
+        memberRepository.save(member);
+    }
+    
     @Test
     @DisplayName("상품명으로 상품 조회")
     @Transactional
@@ -54,7 +68,7 @@ class ProductRepositoryCustomImplTest {
 
         final String keyword = "커피";
         final Pageable pageable = PageRequest.of(0, 4, Sort.unsorted());
-        final Slice<Product4DisplayDto> slice = productRepository.findBySearchConditions(keyword, null, null, null, pageable);
+        final Slice<Product4DisplayDto> slice = productRepository.findBySearchConditions(keyword, null, null, null, pageable,member.getProviderId());
 
         final List<Product4DisplayDto> products = slice.getContent();
         assertThat(products.size()).isEqualTo(2);
@@ -83,7 +97,7 @@ class ProductRepositoryCustomImplTest {
 
         final String keyword = "커피";
         final Pageable pageable = PageRequest.of(0, 4, Sort.by("price").ascending());
-        final Slice<Product4DisplayDto> slice = productRepository.findBySearchConditions(keyword, null, null, null, pageable);
+        final Slice<Product4DisplayDto> slice = productRepository.findBySearchConditions(keyword, null, null, null, pageable,member.getProviderId());
 
         final List<Product4DisplayDto> products = slice.getContent();
         assertThat(products.size()).isEqualTo(4);
@@ -117,7 +131,7 @@ class ProductRepositoryCustomImplTest {
 
         final String keyword = "커피";
         final Pageable pageable = PageRequest.of(0, 4, Sort.by("price").ascending());
-        final Slice<Product4DisplayDto> slice = productRepository.findBySearchConditions(keyword, null, null, null, pageable);
+        final Slice<Product4DisplayDto> slice = productRepository.findBySearchConditions(keyword, null, null, null, pageable,member.getProviderId());
 
         final List<Product4DisplayDto> products = slice.getContent();
         assertThat(products.size()).isEqualTo(4);
@@ -151,7 +165,7 @@ class ProductRepositoryCustomImplTest {
 
         final String keyword = "커피";
         final Pageable pageable = PageRequest.of(0, 4, Sort.unsorted());
-        final Slice<SimpleBrandProductDto> slice = productRepository.findBySearchConditionsGroupByBrand(keyword, pageable);
+        final Slice<SimpleBrandProductDto> slice = productRepository.findBySearchConditionsGroupByBrand(keyword, pageable,member.getProviderId());
 
         final List<SimpleBrandProductDto> brandProducts = slice.getContent();
         assertThat(brandProducts.size()).isEqualTo(2);
@@ -163,7 +177,7 @@ class ProductRepositoryCustomImplTest {
     }
 
     private Product4DisplayDto getProduct4DisplayDto(final Product product) {
-        return new Product4DisplayDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice(), product.getBrand().getName(), null);
+        return new Product4DisplayDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice(), product.getBrand().getName(), null,false);
     }
 
     private SimpleBrandDto getSimpleBrandDto(final Brand brand) {
