@@ -30,7 +30,6 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
 
         OrderSpecifier<?>[] orderSpecifiers = RepositoryUtils.createOrderSpecifiers(order, pageable);
 
-        // Create the main query to fetch the content
         var contentQuery = queryFactory
                 .select(Projections.constructor(RankResponse.class,
                         product.productId,
@@ -43,7 +42,6 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
                 .groupBy(product.productId)
                 .orderBy(orderSpecifiers);
 
-        // Create a query to count total results
         var countQuery = queryFactory
                 .select(order.ordersId.count())
                 .from(order)
