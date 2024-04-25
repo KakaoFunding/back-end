@@ -157,7 +157,9 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .collect(Collectors.toMap(
                         SimpleBrandProductDto::brand,
                         brandProducts -> brandProducts.products()
-                                .subList(0, Math.min(brandProducts.products().size(), PRODUCT_SIZE_GROUP_BY_BRAND))
+                                .subList(0, Math.min(brandProducts.products().size(), PRODUCT_SIZE_GROUP_BY_BRAND)),
+                        (newVal,oldVal)->newVal
+                        //TODO 2024 04 25 15:31:13 : 검색 상품 이름으로 같은 브랜드의 상품들을 조회해 브랜드가 중복되어 조회되는 경우
                 ));
         
         final List<SimpleBrandProductDto> content = productsGroupByBrand.keySet()
