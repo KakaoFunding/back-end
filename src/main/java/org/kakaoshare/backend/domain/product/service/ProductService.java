@@ -47,8 +47,8 @@ public class ProductService {
         return detailResponse;
     }
     
-    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable) {
-        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable);
+    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable,providerId);
         if (productDtos.isEmpty()) {
             throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }

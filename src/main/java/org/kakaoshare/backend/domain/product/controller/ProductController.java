@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.product.controller;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
@@ -46,9 +47,11 @@ public class ProductController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getSimpleProductsInPage(@RequestParam("categoryId") Long categoryId,
-                                                     @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
-        Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable);
+    public ResponseEntity<?> getSimpleProductsInPage(
+            @Nullable @LoggedInMember String providerId,
+            @RequestParam("categoryId") Long categoryId,
+            @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
+        Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable,providerId);
         return ResponseEntity.ok(simpleProductsPage);
     }
     
@@ -68,10 +71,11 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
+    
     @DeleteMapping("/{productId}/wishes")
     public ResponseEntity<?> cancelWisingProduct(@LoggedInMember String providerId,
                                                  @PathVariable("productId") Long productId) {
-        WishResponse response=productService.removeWishlist(providerId,productId);
+        WishResponse response = productService.removeWishlist(providerId, productId);
         return ResponseEntity.ok(response);
     }
 }
