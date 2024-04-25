@@ -30,7 +30,7 @@ public class SearchService {
     public PageResponse<?> searchProducts(final ProductSearchRequest productSearchRequest,
                                           final Pageable pageable,
                                           final String providerId) {
-        final Page<Product4DisplayDto> page = findProductsBySearchConditions(productSearchRequest, pageable);
+        final Page<Product4DisplayDto> page = findProductsBySearchConditions(productSearchRequest, pageable,providerId);
         return PageResponse.from(page);
     }
 
@@ -44,17 +44,18 @@ public class SearchService {
                                                      final Pageable pageable,
                                                      final String providerId) {
         final String keyword = brandSearchRequest.keyword();
-        final Page<SimpleBrandProductDto> slice = productRepository.findBySearchConditionsGroupByBrand(keyword, pageable);
+        final Page<SimpleBrandProductDto> slice = productRepository.findBySearchConditionsGroupByBrand(keyword, pageable,providerId);
         return PageResponse.from(slice);
     }
 
     private Page<Product4DisplayDto> findProductsBySearchConditions(final ProductSearchRequest productSearchRequest,
-                                                                     final Pageable pageable) {
+                                                                     final Pageable pageable,
+                                                                    final String providerId) {
         final String keyword = productSearchRequest.keyword();
         final List<String> categories = productSearchRequest.categories();
         final Integer minPrice = productSearchRequest.minPrice();
         final Integer maxPrice = productSearchRequest.maxPrice();
-        return productRepository.findBySearchConditions(keyword, minPrice, maxPrice, categories, pageable);
+        return productRepository.findBySearchConditions(keyword, minPrice, maxPrice, categories, pageable,providerId);
     }
 
     private boolean isLoggedIn(final String providerId) {
