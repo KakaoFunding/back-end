@@ -23,7 +23,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
                         product.productId,
                         product.name,
                         product.price.multiply(order.receipt.quantity).sum().as("totalSales"),
-                        product.productThumbnails.any().thumbnailUrl))
+                        product.photo))
                 .from(order)
                 .join(order.receipt, receipt)
                 .join(receipt.product, product)
