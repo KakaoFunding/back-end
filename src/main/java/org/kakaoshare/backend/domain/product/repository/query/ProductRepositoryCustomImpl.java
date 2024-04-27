@@ -236,7 +236,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         }
         
         List<OptionResponse> optionsResponses = findOptions(productId);
-        return DetailResponse.from(product, optionsResponses);
+        return DetailResponse.of(product, optionsResponses);
     }
     
     

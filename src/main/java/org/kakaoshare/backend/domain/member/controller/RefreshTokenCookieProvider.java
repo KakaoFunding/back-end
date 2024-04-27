@@ -34,8 +34,8 @@ public class RefreshTokenCookieProvider {
 
     private ResponseCookieBuilder createTokenCookieBuilder(final String value) {
         return ResponseCookie.from(REFRESH_TOKEN, value)
-                .httpOnly(true)
-                .secure(true)
+                .httpOnly(false)    // TODO: 4/16/24 Http 요청이므로 httpOnly, secure 
+                .secure(false)
                 .path(ALL_PATH)
                 .sameSite(Cookie.SameSite.NONE.attributeValue());
     }
