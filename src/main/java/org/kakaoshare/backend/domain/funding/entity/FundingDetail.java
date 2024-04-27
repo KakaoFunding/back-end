@@ -78,6 +78,22 @@ public class FundingDetail extends BaseTimeEntity {
         }
     }
 
+    public void partialCancel(final Long amount) {
+        this.rate -= calculateRate(amount);
+        this.amount -= amount;
+        payment.partialCancel(amount);
+    }
+
+    public void cancel() {
+        // TODO: 4/27/24 상태, 기여도만 수정하고 기여 금액은 남김
+        this.status = CANCEL_REFUND;
+        this.rate = 0.;
+    }
+
+    public boolean canceled() {
+        return status.canceled();
+    }
+
     private double calculateRate(final Long amount) {
         return 100. * amount / funding.getGoalAmount();
     }
