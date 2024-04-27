@@ -261,6 +261,7 @@ class PaymentServiceTest {
         final Funding funding = SAMPLE_FUNDING.생성(1L, creator, cake);
         doReturn(fundingOrderDetail).when(redisUtils).remove(orderDetailsKey, FundingOrderDetail.class);
         doReturn(Optional.of(funding)).when(fundingRepository).findById(funding.getFundingId());
+        doReturn(Optional.empty()).when(fundingDetailRepository).findByFundingAndMember(funding, contributor);
         doReturn(Optional.of(contributor)).when(memberRepository).findMemberByProviderId(providerId);
 
         final PaymentSuccessResponse expect = new PaymentSuccessResponse(Receiver.from(creator), Collections.emptyList());

@@ -54,9 +54,9 @@ public class FundingDetail extends BaseTimeEntity {
                          final Payment payment) {
         this.member = member;
         this.amount = payment.getTotalPrice();
-        this.rate = calculateRate(this.amount);
         this.funding = funding;
         this.payment = payment;
+        this.rate = calculateRate(this.amount);
     }
 
     public void increaseAmountAndRate(final Long amount) {
