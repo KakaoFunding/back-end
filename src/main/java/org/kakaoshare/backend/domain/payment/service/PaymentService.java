@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
+import org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode;
+import org.kakaoshare.backend.domain.funding.exception.FundingDetailException;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
@@ -31,6 +33,7 @@ import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApprov
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelDto;
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
@@ -175,6 +178,17 @@ public class PaymentService {
         final List<FundingDetail> fundingDetails = fundingDetailRepository.findAllByFundingId(fundingId);
         fundingDetails.forEach(fundingDetail -> refundFundingDetails(fundingDetail.getAmount(), fundingDetail));
         funding.cancel();
+    }
+
+    @Transactional
+    public void cancelFundingDetail(final String providerId,
+                                    final PaymentFundingDetailCancelRequest paymentFundingCancelRequest) {
+        final Long fundingDetailId = paymentFundingCancelRequest.fundingDetailId();
+        final FundingDetail fundingDetail = findFundingDetailById(fundingDetailId);
+        validateAlreadyCanceled(fundingDetail, FundingDetail::canceled);
+        validateMemberFundingDetail(providerId, fundingDetail);
+        final Long amount = paymentFundingCancelRequest.amount();
+        refundFundingDetails(amount, fundingDetail);
     }
 
     private Order findOrderByPaymentId(final Long paymentId) {
@@ -344,6 +358,12 @@ public class PaymentService {
         }
     }
 
+    private void validateMemberFundingDetail(final String providerId, final FundingDetail fundingDetail) {
+        if (!Objects.equals(fundingDetail.getMember().getProviderId(), providerId)) {
+            throw new MemberException(NOT_FOUND);
+        }
+    }
+
     private void validateMemberFunding(final String providerId, final Funding funding) {
         if (!Objects.equals(funding.getMember().getProviderId(), providerId)) {
             throw new MemberException(NOT_FOUND);
@@ -375,6 +395,11 @@ public class PaymentService {
     private PaymentCancelDto findPaymentDtoById(final Long paymentId) {
         return paymentRepository.findCancelDtoById(paymentId)
                 .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND));
+    }
+
+    private FundingDetail findFundingDetailById(final Long fundingDetailId) {
+        return fundingDetailRepository.findById(fundingDetailId)
+                .orElseThrow(() -> new FundingDetailException(FundingDetailErrorCode.NOT_FOUND));
     }
 
     private void saveOrReflectFundingDetail(final Payment payment, final Funding funding, final Member member, final Long amount) {
