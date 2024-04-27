@@ -2,6 +2,8 @@ package org.kakaoshare.backend.domain.funding.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +15,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -21,10 +22,12 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 
 import java.time.LocalDate;
 
+import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.CANCEL;
+import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.PROGRESS;
+
 
 @Entity
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(
         indexes = {
@@ -37,9 +40,11 @@ public class Funding extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fundingId;
-    
+
+    @Builder.Default
     @Column
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private FundingStatus status = PROGRESS;
     
     @Column(nullable = false)
     private LocalDate expiredAt;
@@ -59,6 +64,10 @@ public class Funding extends BaseTimeEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    protected Funding() {
+
+    }
+
     @Builder
     public Funding(final Long fundingId,
                    final Member member,
@@ -70,7 +79,6 @@ public class Funding extends BaseTimeEntity {
         this.product = product;
         this.goalAmount = goalAmount;
         this.expiredAt = expiredAt;
-        this.status = "ACTIVE"; // 초기 상태 설정
     }
 
     public Funding(final Member member,

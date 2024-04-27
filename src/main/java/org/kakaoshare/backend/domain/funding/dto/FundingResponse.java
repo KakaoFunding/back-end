@@ -27,7 +27,7 @@ public class FundingResponse {
 
         return FundingResponse.builder()
                 .fundingId(funding.getFundingId())
-                .status(funding.getStatus())
+                .status(funding.getStatus().name())
                 .expiredAt(funding.getExpiredAt())
                 .goalAmount(funding.getGoalAmount())
                 .brandName(product.getBrand().getName())
