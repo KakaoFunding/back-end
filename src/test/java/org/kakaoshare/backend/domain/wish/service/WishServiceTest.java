@@ -10,6 +10,7 @@ import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.product.service.ProductService;
+import org.kakaoshare.backend.domain.wish.dto.WishDetail;
 import org.kakaoshare.backend.domain.wish.dto.WishReservationEvent;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.kakaoshare.backend.domain.wish.error.WishErrorCode;
@@ -17,6 +18,7 @@ import org.kakaoshare.backend.domain.wish.error.exception.WishException;
 import org.kakaoshare.backend.domain.wish.repository.WishRepository;
 import org.kakaoshare.backend.fixture.MemberFixture;
 import org.kakaoshare.backend.fixture.ProductFixture;
+import org.kakaoshare.backend.fixture.WishFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,6 +26,7 @@ import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -148,5 +151,30 @@ class WishServiceTest {
         assertThat(product.getWishCount()).isEqualTo(0);
         wishService.recoverCancel(new WishException(WishErrorCode.REMOVING_FAILED), event);
         assertThat(product.getWishCount()).isEqualTo(1);
+    }
+    
+    @Test
+    @DisplayName("위시 공개 범위 수정 요청은 공개 범위를 반전시킨다.")
+    void testChangeScopeOfDisclosure() {
+        // given
+        Wish wish = WishFixture.TEST_WISH3.생성();//isPublic=true
+        Boolean isPublic = wish.getIsPublic();
+        WishDetail wishDetail = new WishDetail(
+                wish.getWishId(),
+                product.getProductId(),
+                product.getName(),
+                product.getPrice(),
+                product.getPhoto(),
+                wish.getIsPublic());
+        when(wishRepository.findById(any()))
+                .thenReturn(Optional.of(wish));
+        when(wishRepository.findWishDetailsByProviderId(any()))
+                .thenReturn(List.of(wishDetail));
+        
+        // when
+        wishService.changeWishType(member.getProviderId(), wish.getWishId());
+        
+        // then
+        assertThat(wish.getIsPublic()).isEqualTo(!isPublic);
     }
 }

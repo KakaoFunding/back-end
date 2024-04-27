@@ -206,7 +206,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
                 .fetch();
 
-        return DescriptionResponse.from(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls);
+        return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls);
     }
 
 
@@ -222,7 +222,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         }
 
         List<OptionResponse> optionsResponses = findOptions(productId);
-        return DetailResponse.from(product, optionsResponses);
+        return DetailResponse.of(product, optionsResponses);
     }
 
 
