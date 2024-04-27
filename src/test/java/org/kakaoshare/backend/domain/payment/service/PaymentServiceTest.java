@@ -18,7 +18,7 @@ import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.FundingOrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
-import org.kakaoshare.backend.domain.payment.dto.approve.response.Amount;
+import org.kakaoshare.backend.domain.payment.dto.kakaopay.Amount;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
