@@ -2,7 +2,13 @@ package org.kakaoshare.backend.domain.order.repository;
 
 import org.kakaoshare.backend.domain.order.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
+    @Query("SELECT o FROM Order o " +
+            "WHERE o.payment.paymentId =:paymentId")
+    Optional<Order> findByPaymentId(final Long paymentId);
 }
