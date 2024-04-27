@@ -51,7 +51,7 @@ public class ProductController {
             @Nullable @LoggedInMember String providerId,
             @RequestParam("categoryId") Long categoryId,
             @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
-        Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable,providerId);
+        Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable, providerId);
         return ResponseEntity.ok(simpleProductsPage);
     }
     
