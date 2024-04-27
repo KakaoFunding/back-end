@@ -30,6 +30,7 @@ import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelDto;
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
@@ -162,6 +163,18 @@ public class PaymentService {
         gift.cancel();
         final PaymentCancelDto paymentCancelDto = findPaymentDtoById(paymentId);
         webClientService.cancel(paymentCancelDto);
+    }
+
+    @Transactional
+    public void cancelFunding(final String providerId,
+                              final PaymentFundingCancelRequest paymentFundingCancelRequest) {
+        final Long fundingId = paymentFundingCancelRequest.fundingId();
+        final Funding funding = findFundingById(fundingId);
+        validateMemberFunding(providerId, funding);
+        validateAlreadyCanceled(funding, Funding::canceled);
+        final List<FundingDetail> fundingDetails = fundingDetailRepository.findAllByFundingId(fundingId);
+        fundingDetails.forEach(fundingDetail -> refundFundingDetails(fundingDetail.getAmount(), fundingDetail));
+        funding.cancel();
     }
 
     private Order findOrderByPaymentId(final Long paymentId) {
@@ -304,9 +317,36 @@ public class PaymentService {
                 .toList();
     }
 
+    private void refundFundingDetails(final Long refundAmount,
+                                      final FundingDetail fundingDetail) {
+        final Payment payment = fundingDetail.getPayment();
+        final Funding funding = fundingDetail.getFunding();
+        funding.decreaseAccumulateAmount(refundAmount);
+
+        final Long attributeAmount = fundingDetail.getAmount();
+        // TODO: 4/27/24 전체 환불인 경우 상태 변경
+        if (refundAmount.equals(attributeAmount)) {
+            fundingDetail.cancel();
+        }
+
+        // TODO: 4/27/24 부분 환불인 경우(refundAmount < fundingDetail.getAmount())
+        if (refundAmount < attributeAmount) {
+            fundingDetail.partialCancel(refundAmount);
+        }
+
+        final PaymentCancelDto paymentCancelDto = PaymentCancelDto.of(payment, refundAmount);
+        webClientService.cancel(paymentCancelDto);
+    }
+
     private <T> void validateAlreadyCanceled(final T item, final Function<T, Boolean> mapper) {
         if (mapper.apply(item)) {
             throw new PaymentException(ALREADY_REFUND);
+        }
+    }
+
+    private void validateMemberFunding(final String providerId, final Funding funding) {
+        if (!Objects.equals(funding.getMember().getProviderId(), providerId)) {
+            throw new MemberException(NOT_FOUND);
         }
     }
 
