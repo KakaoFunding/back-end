@@ -19,6 +19,7 @@ import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 
+import static org.kakaoshare.backend.domain.order.entity.OrderStatus.CANCELLATION_RETURN_EXCHANGE;
 import static org.kakaoshare.backend.domain.order.entity.OrderStatus.COMPLETE_PAYMENT;
 
 
@@ -52,6 +53,14 @@ public class Order extends BaseTimeEntity {
     public Order(final Payment payment, final Receipt receipt) {
         this.payment = payment;
         this.receipt = receipt;
+    }
+
+    public void cancel() {
+        this.status = CANCELLATION_RETURN_EXCHANGE;
+    }
+
+    public boolean canceled() {
+        return status.canceled();
     }
     
     @Override
