@@ -53,4 +53,7 @@ public class Wish extends BaseTimeEntity {
     public boolean equalProductId(final Long productId) {
         return this.product.getProductId() == productId;
     }
+    public void changeScopeOfDisclosure(){
+        this.isPublic=!this.isPublic;
+    }
 }

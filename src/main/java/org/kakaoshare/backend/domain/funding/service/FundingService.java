@@ -1,16 +1,20 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
-import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
-import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
-import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
-import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
+import org.kakaoshare.backend.domain.funding.dto.*;
+import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
+import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
+import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
+import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
+import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
+import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -69,6 +73,17 @@ public class FundingService {
                 .build();
     }
 
+    public FundingPreviewResponse preview(final FundingPreviewRequest fundingPreviewRequest) {
+        final Long fundingId = fundingPreviewRequest.fundingId();
+        final FundingProductDto fundingProductDto = findFundingProductDtoById(fundingId);
+        final Long attributeAmount = fundingPreviewRequest.attributeAmount();
+        validateAttributeAmount(fundingProductDto.remainAmount(), attributeAmount);
+
+        final Long productId = fundingProductDto.productId();
+        final ProductDto productDto = findProductDtoByProductId(productId);
+        return FundingPreviewResponse.of(productDto, attributeAmount);
+    }
+
     private Member findMemberByProviderId(String providerId) {
         return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
@@ -77,5 +92,21 @@ public class FundingService {
     private Product findProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+    }
+
+    private FundingProductDto findFundingProductDtoById(final Long fundingId) {
+        return fundingRepository.findAccumulateAmountAndProductIdById(fundingId)
+                .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
+    }
+
+    private ProductDto findProductDtoByProductId(final Long productId) {
+        return productRepository.findProductDtoById(productId)
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
+    }
+
+    private void validateAttributeAmount(final Long remainAmount, final Long attributeAmount) {
+        if (remainAmount < attributeAmount) {
+            throw new FundingException(FundingErrorCode.INVALID_ACCUMULATE_AMOUNT);
+        }
     }
 }
