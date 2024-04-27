@@ -94,6 +94,21 @@ public class Funding extends BaseTimeEntity {
         }
     }
 
+    public void decreaseAccumulateAmount(final Long amount) {
+        if (amount != null) {
+            this.accumulateAmount -= amount;
+        }
+    }
+
+    public void cancel() {
+        this.status = CANCEL;
+        this.accumulateAmount = 0L;
+    }
+
+    public boolean canceled() {
+        return status.canceled();
+    }
+
     @Override
     public String toString() {
         return "Funding{" +
