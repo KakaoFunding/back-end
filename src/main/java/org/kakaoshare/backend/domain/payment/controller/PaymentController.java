@@ -1,6 +1,8 @@
 package org.kakaoshare.backend.domain.payment.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.service.PaymentService;
@@ -14,31 +16,37 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/payments")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/ready")
+    @PostMapping("/payments/preview")
+    public ResponseEntity<?> preview(@RequestBody final List<PaymentPreviewRequest> paymentPreviewRequests) {
+        return ResponseEntity.ok(paymentService.preview(paymentPreviewRequests));
+    }
+
+    @PostMapping("/payments/ready")
     public ResponseEntity<?> ready(@LoggedInMember final String providerId,
                                    @RequestBody final List<PaymentReadyRequest> requests) {
         return ResponseEntity.ok(paymentService.ready(providerId, requests));
     }
 
-    @PostMapping("/success")
+    @PostMapping("/funding/payments/ready")
+    public ResponseEntity<?> ready(@LoggedInMember final String providerId,
+                                   @RequestBody final PaymentFundingReadyRequest paymentFundingReadyRequest) {
+        return ResponseEntity.ok(paymentService.readyFunding(providerId, paymentFundingReadyRequest));
+    }
+
+    @PostMapping("/payments/success")
     public ResponseEntity<?> success(@LoggedInMember final String providerId,
-                                     @RequestBody final PaymentSuccessRequest requests) {
-        return ResponseEntity.ok(paymentService.approve(providerId, requests));
+                                     @RequestBody final PaymentSuccessRequest paymentSuccessRequest) {
+        return ResponseEntity.ok(paymentService.approve(providerId, paymentSuccessRequest));
     }
 
-    // TODO: 3/15/24 결제 취소 및 실패 관련 API는 추후 추가 예정
-    @PostMapping("/cancel")
-    public void cancel() {
-
-    }
-
-    @PostMapping("/fail")
-    public void fail() {
-
+    @PostMapping("/funding/payments/success")
+    public ResponseEntity<?> successFunding(@LoggedInMember final String providerId,
+                                            @RequestBody final PaymentSuccessRequest paymentSuccessRequest) {
+        return ResponseEntity.ok(paymentService.approveFunding(providerId, paymentSuccessRequest));
     }
 }

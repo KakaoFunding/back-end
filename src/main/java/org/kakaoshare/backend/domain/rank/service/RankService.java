@@ -19,4 +19,5 @@ public class RankService {
     public Page<RankResponse> getTopRankedProducts(Pageable pageable) {
         return orderRepository.findTopRankedProductsByOrders(LocalDateTime.now().minusMonths(MONTH_VALUE),pageable);
     }
+
 }

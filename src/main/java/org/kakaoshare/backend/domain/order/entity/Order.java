@@ -16,7 +16,6 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 
@@ -37,10 +36,6 @@ public class Order extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status = COMPLETE_PAYMENT;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "funding_detail_id")
-    private FundingDetail fundingDetail;
     
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "payment_id")
@@ -64,7 +59,6 @@ public class Order extends BaseTimeEntity {
         return "Order{" +
                 "ordersId=" + ordersId +
                 ", status=" + status +
-                ", fundingDetail=" + fundingDetail +
                 ", payment=" + payment +
                 ", receipt=" + receipt +
                 '}';

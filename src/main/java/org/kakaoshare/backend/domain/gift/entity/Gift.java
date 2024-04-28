@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public class Gift extends BaseTimeEntity {
     private LocalDateTime expiredAt;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "receipt_id", nullable = false)
     private Receipt receipt;
 
     protected Gift() {
