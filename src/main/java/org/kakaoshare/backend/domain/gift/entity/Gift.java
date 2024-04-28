@@ -30,8 +30,8 @@ public class Gift extends BaseTimeEntity {
     private Long giftId;
 
     @Builder.Default
+    @Column(columnDefinition = "ENUM('NOT_USED', 'USING', 'USED', 'CANCEL_REFUND')", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false,columnDefinition = "varchar(255)")
     private GiftStatus status = NOT_USED;
 
     @Column

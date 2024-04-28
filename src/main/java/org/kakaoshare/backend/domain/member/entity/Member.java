@@ -28,7 +28,7 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
     
-    @Column(nullable = false, columnDefinition = "varchar(255)")
+    @Column(columnDefinition = "ENUM('MALE', 'FEMALE')", nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
     

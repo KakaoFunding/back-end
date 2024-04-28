@@ -32,8 +32,7 @@ public class Order extends BaseTimeEntity {
     private Long ordersId;
     
     @Builder.Default
-    @Column(nullable = false, columnDefinition = "varchar(255)")
-
+    @Column(columnDefinition = "ENUM('COMPLETE_PAYMENT', 'PURCHASE_DECISION', 'CANCELLATION_RETURN_EXCHANGE')", nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status = COMPLETE_PAYMENT;
     
