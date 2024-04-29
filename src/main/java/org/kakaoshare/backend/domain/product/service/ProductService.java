@@ -42,7 +42,7 @@ public class ProductService {
     public DetailResponse getProductDetail(Long productId) {
         DetailResponse detailResponse = productRepository.findProductDetail(productId);
         if (detailResponse == null) {
-            throw new EntityNotFoundException("Product not found with id: " + productId);
+            throw new EntityNotFoundException("Product not found with id: " + productId); // 이후 예외처리 추가
         }
         return detailResponse;
     }

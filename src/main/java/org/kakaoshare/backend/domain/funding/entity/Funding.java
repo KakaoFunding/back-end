@@ -58,7 +58,7 @@ public class Funding extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
-
+  
     @Builder
     public Funding(final Long fundingId,
                    final Member member,
