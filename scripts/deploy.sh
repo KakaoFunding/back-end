@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#ROOT_PATH="/home/ec2-user/back-end"
-ROOT_PATH="/Users/sin-yechan/IdeaProjects/back-end"
+ROOT_PATH="/home/ec2-user/back-end"
 DOCKERFILE_PATH="$ROOT_PATH/Dockerfile"
 DOCKER_COMPOSE_PATH="$ROOT_PATH/docker-compose.yml"
 
