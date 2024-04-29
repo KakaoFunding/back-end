@@ -59,16 +59,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                                         final Pageable pageable,
                                                         final String providerId) {
         
-        List<Product4DisplayDto> fetch = queryFactory
+        JPAQuery<Product4DisplayDto> contentQuery = queryFactory
                 .select(getProduct4DisplayDto(providerId))
                 .from(product)
                 .where(categoryIdEqualTo(categoryId))
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .limit(pageable.getPageSize());
         JPAQuery<Long> countQuery = countProduct(categoryId);
-        return toPage(pageable, fetch, countQuery);
+        return toPage(pageable, contentQuery, countQuery);
     }
     
     @Override
@@ -220,7 +219,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
                 .fetch();
         
-        return DescriptionResponse.from(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls);
+        return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls);
     }
     
     
