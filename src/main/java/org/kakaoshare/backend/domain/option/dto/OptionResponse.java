@@ -11,11 +11,8 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class OptionResponse {
-    private final Long optionsId;
-    private final String name;
+    private Long optionsId;
+    private String name;
     private List<OptionDetailResponse> optionDetails;
 
-    public void setOptionDetails(List<OptionDetailResponse> optionDetails) {
-        this.optionDetails = optionDetails;
-    }
 }

@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.product.repository.query;
 
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -305,26 +306,47 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     
     private List<OptionResponse> findOptions(Long productId) {
         
-        // 옵션과 옵션 상세 정보를 조회합니다.
-        return queryFactory
-                .selectFrom(QOption.option)
-                .leftJoin(QOptionDetail.optionDetail)
-                .on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
-                .where(QOption.option.product.productId.eq(productId))
-                .transform(
-                        groupBy(QOption.option.optionsId).list(Projections.constructor(
-                                OptionResponse.class,
-                                QOption.option.optionsId,
-                                QOption.option.name,
-                                list(Projections.constructor(
-                                        ProductOptionDetailResponse.class,
-                                        QOptionDetail.optionDetail.optionDetailId,
-                                        QOptionDetail.optionDetail.name,
-                                        QOptionDetail.optionDetail.additionalPrice,
-                                        QOptionDetail.optionDetail.photo
-                                )).as("optionDetails")
-                        ))
-                );
+    // 옵션과 옵션 상세 정보를 조회합니다.
+    return queryFactory
+            .selectFrom(QOption.option)
+            .leftJoin(QOptionDetail.optionDetail)
+            .on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
+            .where(QOption.option.product.productId.eq(productId))
+            .transform(
+                    groupBy(QOption.option.optionsId).list(Projections.constructor(
+                            OptionResponse.class,
+                            QOption.option.optionsId,
+                            QOption.option.name,
+                                    ProductOptionDetailResponse.class,
+                                    QOptionDetail.optionDetail.optionDetailId,
+                                    QOptionDetail.optionDetail.name,
+                                    QOptionDetail.optionDetail.additionalPrice,
+                                    QOptionDetail.optionDetail.photo
+                            )
+                    )
+            ))
+            .from(QOption.option)
+            .innerJoin(QOptionDetail.optionDetail)
+            .on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
+            .where(QOption.option.product.productId.eq(productId))
+            .transform(
+                    GroupBy.groupBy(QOption.option.optionsId).list(
+                            Projections.constructor(
+                                    OptionResponse.class,
+                                    QOption.option.optionsId,
+                                    QOption.option.name,
+                                    GroupBy.list(
+                                            Projections.constructor(
+                                                    ProductOptionDetailResponse.class,
+                                                    QOptionDetail.optionDetail.optionDetailId,
+                                                    QOptionDetail.optionDetail.name,
+                                                    QOptionDetail.optionDetail.additionalPrice,
+                                                    QOptionDetail.optionDetail.photo
+                                            )
+                                    )
+                            )
+                    )
+            );
     }
     
 }
