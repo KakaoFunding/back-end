@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderRepositoryCustom {
     @Query("SELECT o FROM Order o " +
             "WHERE o.payment.paymentId =:paymentId")
