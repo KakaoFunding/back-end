@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.CANCEL;
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.PROGRESS;
 
-
 @Entity
 @Getter
 @AllArgsConstructor
