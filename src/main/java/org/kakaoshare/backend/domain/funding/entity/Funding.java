@@ -42,7 +42,7 @@ public class Funding extends BaseTimeEntity {
     private Long fundingId;
 
     @Builder.Default
-    @Column(columnDefinition = "ENUM('PROGRESS', 'COMPLETE', 'CANCEL')", nullable = false)
+    @Column(columnDefinition = "varchar(255)", nullable = false)
     @Enumerated(EnumType.STRING)
     private FundingStatus status = PROGRESS;
     
