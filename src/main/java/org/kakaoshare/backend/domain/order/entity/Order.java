@@ -34,7 +34,6 @@ public class Order extends BaseTimeEntity {
     
     @Builder.Default
     @Column(nullable = false, columnDefinition = "varchar(255)")
-
     @Enumerated(EnumType.STRING)
     private OrderStatus status = COMPLETE_PAYMENT;
     
