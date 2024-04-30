@@ -14,7 +14,6 @@ ALTER TABLE funding_detail
 ALTER TABLE funding_detail
     ADD CONSTRAINT FK_FUNDINGDETAIL_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES payment (payment_id);
 
-
 -- funding_detail 에 member_id (FK) 추가
 ALTER TABLE funding_detail
     ADD COLUMN `member_id` bigint NOT NULL;
