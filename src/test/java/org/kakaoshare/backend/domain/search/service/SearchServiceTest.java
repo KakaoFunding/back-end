@@ -7,18 +7,22 @@ import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.brand.repository.BrandRepository;
+import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.search.dto.BrandSearchRequest;
 import org.kakaoshare.backend.domain.search.dto.ProductSearchRequest;
 import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
+import org.kakaoshare.backend.fixture.MemberFixture;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,6 +39,9 @@ class SearchServiceTest {
 
     @Mock
     private BrandRepository brandRepository;
+    
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private SearchService searchService;
@@ -51,16 +58,18 @@ class SearchServiceTest {
                 getProduct4DisplayDto(coffee1, null),
                 getProduct4DisplayDto(coffee2, null)
         );
+        Member member = MemberFixture.KAKAO.생성();
         final Page<Product4DisplayDto> page = new PageImpl<>(product4DisplayDtos, pageable, product4DisplayDtos.size());
         doReturn(page).when(productRepository).findBySearchConditions(
                 request.keyword(),
                 request.minPrice(),
                 request.maxPrice(),
                 request.categories(),
-                pageable
+                pageable,
+                member.getProviderId()
         );
         final PageResponse<?> expect = PageResponse.from(page);
-        final PageResponse<?> actual = searchService.searchProducts(request, pageable, null);
+        final PageResponse<?> actual = searchService.searchProducts(request, pageable, member.getProviderId());
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
@@ -78,17 +87,20 @@ class SearchServiceTest {
                 getProduct4DisplayDto(coffee1, null),
                 getProduct4DisplayDto(coffee2, null)
         );
-
+        
+        Member member = MemberFixture.KAKAO.생성();
+        
         final Page<Product4DisplayDto> page = new PageImpl<>(product4DisplayDtos, pageable, product4DisplayDtos.size());
         doReturn(page).when(productRepository).findBySearchConditions(
                 request.keyword(),
                 request.minPrice(),
                 request.maxPrice(),
                 request.categories(),
-                pageable
+                pageable,
+                member.getProviderId()
         );
         final PageResponse<?> expect = PageResponse.from(page);
-        final PageResponse<?> actual = searchService.searchProducts(request, pageable, null);
+        final PageResponse<?> actual = searchService.searchProducts(request, pageable, member.getProviderId());
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
@@ -118,7 +130,10 @@ class SearchServiceTest {
         final Brand ediya = EDIYA.생성();
         final Product ediyasCoffee1 = COFFEE.생성(3L, ediya);
         final Product ediyasCoffee2 = COFFEE.생성(4L, ediya);
-
+        
+        Member member = MemberFixture.KAKAO.생성();
+        
+        
         final Pageable pageable = Pageable.unpaged();
         final BrandSearchRequest request = new BrandSearchRequest("커피");
         final List<SimpleBrandProductDto> simpleBrandProductDtos = List.of(
@@ -126,19 +141,19 @@ class SearchServiceTest {
                 getSimpleBrandProductDto(ediya, ediyasCoffee1, ediyasCoffee2)
         );
         final Page<SimpleBrandProductDto> page = new PageImpl<>(simpleBrandProductDtos, pageable, simpleBrandProductDtos.size());
-        doReturn(page).when(productRepository).findBySearchConditionsGroupByBrand(request.keyword(), pageable);
+        doReturn(page).when(productRepository).findBySearchConditionsGroupByBrand(request.keyword(), pageable,member.getProviderId());
 
         final PageResponse<?> expect = PageResponse.from(page);
-        final PageResponse<?> actual = searchService.searchProductGroupByBrand(request, pageable, null);
+        final PageResponse<?> actual = searchService.searchProductGroupByBrand(request, pageable, member.getProviderId());
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
     private Product4DisplayDto getProduct4DisplayDto(final Product product) {
-        return new Product4DisplayDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice(), product.getBrand().getName(), null);
+        return new Product4DisplayDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice(), product.getBrand().getName(), null,false);
     }
 
     private Product4DisplayDto getProduct4DisplayDto(final Product product, final String brandName) {
-        return new Product4DisplayDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice(), brandName, null);
+        return new Product4DisplayDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice(), brandName, null,false);
     }
 
     private SimpleBrandDto getSimpleBrandDto(final Brand brand) {

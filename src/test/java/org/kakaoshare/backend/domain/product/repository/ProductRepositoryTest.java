@@ -1,15 +1,19 @@
 package org.kakaoshare.backend.domain.product.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.RepositoryTest;
+import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.fixture.MemberFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +38,15 @@ class ProductRepositoryTest {
     ProductRepository productRepository;
     @Autowired
     JPAQueryFactory queryFactory;
+    @Autowired
+    MemberRepository memberRepository;
+    Member member;
+    
+    @BeforeEach
+    void setUp() {
+        member = MemberFixture.KAKAO.생성();
+        memberRepository.save(member);
+    }
     
     @ValueSource(strings = {"PRICE", "WISH_COUNT"})
     @ParameterizedTest
@@ -41,11 +54,12 @@ class ProductRepositoryTest {
     void testProductPagination(String order) {
         PageRequest first = PageRequest.of(0, PAGE_SIZE,
                 Sort.Direction.ASC, order);
-        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CHILD_ID, first);
+        
+        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CHILD_ID, first, member.getProviderId());
         System.out.println(firstPage.getContent());
         
         Pageable next = first.next();
-        Page<Product4DisplayDto> nextPage = productRepository.findAllByCategoryId(CHILD_ID, next);
+        Page<Product4DisplayDto> nextPage = productRepository.findAllByCategoryId(CHILD_ID, next, member.getProviderId());
         System.out.println(nextPage.getContent());
         
         assertThat(firstPage.getSize()).isEqualTo(PAGE_SIZE);
@@ -64,7 +78,7 @@ class ProductRepositoryTest {
     @DisplayName("정렬은 기본적으로 상품명을 기준으로 정렬된다")
     void testDefaultPagination() {
         PageRequest first = PageRequest.of(0, PAGE_SIZE);
-        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CHILD_ID, first);
+        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(CHILD_ID, first, member.getProviderId());
         assertThat(firstPage.getContent().stream().map(Product4DisplayDto::getName).toList())
                 .isSortedAccordingTo(String::compareTo);
     }
@@ -74,7 +88,7 @@ class ProductRepositoryTest {
     void testMultipleCondition() {
         Sort sort = Sort.by(Sort.Order.asc(PRICE.name()), Sort.Order.desc(PRODUCT_NAME.name()));
         PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE, sort);
-        Page<Product4DisplayDto> page = productRepository.findAllByCategoryId(CHILD_ID, pageRequest);
+        Page<Product4DisplayDto> page = productRepository.findAllByCategoryId(CHILD_ID, pageRequest, member.getProviderId());
         page.forEach(System.out::println);
         
         assertThat(page.getContent().stream().map(Product4DisplayDto::getPrice).toList())
@@ -96,7 +110,7 @@ class ProductRepositoryTest {
     void testFindProductsByChildCategoryId() {
         // given
         PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE);
-        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(CHILD_ID, pageRequest);
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(CHILD_ID, pageRequest, member.getProviderId());
         // then
         assertThat(productDtos.getContent().size()).isEqualTo(PAGE_SIZE);
         assertThat(productDtos.getTotalElements()).isEqualTo(400);
@@ -108,7 +122,7 @@ class ProductRepositoryTest {
     void testFindProductsByParentCategoryId() {
         // given
         PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE);
-        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(PARENT_ID, pageRequest);
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(PARENT_ID, pageRequest, member.getProviderId());
         // then
         assertThat(productDtos.getContent().size()).isEqualTo(PAGE_SIZE);
         assertThat(productDtos.getTotalElements()).isEqualTo(2000);
@@ -121,7 +135,7 @@ class ProductRepositoryTest {
         // given
         PageRequest pageRequest = PageRequest.of(0, 20000, Sort.by(WISH_COUNT.name()));
         // when
-        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(categoryId, pageRequest);
+        Page<Product4DisplayDto> firstPage = productRepository.findAllByCategoryId(categoryId, pageRequest, member.getProviderId());
         // then
         assertThat(firstPage.getContent()).isSortedAccordingTo(Comparator.comparing(Product4DisplayDto::getWishCount)
         );
