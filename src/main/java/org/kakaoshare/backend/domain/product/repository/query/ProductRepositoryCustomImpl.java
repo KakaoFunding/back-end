@@ -308,15 +308,12 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         
     // 옵션과 옵션 상세 정보를 조회합니다.
     return queryFactory
-            .selectFrom(QOption.option)
-            .leftJoin(QOptionDetail.optionDetail)
-            .on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
-            .where(QOption.option.product.productId.eq(productId))
-            .transform(
-                    groupBy(QOption.option.optionsId).list(Projections.constructor(
-                            OptionResponse.class,
-                            QOption.option.optionsId,
-                            QOption.option.name,
+            .select(Projections.constructor(
+                    OptionResponse.class,
+                    QOption.option.optionsId,
+                    QOption.option.name,
+                    GroupBy.list(
+                            Projections.constructor(
                                     ProductOptionDetailResponse.class,
                                     QOptionDetail.optionDetail.optionDetailId,
                                     QOptionDetail.optionDetail.name,
