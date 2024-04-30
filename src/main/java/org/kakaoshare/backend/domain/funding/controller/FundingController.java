@@ -5,6 +5,8 @@ import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
+import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
+import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.service.FundingService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.data.domain.PageRequest;
@@ -44,5 +46,11 @@ public class FundingController {
         PageRequest pageRequest = PageRequest.of(page, size);
         FundingSliceResponse response = fundingService.getMyAllFundingProducts(providerId, pageRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/funding/preview")
+    public ResponseEntity<?> preview(@RequestBody final FundingPreviewRequest fundingPreviewRequest) {
+        final FundingPreviewResponse fundingPreviewResponse = fundingService.preview(fundingPreviewRequest);
+        return ResponseEntity.ok(fundingPreviewResponse);
     }
 }

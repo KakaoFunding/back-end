@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -57,12 +58,44 @@ public class Funding extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
-    
-    public Funding(Member member, Product product, Long goalAmount, LocalDate expiredAt) {
+  
+    @Builder
+    public Funding(final Long fundingId,
+                   final Member member,
+                   final Product product,
+                   final Long goalAmount,
+                   final LocalDate expiredAt) {
+        this.fundingId = fundingId;
         this.member = member;
         this.product = product;
         this.goalAmount = goalAmount;
         this.expiredAt = expiredAt;
         this.status = "ACTIVE"; // 초기 상태 설정
+    }
+
+    public Funding(final Member member,
+                   final Product product,
+                   final Long goalAmount,
+                   final LocalDate expiredAt) {
+        this(null, member, product, goalAmount, expiredAt);
+    }
+
+    public void increaseAccumulateAmount(final Long amount) {
+        if (amount != null) {
+            this.accumulateAmount += amount;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Funding{" +
+                "fundingId=" + fundingId +
+                ", status='" + status + '\'' +
+                ", expiredAt=" + expiredAt +
+                ", goalAmount=" + goalAmount +
+                ", accumulateAmount=" + accumulateAmount +
+                ", member=" + member +
+                ", product=" + product +
+                '}';
     }
 }

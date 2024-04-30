@@ -42,13 +42,13 @@ public class ProductService {
     public DetailResponse getProductDetail(Long productId) {
         DetailResponse detailResponse = productRepository.findProductDetail(productId);
         if (detailResponse == null) {
-            throw new EntityNotFoundException("Product not found with id: " + productId);
+            throw new EntityNotFoundException("Product not found with id: " + productId); // 이후 예외처리 추가
         }
         return detailResponse;
     }
     
-    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable) {
-        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable);
+    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable,providerId);
         if (productDtos.isEmpty()) {
             throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }
