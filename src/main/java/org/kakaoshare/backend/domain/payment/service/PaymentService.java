@@ -37,8 +37,9 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDe
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -95,13 +96,16 @@ public class PaymentService {
     }
 
     public PaymentReadyResponse ready(final String providerId,
-                                      final List<PaymentReadyRequest> paymentReadyRequests) {
-        validateTotalAmount(paymentReadyRequests);
-        validateOptionDetailIds(paymentReadyRequests);
+                                      final PaymentGiftReadyRequest paymentGiftReadyRequest) {
+        final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
+        validateTotalAmount(paymentGiftReadyItems);
+        validateOptionDetailIds(paymentGiftReadyItems);
+
         final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
-        final OrderDetails orderDetails = getOrderDetails(paymentReadyRequests);
-        final List<PaymentReadyProductDto> paymentProductReadyRequests = getPaymentProductReadyRequests(paymentReadyRequests);
+        final List<PaymentReadyProductDto> paymentProductReadyRequests = getPaymentProductReadyRequests(paymentGiftReadyItems);
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, paymentProductReadyRequests, orderDetailKey);
+
+        final OrderDetails orderDetails = getOrderDetails(paymentGiftReadyRequest);
         redisUtils.save(orderDetailKey, orderDetails);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), kakaoPayReadyResponse.next_redirect_pc_url(), orderDetailKey);
     }
@@ -124,12 +128,16 @@ public class PaymentService {
                                           final PaymentSuccessRequest paymentSuccessRequest) {
         final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
         final Payment payment = saveAndGetPayment(approveResponse);
-        final Member recipient = findMemberByProviderId(providerId); // TODO: 3/30/24 토큰에 저장된 값이 PK가 아니라 Member 엔티티를 가져와야 함
-        final Member receiver = findMemberByProviderId(providerId); // TODO: 3/28/24 친구목록이 구현되지 않아 나에게로 선물만 구현
         final OrderDetails orderDetails = redisUtils.remove(approveResponse.partner_order_id(), OrderDetails.class);
+
+        final String receiverProviderId = orderDetails.getReceiverProviderId();
+        final Member recipient = findMemberByProviderId(providerId); // TODO: 3/30/24 토큰에 저장된 값이 PK가 아니라 Member 엔티티를 가져와야 함
+        final Member receiver = findMemberByProviderId(receiverProviderId);
+
         final Receipts receipts = getReceipts(recipient.getMemberId(), receiver, orderDetails);
         saveGifts(receipts);
         saveOrders(payment, receipts);
+
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
         return new PaymentSuccessResponse(Receiver.from(receiver), orderSummaries);
     }
@@ -213,39 +221,39 @@ public class PaymentService {
                 .sum();
     }
 
-    private void validateTotalAmount(final List<PaymentReadyRequest> paymentReadyRequests) {
-        final List<Long> productIds = extractedProductIds(paymentReadyRequests, PaymentReadyRequest::productId);
+    private void validateTotalAmount(final List<PaymentGiftReadyItem> paymentGiftReadyItems) {
+        final List<Long> productIds = extractedProductIds(paymentGiftReadyItems, PaymentGiftReadyItem::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
         if (priceByIds.isEmpty()) {
             throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR);
         }
 
-        final boolean isAllMatch = paymentReadyRequests.stream()
-                .anyMatch(paymentReadyRequest -> paymentReadyRequest.quantity() * priceByIds.get(paymentReadyRequest.productId()) == paymentReadyRequest.totalAmount());
+        final boolean isAllMatch = paymentGiftReadyItems.stream()
+                .anyMatch(paymentGiftReadyItem -> paymentGiftReadyItem.quantity() * priceByIds.get(paymentGiftReadyItem.productId()) == paymentGiftReadyItem.totalAmount());
         if (!isAllMatch) {
             throw new PaymentException(INVALID_AMOUNT);
         }
     }
 
-    private List<PaymentReadyProductDto> getPaymentProductReadyRequests(final List<PaymentReadyRequest> paymentReadyRequests) {
-        final List<Long> productIds = extractedProductIds(paymentReadyRequests, PaymentReadyRequest::productId);
+    private List<PaymentReadyProductDto> getPaymentProductReadyRequests(final List<PaymentGiftReadyItem> paymentGiftReadyItems) {
+        final List<Long> productIds = extractedProductIds(paymentGiftReadyItems, PaymentGiftReadyItem::productId);
         final Map<Long, String> nameById = productRepository.findAllNameByIdsGroupById(productIds);
-        return paymentReadyRequests.stream()
-                .map(paymentReadyRequest -> new PaymentReadyProductDto(nameById.get(paymentReadyRequest.productId()), paymentReadyRequest.quantity(), paymentReadyRequest.totalAmount()))
+        return paymentGiftReadyItems.stream()
+                .map(paymentGiftReadyItem -> new PaymentReadyProductDto(nameById.get(paymentGiftReadyItem.productId()), paymentGiftReadyItem.quantity(), paymentGiftReadyItem.totalAmount()))
                 .toList();
     }
 
-    private void validateOptionDetailIds(final List<PaymentReadyRequest> paymentReadyRequests) {
-        final boolean isAllMatch = paymentReadyRequests.stream()
+    private void validateOptionDetailIds(final List<PaymentGiftReadyItem> paymentGiftReadyItems) {
+        final boolean isAllMatch = paymentGiftReadyItems.stream()
                 .anyMatch(this::matchesOptionsWithProduct);
         if (!isAllMatch) {
             throw new PaymentException(INVALID_OPTION);
         }
     }
 
-    private boolean matchesOptionsWithProduct(final PaymentReadyRequest paymentReadyRequest) {
-        final Long productId = paymentReadyRequest.productId();
-        final List<Long> optionDetailIds = paymentReadyRequest.optionDetailIds();
+    private boolean matchesOptionsWithProduct(final PaymentGiftReadyItem paymentGiftReadyItem) {
+        final Long productId = paymentGiftReadyItem.productId();
+        final List<Long> optionDetailIds = paymentGiftReadyItem.optionDetailIds();
         if (optionDetailIds == null || optionDetailIds.isEmpty()) {
             return true;
         }
@@ -262,11 +270,13 @@ public class PaymentService {
         return productIds.size() == 1 && productIds.get(0).equals(productId);
     }
 
-    private OrderDetails getOrderDetails(final List<PaymentReadyRequest> paymentReadyRequests) {
-        final List<OrderDetail> orderDetails = paymentReadyRequests.stream()
-                .map(paymentReadyRequest -> paymentReadyRequest.toOrderDetail(orderNumberProvider.createOrderNumber()))
+    private OrderDetails getOrderDetails(final PaymentGiftReadyRequest paymentGiftReadyRequest) {
+        final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
+        final String receiverProviderId = paymentGiftReadyRequest.receiverProviderId();
+        final List<OrderDetail> orderDetails = paymentGiftReadyItems.stream()
+                .map(paymentGiftReadyItem -> paymentGiftReadyItem.toOrderDetail(orderNumberProvider.createOrderNumber()))
                 .toList();
-        return new OrderDetails(orderDetails);
+        return new OrderDetails(receiverProviderId, orderDetails);
     }
 
     private Payment saveAndGetPayment(final KakaoPayApproveResponse approveResponse) {

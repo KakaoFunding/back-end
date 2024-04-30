@@ -12,9 +12,12 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class OrderDetails {
+    private String receiverProviderId;
     private List<OrderDetail> values;
 
-    public OrderDetails(final List<OrderDetail> values) {
+    public OrderDetails(final String receiverProviderId,
+                        final List<OrderDetail> values) {
+        this.receiverProviderId = receiverProviderId;
         this.values = values;
     }
 }

@@ -6,7 +6,7 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCa
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.service.PaymentService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
@@ -31,8 +31,8 @@ public class PaymentController {
 
     @PostMapping("/payments/ready")
     public ResponseEntity<?> ready(@LoggedInMember final String providerId,
-                                   @RequestBody final List<PaymentReadyRequest> requests) {
-        return ResponseEntity.ok(paymentService.ready(providerId, requests));
+                                   @RequestBody final PaymentGiftReadyRequest paymentGiftReadyRequest) {
+        return ResponseEntity.ok(paymentService.ready(providerId, paymentGiftReadyRequest));
     }
 
     @PostMapping("/funding/payments/ready")
