@@ -1,6 +1,9 @@
 package org.kakaoshare.backend.domain.payment.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyRequest;
@@ -48,5 +51,29 @@ public class PaymentController {
     public ResponseEntity<?> successFunding(@LoggedInMember final String providerId,
                                             @RequestBody final PaymentSuccessRequest paymentSuccessRequest) {
         return ResponseEntity.ok(paymentService.approveFunding(providerId, paymentSuccessRequest));
+    }
+
+    @PostMapping("/payments/cancel")
+    public ResponseEntity<?> cancel(@LoggedInMember final String providerId,
+                                    @RequestBody final PaymentCancelRequest paymentCancelRequest) {
+        paymentService.cancel(providerId, paymentCancelRequest);
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    @PostMapping("/funding/payments/cancel")
+    public ResponseEntity<?> cancelFunding(@LoggedInMember final String providerId,
+                                           @RequestBody final PaymentFundingCancelRequest paymentFundingCancelRequest) {
+        paymentService.cancelFunding(providerId, paymentFundingCancelRequest);
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    @PostMapping("/funding/detail/payments/cancel")
+    public ResponseEntity<?> cancelFundingDetail(@LoggedInMember final String providerId,
+                                                 @RequestBody final PaymentFundingDetailCancelRequest paymentFundingDetailCancelRequest) {
+        paymentService.cancelFundingDetail(providerId, paymentFundingDetailCancelRequest);
+        return ResponseEntity.ok()
+                .build();
     }
 }

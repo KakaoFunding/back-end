@@ -13,4 +13,8 @@ public enum OrderStatus {
     OrderStatus(final String description) {
         this.description = description;
     }
+
+    public boolean canceled() {
+        return this.equals(CANCELLATION_RETURN_EXCHANGE);
+    }
 }

@@ -4,11 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
+import org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode;
+import org.kakaoshare.backend.domain.funding.exception.FundingDetailException;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
+import org.kakaoshare.backend.domain.gift.exception.GiftErrorCode;
+import org.kakaoshare.backend.domain.gift.exception.GiftException;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.exception.MemberException;
@@ -19,11 +23,17 @@ import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
 import org.kakaoshare.backend.domain.order.entity.Order;
+import org.kakaoshare.backend.domain.order.exception.OrderErrorCode;
+import org.kakaoshare.backend.domain.order.exception.OrderException;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.FundingOrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelDto;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
@@ -36,6 +46,7 @@ import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccess
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
+import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
 import org.kakaoshare.backend.domain.payment.exception.PaymentException;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
@@ -52,9 +63,11 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
+import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.ALREADY_REFUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_OPTION;
 
@@ -134,6 +147,58 @@ public class PaymentService {
         funding.increaseAccumulateAmount(amount);
         final Receiver receiver = Receiver.from(funding.getMember());
         return new PaymentSuccessResponse(receiver, Collections.emptyList());   // TODO: 4/20/24 펀딩 결제 완료 페이지 디자인이 없어 빈 리스트를 반환
+    }
+
+    @Transactional
+    public void cancel(final String providerId,
+                       final PaymentCancelRequest paymentCancelRequest) {
+        final Long paymentId = paymentCancelRequest.paymentId();
+        final Order order = findOrderByPaymentId(paymentId);
+        final Receipt receipt = order.getReceipt();
+        validateMemberReceipt(providerId, receipt);
+
+        final Long receiptId = receipt.getReceiptId();
+        final Gift gift = findGiftByReceiptId(receiptId);
+        validateAlreadyCanceled(order, Order::canceled);
+        validateAlreadyCanceled(gift, Gift::canceled);
+
+        order.cancel();
+        gift.cancel();
+        final PaymentCancelDto paymentCancelDto = findPaymentDtoById(paymentId);
+        webClientService.cancel(paymentCancelDto);
+    }
+
+    @Transactional
+    public void cancelFunding(final String providerId,
+                              final PaymentFundingCancelRequest paymentFundingCancelRequest) {
+        final Long fundingId = paymentFundingCancelRequest.fundingId();
+        final Funding funding = findFundingById(fundingId);
+        validateMemberFunding(providerId, funding);
+        validateAlreadyCanceled(funding, Funding::canceled);
+        final List<FundingDetail> fundingDetails = fundingDetailRepository.findAllByFundingId(fundingId);
+        fundingDetails.forEach(fundingDetail -> refundFundingDetails(fundingDetail.getAmount(), fundingDetail));
+        funding.cancel();
+    }
+
+    @Transactional
+    public void cancelFundingDetail(final String providerId,
+                                    final PaymentFundingDetailCancelRequest paymentFundingCancelRequest) {
+        final Long fundingDetailId = paymentFundingCancelRequest.fundingDetailId();
+        final FundingDetail fundingDetail = findFundingDetailById(fundingDetailId);
+        validateAlreadyCanceled(fundingDetail, FundingDetail::canceled);
+        validateMemberFundingDetail(providerId, fundingDetail);
+        final Long amount = paymentFundingCancelRequest.amount();
+        refundFundingDetails(amount, fundingDetail);
+    }
+
+    private Order findOrderByPaymentId(final Long paymentId) {
+        return orderRepository.findByPaymentId(paymentId)
+                .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND));
+    }
+
+    private Gift findGiftByReceiptId(final Long receiptId) {
+        return giftRepository.findByReceiptId(receiptId)
+                .orElseThrow(() -> new GiftException(GiftErrorCode.NOT_FOUND_GIFT));
     }
 
     private long getTotalProductAmount(final List<PaymentPreviewRequest> paymentPreviewRequests) {
@@ -266,6 +331,51 @@ public class PaymentService {
                 .toList();
     }
 
+    private void refundFundingDetails(final Long refundAmount,
+                                      final FundingDetail fundingDetail) {
+        final Payment payment = fundingDetail.getPayment();
+        final Funding funding = fundingDetail.getFunding();
+        funding.decreaseAccumulateAmount(refundAmount);
+
+        final Long attributeAmount = fundingDetail.getAmount();
+        // TODO: 4/27/24 전체 환불인 경우 상태 변경
+        if (refundAmount.equals(attributeAmount)) {
+            fundingDetail.cancel();
+        }
+
+        // TODO: 4/27/24 부분 환불인 경우(refundAmount < fundingDetail.getAmount())
+        if (refundAmount < attributeAmount) {
+            fundingDetail.partialCancel(refundAmount);
+        }
+
+        final PaymentCancelDto paymentCancelDto = PaymentCancelDto.of(payment, refundAmount);
+        webClientService.cancel(paymentCancelDto);
+    }
+
+    private <T> void validateAlreadyCanceled(final T item, final Function<T, Boolean> mapper) {
+        if (mapper.apply(item)) {
+            throw new PaymentException(ALREADY_REFUND);
+        }
+    }
+
+    private void validateMemberFundingDetail(final String providerId, final FundingDetail fundingDetail) {
+        if (!Objects.equals(fundingDetail.getMember().getProviderId(), providerId)) {
+            throw new MemberException(NOT_FOUND);
+        }
+    }
+
+    private void validateMemberFunding(final String providerId, final Funding funding) {
+        if (!Objects.equals(funding.getMember().getProviderId(), providerId)) {
+            throw new MemberException(NOT_FOUND);
+        }
+    }
+
+    private void validateMemberReceipt(final String providerId, final Receipt receipt) {
+        if (!Objects.equals(receipt.getRecipient().getProviderId(), providerId)) {
+            throw new MemberException(NOT_FOUND);
+        }
+    }
+
     private <T> List<Long> extractedProductIds(final List<T> values, final Function<T, Long> mapper) {
         return values.stream()
                 .map(mapper)
@@ -280,6 +390,16 @@ public class PaymentService {
     private Funding findFundingById(final Long fundingId) {
         return fundingRepository.findById(fundingId)
                 .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
+    }
+
+    private PaymentCancelDto findPaymentDtoById(final Long paymentId) {
+        return paymentRepository.findCancelDtoById(paymentId)
+                .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND));
+    }
+
+    private FundingDetail findFundingDetailById(final Long fundingDetailId) {
+        return fundingDetailRepository.findById(fundingDetailId)
+                .orElseThrow(() -> new FundingDetailException(FundingDetailErrorCode.NOT_FOUND));
     }
 
     private void saveOrReflectFundingDetail(final Payment payment, final Funding funding, final Member member, final Long amount) {

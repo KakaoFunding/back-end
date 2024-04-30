@@ -6,20 +6,27 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
+import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
+import org.kakaoshare.backend.domain.order.entity.Order;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.payment.dto.FundingOrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 import org.kakaoshare.backend.domain.payment.dto.OrderDetails;
-import org.kakaoshare.backend.domain.payment.dto.approve.response.Amount;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelDto;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
+import org.kakaoshare.backend.domain.payment.dto.kakaopay.Amount;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
@@ -36,6 +43,7 @@ import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
+import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,10 +53,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.kakaoshare.backend.fixture.BrandFixture.STARBUCKS;
 import static org.kakaoshare.backend.fixture.FundingFixture.SAMPLE_FUNDING;
+import static org.kakaoshare.backend.fixture.MemberFixture.HAN;
 import static org.kakaoshare.backend.fixture.MemberFixture.KAKAO;
 import static org.kakaoshare.backend.fixture.MemberFixture.KIM;
 import static org.kakaoshare.backend.fixture.ProductFixture.CAKE;
@@ -163,7 +173,6 @@ class PaymentServiceTest {
         final String providerId = member.getProviderId();
 
 
-
         final Brand brand = STARBUCKS.생성(1L);
 
         final Product cake = CAKE.생성(1L, brand);
@@ -268,6 +277,126 @@ class PaymentServiceTest {
         final PaymentSuccessResponse actual = paymentService.approveFunding(providerId, paymentSuccessRequest);
 
         assertThat(actual).isEqualTo(expect);
+    }
+
+    @Test
+    @DisplayName("선물 결제 취소")
+    public void cancel() throws Exception {
+        // given
+        final Product cake = CAKE.생성();
+        final Member recipient = KIM.생성();
+        final String providerId = recipient.getProviderId();
+        final Member receiver = KAKAO.생성();
+        final Long price = cake.getPrice();
+        final Payment payment = new Payment("tid", price, price);
+        final Long paymentId = payment.getPaymentId();
+        final Receipt receipt = new Receipt("orderNumber", cake, 1, recipient, receiver, Collections.emptyList());
+        final Order order = new Order(payment, receipt);
+        final Gift gift = new Gift(LocalDateTime.now().plusDays(180L), receipt);
+        final PaymentCancelDto paymentCancelDto = PaymentCancelDto.from(payment);
+
+        // when
+        doReturn(Optional.of(order)).when(orderRepository).findByPaymentId(paymentId);
+        doReturn(Optional.of(gift)).when(giftRepository).findByReceiptId(receipt.getReceiptId());
+        doReturn(Optional.of(paymentCancelDto)).when(paymentRepository).findCancelDtoById(paymentId);
+
+        final PaymentCancelRequest paymentCancelRequest = new PaymentCancelRequest(paymentId);
+        paymentService.cancel(providerId, paymentCancelRequest);
+
+        // then
+        assertThat(order.canceled()).isTrue();
+        assertThat(gift.canceled()).isTrue();
+    }
+
+    @Test
+    @DisplayName("개설한 펀딩 취소 시 기여한 모든 사용자 펀딩 결제 환불")
+    public void cancelFunding() throws Exception {
+
+        // given
+        final Product cake = CAKE.가격_설정_생성(10_000L);
+        final Member creator = KIM.생성();
+        final String providerId = creator.getProviderId();
+        final List<Member> contributors = List.of(
+                KAKAO.생성(),
+                HAN.생성()
+        );
+        final Funding funding = SAMPLE_FUNDING.생성(1L, creator, cake);
+        final List<FundingDetail> fundingDetails = contributors.stream()
+                .map(contributor -> new FundingDetail(
+                        contributor, funding,
+                        new Payment(UUID.randomUUID().toString(), 1_000L, 1_000L)
+                ))
+                .toList();
+        final Long fundingId = funding.getFundingId();
+
+        // when
+        doReturn(Optional.of(funding)).when(fundingRepository).findById(fundingId);
+        doReturn(fundingDetails).when(fundingDetailRepository).findAllByFundingId(fundingId);
+
+        // then
+        final PaymentFundingCancelRequest paymentFundingCancelRequest = new PaymentFundingCancelRequest(fundingId);
+        paymentService.cancelFunding(providerId, paymentFundingCancelRequest);
+
+        assertThat(fundingDetails).allMatch(FundingDetail::canceled);
+        assertThat(funding.canceled()).isTrue();
+    }
+
+    @Test
+    @DisplayName("기여한 펀딩 부분 환불")
+    public void cancelFundingDetailRefundPartial() throws Exception {
+
+        // given
+        final Product cake = CAKE.가격_설정_생성(10_000L);
+        final Member creator = KAKAO.생성();
+        final Funding funding = SAMPLE_FUNDING.생성(1L, creator, cake, 0L);
+
+        final Member contributor = KIM.생성();
+        final String providerId = contributor.getProviderId();
+        final long attributeAmount = 1_000L;
+        final Payment payment = new Payment("tid", attributeAmount, attributeAmount);
+        final FundingDetail fundingDetail = new FundingDetail(contributor, funding, payment);
+        final Long fundingDetailId = fundingDetail.getFundingDetailId();
+        funding.increaseAccumulateAmount(attributeAmount);
+
+        // when
+        doReturn(Optional.of(fundingDetail)).when(fundingDetailRepository).findById(fundingDetailId);
+
+        // then
+        final long refundAmount = 300L;
+        final PaymentFundingDetailCancelRequest paymentFundingDetailCancelRequest = new PaymentFundingDetailCancelRequest(fundingDetailId, refundAmount);
+        paymentService.cancelFundingDetail(providerId, paymentFundingDetailCancelRequest);
+
+        assertThat(payment.getTotalPrice()).isEqualTo(attributeAmount - refundAmount);
+        assertThat(funding.getAccumulateAmount()).isEqualTo(attributeAmount - refundAmount);
+        assertThat(fundingDetail.canceled()).isFalse(); // TODO: 4/28/24 부분 환불 시 취소 상태로 변경 X
+    }
+
+    @Test
+    @DisplayName("기여한 펀딩 전액 환불")
+    public void cancelFundingDetailRefundAll() throws Exception {
+
+        // given
+        final Product cake = CAKE.가격_설정_생성(10_000L);
+        final Member creator = KAKAO.생성();
+        final Funding funding = SAMPLE_FUNDING.생성(1L, creator, cake, 0L);
+
+        final Member contributor = KIM.생성();
+        final String providerId = contributor.getProviderId();
+        final long attributeAmount = 1_000L;
+        final Payment payment = new Payment("tid", attributeAmount, attributeAmount);
+        final FundingDetail fundingDetail = new FundingDetail(contributor, funding, payment);
+        final Long fundingDetailId = fundingDetail.getFundingDetailId();
+        funding.increaseAccumulateAmount(attributeAmount);
+
+        // when
+        doReturn(Optional.of(fundingDetail)).when(fundingDetailRepository).findById(fundingDetailId);
+
+        // then
+        final PaymentFundingDetailCancelRequest paymentFundingDetailCancelRequest = new PaymentFundingDetailCancelRequest(fundingDetailId, payment.getTotalPrice());
+        paymentService.cancelFundingDetail(providerId, paymentFundingDetailCancelRequest);
+
+        assertThat(fundingDetail.canceled()).isTrue(); // TODO: 4/28/24 전액 환불 시 취소 상태로 변경
+        assertThat(funding.getAccumulateAmount()).isEqualTo(0L);
     }
 
     private Payment createPayment(final String paymentNumber,
