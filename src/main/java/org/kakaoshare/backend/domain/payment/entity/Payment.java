@@ -50,6 +50,11 @@ public class Payment extends BaseTimeEntity {
         this.purchasePrice = purchasePrice;
     }
 
+    public void partialCancel(final Long amount) {
+        this.totalPrice -= amount;
+        this.purchasePrice -= amount;
+    }
+
     @Override
     public String toString() {
         return "Payment{" +

@@ -63,6 +63,7 @@ pay:
   request-url:
     ready: https://open-api.kakaopay.com/online/v1/payment/ready
     approve: https://open-api.kakaopay.com/online/v1/payment/approve
+    cancel: https://open-api.kakaopay.com/online/v1/payment/cancel
   redirect-url:
     approval: http://localhost:8080/payments/success
     cancel: http://localhost:8080/payments/cancel
