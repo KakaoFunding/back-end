@@ -19,6 +19,14 @@ BUILD_LOG="$ROOT_PATH/build.log"
 
 NOW=$(date +%c)
 
+for PORT in 8081 8082 8083; do
+    PID=$(lsof -ti:$PORT)
+    if [ ! -z "$PID" ]; then
+        echo "[$NOW] 포트 $PORT 사용중인 프로세스($PID) 종료" >> $START_LOG
+        kill -9 $PID
+    fi
+done
+
 echo "[$NOW] Docker 이미지 빌드 시작" >> $START_LOG
 docker build -t $IMAGE_NAME:$IMAGE_TAG -f $DOCKERFILE_PATH $ROOT_PATH >> $BUILD_LOG 2>&1
 
