@@ -1,19 +1,46 @@
 #!/bin/bash
 
-ROOT_PATH="/home/ec2-user/back-end"
-JAR="$ROOT_PATH/application.jar"
+ROOT_PATH="/home/ec2-user/cicd"
+DOCKERFILE_PATH="$ROOT_PATH/Dockerfile"
+DOCKER_COMPOSE_PATH="$ROOT_PATH/docker-compose.yml"
 
-APP_LOG="$ROOT_PATH/application.log"
-ERROR_LOG="$ROOT_PATH/error.log"
+if [ -z "$IMAGE_NAME" ]; then
+    IMAGE_NAME="application"
+    export IMAGE_NAME
+fi
+
+if [ -z "$IMAGE_TAG" ]; then
+    IMAGE_TAG="latest"
+    export IMAGE_TAG
+fi
+
 START_LOG="$ROOT_PATH/start.log"
+BUILD_LOG="$ROOT_PATH/build.log"
 
 NOW=$(date +%c)
 
-echo "[$NOW] $JAR 복사" >> $START_LOG
-cp $ROOT_PATH/build/libs/*.jar $JAR
+for PORT in 8081 8082 8083; do
+    PID=$(lsof -ti:$PORT)
+    if [ ! -z "$PID" ]; then
+        echo "[$NOW] 포트 $PORT 사용중인 프로세스($PID) 종료" >> $START_LOG
+        kill -9 $PID
+    fi
+done
 
-echo "[$NOW] > $JAR 실행" >> $START_LOG
-nohup java -jar $JAR > $APP_LOG 2> $ERROR_LOG &
+echo "[$NOW] Docker 이미지 빌드 시작" >> $START_LOG
+docker build -t $IMAGE_NAME:$IMAGE_TAG -f $DOCKERFILE_PATH $ROOT_PATH >> $BUILD_LOG 2>&1
 
-SERVICE_PID=$(pgrep -f $JAR)
-echo "[$NOW] > 서비스 PID: $SERVICE_PID" >> $START_LOG
+if [ $? -eq 0 ]; then
+    echo "[$NOW] Docker 이미지 빌드 성공: $IMAGE_NAME:$IMAGE_TAG" >> $START_LOG
+
+    echo "[$NOW] Docker Compose를 사용하여 애플리케이션 시작" >> $START_LOG
+    docker-compose -f $DOCKER_COMPOSE_PATH up -d
+
+    if [ $? -eq 0 ]; then
+        echo "[$NOW] Docker Compose로 애플리케이션 시작 성공" >> $START_LOG
+    else
+        echo "[$NOW] Docker Compose로 애플리케이션 시작 실패" >> $START_LOG
+    fi
+else
+    echo "[$NOW] Docker 이미지 빌드 실패: $IMAGE_NAME:$IMAGE_TAG" >> $START_LOG
+fi
