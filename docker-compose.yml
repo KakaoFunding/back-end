@@ -28,6 +28,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
     container_name: "app1"
+    ports:
+      - 8081:8080
 
   app2:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
@@ -37,6 +39,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
     container_name: "app2"
+    ports:
+      - 8082:8080
 
   app3:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
@@ -46,3 +50,5 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
     container_name: "app3"
+    ports:
+      - 8083:8080
