@@ -23,9 +23,9 @@ services:
   app1:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     environment:
-      MYSQL_URL: ${MYSQL_URL}
-      MYSQL_USERNAME: ${MYSQL_USERNAME}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_URL: "${MYSQL_URL}"
+      MYSQL_USERNAME: "${MYSQL_USERNAME}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     restart: always
     container_name: "app1"
     ports:
@@ -34,9 +34,9 @@ services:
   app2:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     environment:
-      MYSQL_URL: ${MYSQL_URL}
-      MYSQL_USERNAME: ${MYSQL_USERNAME}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_URL: "${MYSQL_URL}"
+      MYSQL_USERNAME: "${MYSQL_USERNAME}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     restart: always
     container_name: "app2"
     ports:
@@ -45,9 +45,9 @@ services:
   app3:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     environment:
-      MYSQL_URL: ${MYSQL_URL}
-      MYSQL_USERNAME: ${MYSQL_USERNAME}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_URL: "${MYSQL_URL}"
+      MYSQL_USERNAME: "${MYSQL_USERNAME}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     restart: always
     container_name: "app3"
     ports:
