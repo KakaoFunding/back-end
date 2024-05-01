@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.payment.dto.approve.response;
+package org.kakaoshare.backend.domain.payment.dto.kakaopay;
 
 public record Amount(
         Integer total,

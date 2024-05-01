@@ -12,13 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductRepositoryCustom {
-    Page<Product4DisplayDto> findAllByCategoryId(Long categoryId, Pageable pageable);
+    Page<Product4DisplayDto> findAllByCategoryId(Long categoryId, Pageable pageable, final String providerId);
     Page<ProductDto> findAllByBrandId(final Long brandId, final Pageable pageable);
     Page<ProductDto> findAllByProductIds(final List<Long> productIds, final Pageable pageable);
     DescriptionResponse findProductWithDetailsAndPhotos(Long productId);
     DetailResponse findProductDetail(Long productId);
-    Page<Product4DisplayDto> findBySearchConditions(final String keyword, final Integer minPrice, final Integer maxPrice, final List<String> categories, final Pageable pageable);
-    Page<SimpleBrandProductDto> findBySearchConditionsGroupByBrand(final String keyword, final Pageable pageable);
+    Page<Product4DisplayDto> findBySearchConditions(final String keyword, final Integer minPrice, final Integer maxPrice, final List<String> categories, final Pageable pageable,final String providerId);
+    
+    Page<SimpleBrandProductDto> findBySearchConditionsGroupByBrand(String keyword,
+                                                                   Pageable pageable,
+                                                                   String providerId);
+    
     Map<Long, Long> findAllPriceByIdsGroupById(final List<Long> productIds);
     Map<Long, String> findAllNameByIdsGroupById(final List<Long> productIds);
 }

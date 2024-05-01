@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 
 import java.time.LocalDateTime;
 
+import static org.kakaoshare.backend.domain.gift.entity.GiftStatus.CANCEL_REFUND;
 import static org.kakaoshare.backend.domain.gift.entity.GiftStatus.NOT_USED;
 
 
@@ -43,6 +45,7 @@ public class Gift extends BaseTimeEntity {
     private LocalDateTime expiredAt;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "receipt_id", nullable = false)
     private Receipt receipt;
 
     protected Gift() {
@@ -52,6 +55,14 @@ public class Gift extends BaseTimeEntity {
     public Gift(final LocalDateTime expiredAt, final Receipt receipt) {
         this.expiredAt = expiredAt;
         this.receipt = receipt;
+    }
+
+    public void cancel() {
+        this.status = CANCEL_REFUND;
+    }
+
+    public boolean canceled() {
+        return status.canceled();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.payment.dto.approve.response;
 
+import org.kakaoshare.backend.domain.payment.dto.kakaopay.Amount;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 
 import java.time.LocalDateTime;

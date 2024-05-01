@@ -12,11 +12,12 @@ public class Product4DisplayDto extends ProductDto {
     @QueryProjection
     public Product4DisplayDto(final Long productId, final String name,
                               final String photo, final Long price,
-                              final String brandName, final Long wishCount) {
+                              final String brandName, final Long wishCount,
+                              final boolean isWished) {
         super(productId, name, photo, price);
         this.brandName = brandName;
         this.wishCount = wishCount;
-        this.isWished = false;
+        this.isWished = isWished;
     }
     
     @Override

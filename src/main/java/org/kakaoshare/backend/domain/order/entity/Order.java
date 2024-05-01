@@ -16,10 +16,10 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 
+import static org.kakaoshare.backend.domain.order.entity.OrderStatus.CANCELLATION_RETURN_EXCHANGE;
 import static org.kakaoshare.backend.domain.order.entity.OrderStatus.COMPLETE_PAYMENT;
 
 
@@ -34,13 +34,8 @@ public class Order extends BaseTimeEntity {
     
     @Builder.Default
     @Column(nullable = false, columnDefinition = "varchar(255)")
-
     @Enumerated(EnumType.STRING)
     private OrderStatus status = COMPLETE_PAYMENT;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "funding_detail_id")
-    private FundingDetail fundingDetail;
     
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "payment_id")
@@ -58,13 +53,20 @@ public class Order extends BaseTimeEntity {
         this.payment = payment;
         this.receipt = receipt;
     }
+
+    public void cancel() {
+        this.status = CANCELLATION_RETURN_EXCHANGE;
+    }
+
+    public boolean canceled() {
+        return status.canceled();
+    }
     
     @Override
     public String toString() {
         return "Order{" +
                 "ordersId=" + ordersId +
                 ", status=" + status +
-                ", fundingDetail=" + fundingDetail +
                 ", payment=" + payment +
                 ", receipt=" + receipt +
                 '}';
