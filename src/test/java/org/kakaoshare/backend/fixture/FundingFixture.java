@@ -20,21 +20,10 @@ public enum FundingFixture {
         this.accumulateAmount = accumulateAmount;
     }
 
-    public Funding 생성(final Member member,
-                      final Product product) {
-        final Funding funding = Funding.builder()
-                .expiredAt(expiredAt)
-                .goalAmount(goalAmount)
-                .member(member)
-                .product(product)
-                .build();
-        funding.increaseAccumulateAmount(accumulateAmount);
-        return funding;
-    }
-
     public Funding 생성(final Long fundingId,
                       final Member member,
-                      final Product product) {
+                      final Product product,
+                      final Long accumulateAmount) {
         final Funding funding = Funding.builder()
                 .fundingId(fundingId)
                 .expiredAt(expiredAt)
@@ -44,5 +33,22 @@ public enum FundingFixture {
                 .build();
         funding.increaseAccumulateAmount(accumulateAmount);
         return funding;
+    }
+
+    public Funding 생성(final Member member,
+                      final Product product,
+                      final Long accumulateAmount) {
+        return 생성(null, member, product, accumulateAmount);
+    }
+
+    public Funding 생성(final Member member,
+                      final Product product) {
+        return 생성(null, member, product);
+    }
+
+    public Funding 생성(final Long fundingId,
+                      final Member member,
+                      final Product product) {
+        return 생성(fundingId, member, product, accumulateAmount);
     }
 }

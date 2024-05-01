@@ -4,7 +4,7 @@ import org.kakaoshare.backend.domain.payment.dto.OrderDetail;
 
 import java.util.List;
 
-public record PaymentReadyRequest(
+public record PaymentGiftReadyItem(
         Long productId, Integer totalAmount, Integer discountAmount,
         Integer quantity, List<Long> optionDetailIds) {
 

@@ -1,6 +1,8 @@
 package org.kakaoshare.backend.domain.payment.service;
 
 import org.kakaoshare.backend.domain.payment.dto.approve.request.KakaoPayApproveRequest;
+import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelDto;
+import org.kakaoshare.backend.domain.payment.dto.kakaopay.cancel.request.KakaoPayCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.KakaoPayReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -46,6 +48,12 @@ public class KakaoPayRequestProvider {
         final String orderNumber = paymentSuccessRequest.orderNumber();
         final String pgToken = paymentSuccessRequest.pgToken();
         return new KakaoPayApproveRequest(cid, cidSecret, tid, orderNumber, providerId, pgToken);
+    }
+
+    public KakaoPayCancelRequest createCancelRequest(final PaymentCancelDto paymentCancelDto) {
+        final String tid = paymentCancelDto.tid();
+        final Long amount = paymentCancelDto.amount();
+        return new KakaoPayCancelRequest(cid, tid, amount, 0L);
     }
 
     private int getTotalAmount(final List<PaymentReadyProductDto> paymentReadyProductDtos) {
