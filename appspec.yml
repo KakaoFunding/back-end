@@ -9,7 +9,6 @@ files:
 permissions:
   - object: /
     pattern: "**"
-    mode: 755
     owner: ec2-user
     group: ec2-user
 
