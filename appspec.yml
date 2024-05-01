@@ -7,7 +7,7 @@ files:
     overwrite: yes
 
 permissions:
-  - object: /home/ec2-user/cicd/scripts/stop.sh
+  - object: /home/ec2-user/cicd/scripts/*
     mode: "755"
     owner: ec2-user
     group: ec2-user
@@ -19,6 +19,11 @@ hooks:
       runas: ec2-user
 
   AfterInstall:
+    - location: scripts/init-letsencrypt.sh
+      timeout: 60
+      runas: ec2-user
+
+  ApplicationStart:
     - location: scripts/deploy.sh
       timeout: 60
       runas: ec2-user
