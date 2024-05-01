@@ -10,7 +10,9 @@ services:
       - /etc/letsencrypt/live/fundina.shop/privkey.pem:/etc/ssl/private/privkey.pem
       - /etc/letsencrypt/options-ssl-nginx.conf:/etc/nginx/snippets/options-ssl-nginx.conf
       - /etc/letsencrypt/ssl-dhparams.pem:/etc/ssl/certs/ssl-dhparams.pem
-
+    ports:
+      - "80:80"
+      - "443:443"
     environment:
       - TZ=Asia/Seoul
     depends_on:
