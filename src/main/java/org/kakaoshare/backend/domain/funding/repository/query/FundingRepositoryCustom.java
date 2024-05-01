@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.funding.repository.query;
 
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -14,5 +15,5 @@ public interface FundingRepositoryCustom {
 
     List<Funding> findAllByMemberId(Long memberId);
 
-    Slice<Funding> findFundingByMemberIdWithSlice(Long memberId, Pageable pageable);
+    Slice<Funding> findFundingByMemberIdAndStatusWithSlice(Long memberId, FundingStatus status, Pageable pageable);
 }

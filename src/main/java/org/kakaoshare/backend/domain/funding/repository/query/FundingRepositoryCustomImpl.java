@@ -14,6 +14,7 @@ import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.entity.QFunding;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -59,24 +60,24 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
                 .fetch();
     }
 
-    @Override
-    public Slice<Funding> findFundingByMemberIdWithSlice(Long memberId, Pageable pageable) {
+    public Slice<Funding> findFundingByMemberIdAndStatusWithSlice(Long memberId, FundingStatus status, Pageable pageable) {
         List<Funding> content = queryFactory
                 .selectFrom(QFunding.funding)
-                .where(QFunding.funding.member.memberId.eq(memberId))
+                .where(QFunding.funding.member.memberId.eq(memberId)
+                        .and(QFunding.funding.status.eq(status)))
                 .orderBy(SortUtil.from(pageable))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1) // 다음 페이지 존재 여부 확인을 위해 1 추가
+                .limit(pageable.getPageSize() + 1)
                 .fetch();
 
-        boolean hasNext = false;
-        if (content.size() > pageable.getPageSize()) {
+        boolean hasNext = content.size() > pageable.getPageSize();
+        if (hasNext) {
             content.remove(content.size() - 1);
-            hasNext = true;
         }
 
         return new SliceImpl<>(content, pageable, hasNext);
     }
+
 
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
