@@ -6,6 +6,7 @@ import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewR
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
@@ -57,21 +58,19 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
-    public FundingSliceResponse getMyAllFundingProducts(String providerId, Pageable pageable) {
+    public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status, Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        List<Funding> fundingList = fundingRepository.findAllByMemberId(member.getMemberId());
-        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(),
-                pageable);
-        List<FundingResponse> fundingResponses = allFundingSlices.getContent().stream().map(FundingResponse::from)
-                .toList();
+        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithSlice(member.getMemberId(), status, pageable);
+        List<FundingResponse> fundingResponses = allFundingSlices.getContent().stream().map(FundingResponse::from).toList();
 
         return FundingSliceResponse.builder()
                 .fundingItems(fundingResponses)
-                .numberOfFundingItems(fundingList.size())
+                .numberOfFundingItems(allFundingSlices.getNumberOfElements())
                 .page(allFundingSlices.getPageable().getPageNumber())
                 .isLast(allFundingSlices.isLast())
                 .build();
     }
+
 
     public FundingPreviewResponse preview(final FundingPreviewRequest fundingPreviewRequest) {
         final Long fundingId = fundingPreviewRequest.fundingId();
