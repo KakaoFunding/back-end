@@ -28,8 +28,6 @@ services:
       - MYSQL_PASSWORD =${MYSQL_PASSWORD}
     restart: always
     container_name: "app1"
-    env_file:
-      - ../.env.config
 
   app2:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
@@ -39,8 +37,7 @@ services:
       - MYSQL_PASSWORD= ${MYSQL_PASSWORD}
     restart: always
     container_name: "app2"
-    env_file:
-      - ../.env.config
+
 
   app3:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
@@ -50,5 +47,3 @@ services:
       - MYSQL_PASSWORD= ${MYSQL_PASSWORD}
     restart: always
     container_name: "app3"
-    env_file:
-      - ../.env.config
