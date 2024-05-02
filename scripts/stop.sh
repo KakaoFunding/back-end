@@ -1,5 +1,6 @@
 #!/bin/bash
 
-# shellcheck disable=SC2164
-cd /home/ec2-user/cicd
+echo "Stopping all containers managed by docker-compose..."
 docker-compose down
+
+echo "All containers stopped and cleaned up successfully."
