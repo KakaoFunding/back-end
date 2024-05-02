@@ -158,6 +158,11 @@ public class PaymentService {
         final Long amount = payment.getTotalPrice();
         saveOrReflectFundingDetail(payment, funding, member, amount);
         funding.increaseAccumulateAmount(amount);
+
+        if (funding.satisfiedAccumulateAmount()) {
+            funding.finish();
+        }
+
         final Receiver receiver = Receiver.from(funding.getMember());
         return new PaymentSuccessResponse(receiver, Collections.emptyList());   // TODO: 4/20/24 펀딩 결제 완료 페이지 디자인이 없어 빈 리스트를 반환
     }
