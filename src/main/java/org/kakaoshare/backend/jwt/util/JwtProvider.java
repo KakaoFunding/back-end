@@ -17,10 +17,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.EXPIRED;
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.INVALID;
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.NOT_FOUND;
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.UNSUPPORTED;
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.*;
 
 @Component
 public class JwtProvider {
@@ -32,7 +29,7 @@ public class JwtProvider {
     private final long expireTime;
     private final Key key;
 
-    public JwtProvider(@Value("${spring.jwt.secret}") final String secret,
+    public JwtProvider(@Value("${jwt.secret}") final String secret,
                        @Value("${security.token.access.expire-time}") final long expireTime) {
         final byte[] decodeSecret = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(decodeSecret);
