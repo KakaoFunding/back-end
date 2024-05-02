@@ -24,14 +24,20 @@ services:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     restart: always
     container_name: "app1"
+    environment:
+      TZ: "Asia/Seoul"
 
   app2:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     restart: always
     container_name: "app2"
+    environment:
+      TZ: "Asia/Seoul"
 
 
   app3:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     restart: always
     container_name: "app3"
+    environment:
+      TZ: "Asia/Seoul"
