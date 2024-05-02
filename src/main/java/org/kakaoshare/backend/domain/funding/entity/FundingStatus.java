@@ -17,4 +17,12 @@ public enum FundingStatus {
     public boolean canceled() {
         return this.equals(CANCEL);
     }
+    public static boolean isValid(String value) {
+        for (FundingStatus status : values()) {
+            if (status.name().equalsIgnoreCase(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
