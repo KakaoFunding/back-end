@@ -23,6 +23,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import java.time.LocalDate;
 
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.CANCEL;
+import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.COMPLETE;
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.PROGRESS;
 
 @Entity
@@ -104,8 +105,20 @@ public class Funding extends BaseTimeEntity {
         this.accumulateAmount = 0L;
     }
 
+    public void finish() {
+        if (!satisfiedAccumulateAmount()) {
+            return;
+        }
+
+        this.status = COMPLETE;
+    }
+
     public boolean canceled() {
         return status.canceled();
+    }
+
+    public boolean satisfiedAccumulateAmount() {
+        return goalAmount.equals(accumulateAmount);
     }
 
     @Override
