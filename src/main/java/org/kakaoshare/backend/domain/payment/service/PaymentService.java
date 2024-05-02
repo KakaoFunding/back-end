@@ -17,6 +17,7 @@ import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
+import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
@@ -67,6 +68,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ACCUMULATE_AMOUNT;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.ALREADY_REFUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
@@ -80,6 +82,7 @@ public class PaymentService {
     private final FundingDetailRepository fundingDetailRepository;
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
+    private final OAuthWebClientService oAuthWebClientService;
     private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final OrderRepository orderRepository;
@@ -115,10 +118,12 @@ public class PaymentService {
         final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
         final FundingOrderDetail fundingOrderDetail = FundingOrderDetail.from(paymentFundingReadyRequest);
         redisUtils.save(orderDetailKey, fundingOrderDetail);
+        final int amount = paymentFundingReadyRequest.amount();
         final Long fundingId = paymentFundingReadyRequest.fundingId();
         final Funding funding = findFundingById(fundingId);
+        validateFundingAmount(funding, amount);
         final String name = funding.getProduct().getName();
-        final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, paymentFundingReadyRequest.amount());// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
+        final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, amount);// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, List.of(paymentReadyProductDto), orderDetailKey);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), kakaoPayReadyResponse.next_redirect_pc_url(), orderDetailKey);
     }
@@ -360,6 +365,13 @@ public class PaymentService {
 
         final PaymentCancelDto paymentCancelDto = PaymentCancelDto.of(payment, refundAmount);
         webClientService.cancel(paymentCancelDto);
+    }
+
+    private void validateFundingAmount(final Funding funding, final int attributeAmount) {
+        final long remainAmount = funding.getGoalAmount() - funding.getAccumulateAmount();
+        if (remainAmount < attributeAmount) {
+            throw new FundingException(INVALID_ACCUMULATE_AMOUNT);
+        }
     }
 
     private <T> void validateAlreadyCanceled(final T item, final Function<T, Boolean> mapper) {
