@@ -29,7 +29,7 @@ public class JwtProvider {
     private final long expireTime;
     private final Key key;
 
-    public JwtProvider(@Value("${jwt.secret}") final String secret,
+    public JwtProvider(@Value("${spring.jwt.secret}") final String secret,
                        @Value("${security.token.access.expire-time}") final long expireTime) {
         final byte[] decodeSecret = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(decodeSecret);
