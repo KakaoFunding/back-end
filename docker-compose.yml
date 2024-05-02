@@ -27,10 +27,6 @@ services:
 
   app2:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
-    environment:
-      MYSQL_URL: ${MYSQL_URL}
-      MYSQL_USERNAME: ${MYSQL_USERNAME}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
     container_name: "app2"
 
@@ -39,4 +35,3 @@ services:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     restart: always
     container_name: "app3"
-#  todo: prod에 직접 취약값 기입하고 이를 volumn 등록하기
