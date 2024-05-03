@@ -69,12 +69,12 @@ public class FundingService {
                 .map(FundingResponse::from)
                 .toList();
 
-        return FundingSliceResponse.builder()
-                .fundingItems(fundingResponses)
-                .numberOfFundingItems(allFundingSlices.getNumberOfElements())
-                .page(allFundingSlices.getPageable().getPageNumber())
-                .isLast(allFundingSlices.isLast())
-                .build();
+        return FundingSliceResponse.of(
+                fundingResponses,
+                allFundingSlices.getNumberOfElements(),
+                allFundingSlices.getPageable().getPageNumber(),
+                allFundingSlices.isLast()
+        );
     }
 
 
