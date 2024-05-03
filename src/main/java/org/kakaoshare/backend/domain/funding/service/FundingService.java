@@ -58,10 +58,16 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
-    public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status, Pageable pageable) {
+    public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status,
+                                                             Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithSlice(member.getMemberId(), status, pageable);
-        List<FundingResponse> fundingResponses = allFundingSlices.getContent().stream().map(FundingResponse::from).toList();
+        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithSlice(
+                member.getMemberId(), status, pageable);
+        List<FundingResponse> fundingResponses = allFundingSlices
+                .getContent()
+                .stream()
+                .map(FundingResponse::from)
+                .toList();
 
         return FundingSliceResponse.builder()
                 .fundingItems(fundingResponses)
