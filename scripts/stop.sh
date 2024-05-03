@@ -3,7 +3,7 @@
 #!/bin/bash
 
 # shellcheck disable=SC2164
-cd /home/ec2-user/cicd
+cd ~/cicd
 
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 
