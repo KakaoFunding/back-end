@@ -14,6 +14,7 @@ permissions:
     group: ec2-user
     type:
       - file
+      - directory
 
 hooks:
   ApplicationStop:
