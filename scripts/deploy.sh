@@ -17,6 +17,8 @@ fi
 START_LOG="$ROOT_PATH/start.log"
 BUILD_LOG="$ROOT_PATH/build.log"
 
+touch $START_LOG $BUILD_LOG
+
 NOW=$(date +%c)
 
 for PORT in 8081 8082 8083; do
