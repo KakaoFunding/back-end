@@ -61,7 +61,7 @@ public class FundingService {
     public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status,
                                                              Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithSlice(
+        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithPage(
                 member.getMemberId(), status, pageable);
         List<FundingResponse> fundingResponses = allFundingSlices
                 .getContent()

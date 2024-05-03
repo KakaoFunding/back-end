@@ -46,7 +46,7 @@ public class FundingController {
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                      @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") String status,
                                                      @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                     @RequestParam(value = "size", required = false, defaultValue = "4") int size) {
+                                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         if (!FundingStatus.isValid(status)) {
             throw new FundingException(FundingErrorCode.INVALID_STATUS);
         }

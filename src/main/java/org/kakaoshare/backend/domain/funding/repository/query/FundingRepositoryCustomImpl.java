@@ -4,18 +4,21 @@ import static org.kakaoshare.backend.common.util.sort.SortUtil.MOST_RECENT;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
+import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.entity.QFunding;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -60,24 +63,25 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
                 .fetch();
     }
 
-    public Slice<Funding> findFundingByMemberIdAndStatusWithSlice(Long memberId, FundingStatus status, Pageable pageable) {
-        List<Funding> content = queryFactory
+    @Override
+    public Page<Funding> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status, Pageable pageable) {
+
+        JPAQuery<Funding> contentQuery = queryFactory
                 .selectFrom(QFunding.funding)
                 .where(QFunding.funding.member.memberId.eq(memberId)
                         .and(QFunding.funding.status.eq(status)))
                 .orderBy(SortUtil.from(pageable))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
+                .limit(pageable.getPageSize());
 
-        boolean hasNext = content.size() > pageable.getPageSize();
-        if (hasNext) {
-            content.remove(content.size() - 1);
-        }
+        JPAQuery<Long> countQuery = queryFactory
+                .select(QFunding.funding.count())
+                .from(QFunding.funding)
+                .where(QFunding.funding.member.memberId.eq(memberId)
+                        .and(QFunding.funding.status.eq(status)));
 
-        return new SliceImpl<>(content, pageable, hasNext);
+        return RepositoryUtils.toPage(pageable, contentQuery, countQuery);
     }
-
 
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
