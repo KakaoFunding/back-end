@@ -37,7 +37,7 @@ if [ $? -eq 0 ]; then
 
     echo "[$NOW] Docker Compose를 사용하여 애플리케이션 시작" >> $START_LOG
     cd $ROOT_PATH || exit
-    docker-compose -f $DOCKER_COMPOSE_PATH up -d
+    sudo docker-compose -f $DOCKER_COMPOSE_PATH up -d
 
     if [ $? -eq 0 ]; then
         echo "[$NOW] Docker Compose로 애플리케이션 시작 성공" >> $START_LOG

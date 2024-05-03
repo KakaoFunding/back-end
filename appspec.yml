@@ -7,7 +7,7 @@ files:
     overwrite: yes
 
 permissions:
-  - object: /
+  - object: /home/ec2-user/cicd/scripts/*
     mode: 755
     pattern: "**"
     owner: ec2-user
