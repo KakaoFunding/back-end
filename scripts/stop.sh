@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/ec2-user/cicd || exit
-docker-compose down
+
+sudo docker-compose -f /home/ec2-user/cicd/docker-compose.yml down
