@@ -1,17 +1,23 @@
 #!/bin/bash
 
-#!/bin/bash
+# 모든 앱 컨테이너 종료 및 삭제
+for PORT in 8081 8082 8083; do
+    CONTAINER_ID=$(docker ps --filter "publish=$PORT" --format "{{.ID}}")
+    if [ ! -z "$CONTAINER_ID" ]; then
+        echo "Stopping and removing container on port $PORT..."
+        docker stop $CONTAINER_ID
+        docker rm $CONTAINER_ID
+    else
+        echo "No container is running on port $PORT."
+    fi
+done
 
-# shellcheck disable=SC2164
-cd ~/cicd
-
-DOCKER_COMPOSE_FILE="docker-compose.yml"
-
-# 파일 존재 확인 및 Docker Compose 실행
-if [ -f "$DOCKER_COMPOSE_FILE" ]; then
-    echo "docker-compose 파일을 찾았습니다. 컨테이너를 종료합니다."
-    docker-compose -f "$DOCKER_COMPOSE_FILE" down
+# Nginx 컨테이너 종료 및 삭제
+NGINX_CONTAINER_ID=$(docker ps --filter "name=nginx" --format "{{.ID}}")
+if [ ! -z "$NGINX_CONTAINER_ID" ]; then
+    echo "Stopping and removing Nginx container..."
+    docker stop $NGINX_CONTAINER_ID
+    docker rm $NGINX_CONTAINER_ID
 else
-    echo "docker-compose.yml 파일을 찾을 수 없습니다. 현재 위치: $(pwd)"
-    exit 1
+    echo "No Nginx container is running."
 fi
