@@ -36,6 +36,7 @@ if [ $? -eq 0 ]; then
     echo "[$NOW] Docker 이미지 빌드 성공: $IMAGE_NAME:$IMAGE_TAG" >> $START_LOG
 
     echo "[$NOW] Docker Compose를 사용하여 애플리케이션 시작" >> $START_LOG
+    cd $ROOT_PATH || exit
     docker-compose -f $DOCKER_COMPOSE_PATH up -d
 
     if [ $? -eq 0 ]; then
