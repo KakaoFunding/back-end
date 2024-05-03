@@ -8,6 +8,7 @@ files:
 
 permissions:
   - object: /
+    mode: 755
     pattern: "**"
     owner: root
     group: root
