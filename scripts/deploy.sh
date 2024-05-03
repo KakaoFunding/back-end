@@ -17,6 +17,9 @@ fi
 START_LOG="$ROOT_PATH/start.log"
 BUILD_LOG="$ROOT_PATH/build.log"
 
+chmod o+w START_LOG
+chmod o+w BUILD_LOG
+
 touch $START_LOG $BUILD_LOG
 
 NOW=$(date +%c)
