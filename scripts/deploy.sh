@@ -20,7 +20,6 @@ sudo chown ec2-user:ec2-user ./gradlew
 sudo chmod +x ./gradlew
 
 ./gradlew clean
-./gradlew --warning-mode all
 ./gradlew build -i -x test >> $BUILD_LOG 2>&1
 
 if [ $? -eq 0 ]; then
@@ -31,6 +30,7 @@ if [ $? -eq 0 ]; then
 
     if [ $? -eq 0 ]; then
         echo "[$(date +%c)] Docker 이미지 빌드 성공: $IMAGE_NAME:$IMAGE_TAG" >> $START_LOG
+
         echo "[$(date +%c)] Docker Compose로 애플리케이션 시작" >> $START_LOG
         export SPRING_PROFILES_ACTIVE=prod
         docker-compose -f $DOCKER_COMPOSE_PATH up -d >> $BUILD_LOG 2>&1
