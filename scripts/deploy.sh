@@ -20,7 +20,8 @@ echo "[$(date +%c)] Gradle 빌드 시작" >> $START_LOG
 cd $ROOT_PATH || exit
 
 # gradlew에 실행 권한 부여
-chmod +x ./gradlew
+sudo chown ec2-user:ec2-user ./gradlew
+sudo chmod +x ./gradlew
 
 ./gradlew build -x test >> $BUILD_LOG 2>&1
 
