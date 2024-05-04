@@ -22,8 +22,8 @@ cd $ROOT_PATH || exit
 # gradlew에 실행 권한 부여
 sudo chown ec2-user:ec2-user ./gradlew
 sudo chmod +x ./gradlew
-
-./gradlew build -x test >> $BUILD_LOG 2>&1
+./gradlew clean build
+./gradlew build -i -x test >> $BUILD_LOG 2>&1
 
 if [ $? -eq 0 ]; then
     echo "[$(date +%c)] Gradle 빌드 성공" >> $START_LOG
