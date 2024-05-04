@@ -17,10 +17,7 @@ fi
 START_LOG="$ROOT_PATH/start.log"
 BUILD_LOG="$ROOT_PATH/build.log"
 
-# 로그 파일이 없다면 생성하고, ec2-user가 소유하도록 설정
 touch $START_LOG $BUILD_LOG
-sudo chown ec2-user:ec2-user $START_LOG $BUILD_LOG
-sudo chmod 666 $START_LOG $BUILD_LOG
 
 NOW=$(date +%c)
 
