@@ -3,8 +3,15 @@
 ROOT_PATH="/home/ec2-user/cicd"
 DOCKER_COMPOSE_PATH="$ROOT_PATH/docker-compose.yml"
 
-IMAGE_NAME="application"
-IMAGE_TAG="latest"
+if [ -z "$IMAGE_NAME" ]; then
+    IMAGE_NAME="application"
+    export IMAGE_NAME
+fi
+
+if [ -z "$IMAGE_TAG" ]; then
+    IMAGE_TAG="latest"
+    export IMAGE_TAG
+fi
 
 START_LOG="$ROOT_PATH/start.log"
 BUILD_LOG="$ROOT_PATH/build.log"
