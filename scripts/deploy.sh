@@ -37,6 +37,7 @@ if [ $? -eq 0 ]; then
 
     echo "[$NOW] Docker Compose를 사용하여 애플리케이션 시작" >> $START_LOG
     cd $ROOT_PATH || exit
+    export SPRING_PROFILES_ACTIVE=prod
     docker-compose -f $DOCKER_COMPOSE_PATH up -d
 
     if [ $? -eq 0 ]; then
