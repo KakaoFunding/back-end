@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 ROOT_PATH="/home/ec2-user/cicd"
 DOCKERFILE_PATH="$ROOT_PATH/Dockerfile"
@@ -16,10 +15,8 @@ touch $START_LOG $BUILD_LOG
 echo "[$(date +%c)] Gradle 빌드 시작" >> $START_LOG
 cd $ROOT_PATH || exit
 
-sudo chown ec2-user:ec2-user ./gradlew
-sudo chmod +x ./gradlew
+chmod +x ./gradlew
 
-./gradlew clean
 ./gradlew build -i -x test >> $BUILD_LOG 2>&1
 
 if [ $? -eq 0 ]; then
