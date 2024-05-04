@@ -20,6 +20,7 @@ sudo chown ec2-user:ec2-user ./gradlew
 sudo chmod +x ./gradlew
 
 ./gradlew clean
+./gradlew --warning-mode all
 ./gradlew build -i -x test >> $BUILD_LOG 2>&1
 
 if [ $? -eq 0 ]; then
