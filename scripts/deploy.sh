@@ -23,7 +23,7 @@ cd $ROOT_PATH || exit
 
 chmod +x ./gradlew
 
-./gradlew build -Dspring.profiles.active=prod -i -x test >> $BUILD_LOG 2>&1
+./gradlew build -i -x test >> $BUILD_LOG 2>&1
 
 if [ $? -eq 0 ]; then
     echo "[$(date +%c)] Gradle 빌드 성공" >> $START_LOG
