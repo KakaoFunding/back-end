@@ -29,7 +29,10 @@ jobs:
       - name: gradlew에 실행 권한 부여
         run: chmod +x ./gradlew
 
-      - name: Package files
+      - name: 프로젝트 빌드
+        run: ./gradlew clean build -x test
+
+      - name: 파일 입축
         run: |
           mkdir deploy
           cp ./build/libs/*SNAPSHOT.jar ./deploy/
