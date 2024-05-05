@@ -22,6 +22,13 @@ permissions:
     type:
       - file
       - directory
+  - object: /home/ec2-user/cicd/*.log
+    mode: 664
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
+    type:
+      - file
 
 hooks:
   ApplicationStop:
