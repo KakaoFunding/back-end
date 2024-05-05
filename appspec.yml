@@ -26,7 +26,7 @@ permissions:
 hooks:
   ApplicationStop:
     - location: scripts/stop.sh
-      timeout: 10
+      timeout: 60
       runas: ec2-user
 
   ApplicationStart:
