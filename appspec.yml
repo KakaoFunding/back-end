@@ -7,19 +7,10 @@ files:
     overwrite: yes
 
 permissions:
-  - object: /home/ec2-user/cicd/scripts/*
-    mode: 755
-    pattern: "**"
+  - object: /home/ec2-user/cicd/scripts/stop.sh
+    mode: "755"
     owner: ec2-user
     group: ec2-user
-  - object: /home/ec2-user/cicd/*
-    mode: 664
-    pattern: "**"
-    owner: ec2-user
-    group: ec2-user
-    type:
-      - file
-      - directory
 
 hooks:
   ApplicationStop:
