@@ -29,14 +29,14 @@ jobs:
       - name: gradlew에 실행 권한 부여
         run: chmod +x ./gradlew
 
+      - name: 설정파일 디코딩 및 저장
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application-prod.yml
+          find src
+
       - name: 프로젝트 빌드
         run: ./gradlew clean build -x test
-
-      - name: 파일 입축
-        run: |
-          mkdir deploy
-          cp ./build/libs/*SNAPSHOT.jar ./deploy/
-          zip -r -qq ./spring-project.zip ./deploy
 
       - name: AWS credential 설정
         uses: aws-actions/configure-aws-credentials@v1
@@ -50,7 +50,7 @@ jobs:
           aws deploy push \
           --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} \
           --ignore-hidden-files \
-          --s3-location s3://${{ env.AWS_CODE_BUCKET_NAME }}/cicdDir/spring-project.zip \
+          --s3-location s3://${{ env.AWS_CODE_BUCKET_NAME }}/cicdDir/$GITHUB_SHA.zip \
           --source .
 
       - name: EC2에 배포
@@ -59,4 +59,4 @@ jobs:
           --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} \
-          --s3-location bucket=${{ env.AWS_CODE_BUCKET_NAME }},key=cicdDir/spring-project.zip,bundleType=zip
+          --s3-location bucket=${{ env.AWS_CODE_BUCKET_NAME }},key=cicdDir/$GITHUB_SHA.zip,bundleType=zip

@@ -28,6 +28,8 @@ services:
       - "8081:8080"
     build:
       dockerfile: Dockerfile
+    depends_on:
+      - redis
 
   app2:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
@@ -37,6 +39,8 @@ services:
       - "8082:8080"
     build:
       dockerfile: Dockerfile
+    depends_on:
+      - redis
 
   app3:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
@@ -46,3 +50,12 @@ services:
       - "8083:8080"
     build:
       dockerfile: Dockerfile
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
