@@ -14,7 +14,7 @@ public record FundingPreviewResponse(Long productId, String name, String photo, 
                 productDto.getName(),
                 productDto.getPhoto(),
                 null,   // TODO: 4/20/24 Funding 에 옵션 관련 컬럼이 없어 null로 대체
-                new FundingPreviewAmount(fundingProductDto.goalAmount(), fundingProductDto.remainAmount())
+                new FundingPreviewAmount(productDto.getPrice(), fundingProductDto.goalAmount(), fundingProductDto.remainAmount())
         );
     }
 }
