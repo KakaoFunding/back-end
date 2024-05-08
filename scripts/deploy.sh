@@ -21,12 +21,13 @@ touch $START_LOG $BUILD_LOG
 echo "[$(date +%c)] Gradle 빌드 시작" >> $START_LOG
 cd $ROOT_PATH || exit
 
+./gradlew build -x test >> $BUILD_LOG 2>&1
+
 if [ $? -eq 0 ]; then
     echo "[$(date +%c)] Gradle 빌드 성공" >> $START_LOG
 
     if [ $? -eq 0 ]; then
         echo "[$(date +%c)] Docker Compose로 애플리케이션 시작" >> $START_LOG
-        export SPRING_PROFILES_ACTIVE=prod
         docker-compose -f $DOCKER_COMPOSE_PATH up -d >> $BUILD_LOG 2>&1
 
         if [ $? -eq 0 ]; then
