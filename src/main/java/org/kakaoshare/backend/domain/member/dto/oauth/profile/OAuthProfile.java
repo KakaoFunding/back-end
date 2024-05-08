@@ -17,6 +17,7 @@ public abstract class OAuthProfile {
     public abstract String getGender();
     public abstract String getName();
     public abstract String getPhoneNumber();
+    public abstract String getProfileImageUrl();
     public abstract String getProvider();
     public abstract String getProviderId();
 
