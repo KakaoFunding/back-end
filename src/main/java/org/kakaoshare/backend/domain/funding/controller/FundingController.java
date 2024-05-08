@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.funding.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.util.EnumValue;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
@@ -44,12 +45,11 @@ public class FundingController {
 
     @GetMapping("/members/funding/products")
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
+                                                     @EnumValue(enumClass = FundingStatus.class, ignoreCase = true, message = "존재하지 않는 상태입니다.")
                                                      @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") String status,
                                                      @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                      @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-        if (!FundingStatus.isValid(status)) {
-            throw new FundingException(FundingErrorCode.INVALID_STATUS);
-        }
+
         PageRequest pageRequest = PageRequest.of(page, size);
         FundingStatus fundingStatus = FundingStatus.valueOf(status.toUpperCase());
         FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, fundingStatus, pageRequest);
