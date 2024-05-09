@@ -98,6 +98,6 @@ public class FundingService {
 
     private ProductDto findProductDtoByProductId(final Long productId) {
         return productRepository.findProductDtoById(productId)
-                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
     }
 }

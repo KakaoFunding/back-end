@@ -206,14 +206,14 @@ public class PaymentService {
 
     private Gift findGiftByReceiptId(final Long receiptId) {
         return giftRepository.findByReceiptId(receiptId)
-                .orElseThrow(() -> new GiftException(GiftErrorCode.NOT_FOUND_GIFT));
+                .orElseThrow(() -> new GiftException(GiftErrorCode.NOT_FOUND));
     }
 
     private long getTotalProductAmount(final List<PaymentPreviewRequest> paymentPreviewRequests) {
         final List<Long> productIds = extractedProductIds(paymentPreviewRequests, PaymentPreviewRequest::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
         if (priceByIds == null || priceByIds.isEmpty()) {
-            throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR);
+            throw new ProductException(ProductErrorCode.NOT_FOUND);
         }
 
         return paymentPreviewRequests.stream()
@@ -225,7 +225,7 @@ public class PaymentService {
         final List<Long> productIds = extractedProductIds(paymentGiftReadyItems, PaymentGiftReadyItem::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
         if (priceByIds.isEmpty()) {
-            throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR);
+            throw new ProductException(ProductErrorCode.NOT_FOUND);
         }
 
         final boolean isAllMatch = paymentGiftReadyItems.stream()
