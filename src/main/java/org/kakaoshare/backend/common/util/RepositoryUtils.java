@@ -3,7 +3,7 @@ package org.kakaoshare.backend.common.util;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.ComparableExpression;
+import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -17,6 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public final class RepositoryUtils {
@@ -76,6 +79,12 @@ public final class RepositoryUtils {
         }
 
         return numberExpression.between(min, max);
+    }
+
+    public static BooleanExpression containsExpression(final DateTimePath<LocalDateTime> dateExpression,
+                                                       final LocalDate startDate,
+                                                       final LocalDate endDate) {
+        return dateExpression.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
     }
 
     public static <T> BooleanExpression containsExpression(final SimpleExpression<T> simpleExpression, final List<T> items) {
