@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.domain.member.exception;
 
-public class MemberException extends RuntimeException {
-    private final MemberErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public MemberException(final MemberErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+public class MemberException extends BusinessException {
+    public MemberException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }
