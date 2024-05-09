@@ -17,10 +17,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.EXPIRED;
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.INVALID;
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.NOT_FOUND;
-import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.UNSUPPORTED;
+import static org.kakaoshare.backend.jwt.exception.JwtErrorCode.*;
 
 @Component
 public class JwtProvider {

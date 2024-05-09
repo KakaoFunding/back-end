@@ -76,12 +76,9 @@ public class FundingService {
     public FundingPreviewResponse preview(final FundingPreviewRequest fundingPreviewRequest) {
         final Long fundingId = fundingPreviewRequest.fundingId();
         final FundingProductDto fundingProductDto = findFundingProductDtoById(fundingId);
-        final Long attributeAmount = fundingPreviewRequest.attributeAmount();
-        validateAttributeAmount(fundingProductDto.remainAmount(), attributeAmount);
-
         final Long productId = fundingProductDto.productId();
         final ProductDto productDto = findProductDtoByProductId(productId);
-        return FundingPreviewResponse.of(productDto, attributeAmount);
+        return FundingPreviewResponse.of(productDto, fundingProductDto);
     }
 
     private Member findMemberByProviderId(String providerId) {
@@ -102,11 +99,5 @@ public class FundingService {
     private ProductDto findProductDtoByProductId(final Long productId) {
         return productRepository.findProductDtoById(productId)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
-    }
-
-    private void validateAttributeAmount(final Long remainAmount, final Long attributeAmount) {
-        if (remainAmount < attributeAmount) {
-            throw new FundingException(FundingErrorCode.INVALID_ACCUMULATE_AMOUNT);
-        }
     }
 }
