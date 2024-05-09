@@ -14,6 +14,8 @@ import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.service.FundingService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class FundingController {
     private final FundingService fundingService;
+    private static final int FUNDING_DEFAULT_SIZE = 20;
 
     @PostMapping("/funding/{productId}")
     public ResponseEntity<?> registerFunding(@PathVariable Long productId, @LoggedInMember String providerId,
@@ -47,12 +50,10 @@ public class FundingController {
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                      @EnumValue(enumClass = FundingStatus.class, ignoreCase = true, message = "존재하지 않는 상태입니다.")
                                                      @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") String status,
-                                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+                                                     @PageableDefault(size = FUNDING_DEFAULT_SIZE) final Pageable pageable) {
 
-        PageRequest pageRequest = PageRequest.of(page, size);
         FundingStatus fundingStatus = FundingStatus.valueOf(status.toUpperCase());
-        FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, fundingStatus, pageRequest);
+        FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, fundingStatus, pageable);
         return ResponseEntity.ok(response);
     }
 
