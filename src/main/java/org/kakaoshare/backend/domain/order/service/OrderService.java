@@ -50,7 +50,7 @@ public class OrderService {
         final Map<Long, Integer> quantityGroupByProductId = getQuantityGroupByProductId(orderPreviewRequests);
         final Page<ProductDto> productDtos = getProductDtos(orderPreviewRequests, pageable);
         final Page<OrderPreviewResponse> page = productDtos
-                .map(productDto -> OrderPreviewResponse.of(
+                .map(productDto -> new OrderPreviewResponse(
                         productDto,
                         optionNamesGroupByProductId.get(productDto.getProductId()),
                         quantityGroupByProductId.get(productDto.getProductId()))
