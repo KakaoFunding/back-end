@@ -4,11 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryRequest;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
+import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
+import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailResponse;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewRequest;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewResponse;
+import org.kakaoshare.backend.domain.order.exception.OrderErrorCode;
 import org.kakaoshare.backend.domain.order.exception.OrderException;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
+import org.kakaoshare.backend.domain.payment.dto.inquiry.PaymentHistoryDto;
+import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
+import org.kakaoshare.backend.domain.payment.exception.PaymentException;
+import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
@@ -35,6 +42,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
 
     public PageResponse<?> preview(final List<OrderPreviewRequest> orderPreviewRequests,
                                    final Pageable pageable) {
@@ -54,8 +62,15 @@ public class OrderService {
                                   final LocalDate endDate,
                                   final Pageable pageable) {
         validateDateRange(startDate, endDate);
+
         final Page<OrderProductDto> page = orderRepository.findAllOrderProductDtoByDate(startDate, endDate, pageable);
         return PageResponse.from(page);
+    }
+
+    public OrderHistoryDetailResponse lookUpDetail(final Long orderId) {
+        final OrderHistoryDetailDto orderHistoryDetailDto = findOrderHistoryDetailByOrderId(orderId);
+        final PaymentHistoryDto paymentHistoryDto = findPaymentHistoryDtoByOrderId(orderId);
+        return new OrderHistoryDetailResponse(orderHistoryDetailDto, paymentHistoryDto);
     }
 
     private Page<ProductDto> getProductDtos(final List<OrderPreviewRequest> orderPreviewRequests, final Pageable pageable) {
@@ -104,5 +119,15 @@ public class OrderService {
         if (ChronoUnit.YEARS.between(endDate, startDate) >= MAX_DATE_PERIOD) {
             throw new OrderException(INVALID_DATE_RANGE);
         }
+    }
+
+    private OrderHistoryDetailDto findOrderHistoryDetailByOrderId(final Long orderId) {
+        return orderRepository.findHistoryDetailById(orderId)
+                .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND));
+    }
+
+    private PaymentHistoryDto findPaymentHistoryDtoByOrderId(final Long orderId) {
+        return paymentRepository.findHistoryByOrderId(orderId)
+                .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND));
     }
 }
