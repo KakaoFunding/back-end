@@ -27,17 +27,15 @@ chmod +x ./gradlew
 if [ $? -eq 0 ]; then
     echo "[$(date +%c)] Gradle 빌드 성공" >> $START_LOG
 
-    if [ $? -eq 0 ]; then
-        echo "[$(date +%c)] Docker Compose로 애플리케이션 시작" >> $START_LOG
-        docker-compose -f $DOCKER_COMPOSE_PATH up -d >> $BUILD_LOG 2>&1
+    echo "[$(date +%c)] Docker Compose로 애플리케이션 시작 시도" >> $START_LOG
+    docker-compose -f $DOCKER_COMPOSE_PATH up -d >> $BUILD_LOG 2>&1
 
-        if [ $? -eq 0 ]; then
-            echo "[$(date +%c)] Docker Compose로 애플리케이션 시작 성공" >> $START_LOG
-        else
-            echo "[$(date +%c)] Docker Compose로 애플리케이션 시작 실패" >> $START_LOG
-        fi
+    if [ $? -eq 0 ]; then
+        echo "[$(date +%c)] Docker Compose로 애플리케이션 시작 성공" >> $START_LOG
     else
-        echo "[$(date +%c)] Docker 이미지 빌드 실패: $IMAGE_NAME:$IMAGE_TAG" >> $START_LOG
+        echo "[$(date +%c)] Docker Compose로 애플리케이션 시작 실패" >> $START_LOG
+        echo "[$(date +%c)] 오류 내용:" >> $START_LOG
+        docker-compose -f $DOCKER_COMPOSE_PATH logs >> $START_LOG
     fi
 else
     echo "[$(date +%c)] Gradle 빌드 실패" >> $START_LOG
