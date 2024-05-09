@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryRequest;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
+import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewRequest;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewResponse;
+import org.kakaoshare.backend.domain.order.exception.OrderException;
+import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
@@ -13,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +34,7 @@ public class OrderService {
 
     private final ProductRepository productRepository;
     private final OptionDetailRepository optionDetailRepository;
+    private final OrderRepository orderRepository;
 
     public PageResponse<?> preview(final List<OrderPreviewRequest> orderPreviewRequests,
                                    final Pageable pageable) {
@@ -42,6 +48,14 @@ public class OrderService {
                         quantityGroupByProductId.get(productDto.getProductId()))
                 );
         return PageResponse.from(page); // TODO: 4/15/24 동일한 상품이 여러 개인 경우를 처리하지 못함
+    }
+
+    public PageResponse<?> lookUp(final LocalDate startDate,
+                                  final LocalDate endDate,
+                                  final Pageable pageable) {
+        validateDateRange(startDate, endDate);
+        final Page<OrderProductDto> page = orderRepository.findAllOrderProductDtoByDate(startDate, endDate, pageable);
+        return PageResponse.from(page);
     }
 
     private Page<ProductDto> getProductDtos(final List<OrderPreviewRequest> orderPreviewRequests, final Pageable pageable) {
