@@ -7,6 +7,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RepositoryUtils;
+import org.kakaoshare.backend.domain.option.dto.QOptionSummaryResponse;
+import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
 import org.kakaoshare.backend.domain.order.dto.inquiry.QOrderProductDto;
 import org.kakaoshare.backend.domain.product.dto.QProductDto;
@@ -17,14 +19,17 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.eqExpression;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
 import static org.kakaoshare.backend.domain.member.entity.QMember.member;
 import static org.kakaoshare.backend.domain.order.entity.QOrder.order;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
+import static org.kakaoshare.backend.domain.receipt.entity.QReceiptOption.receiptOption;
 
 @Component
 @RequiredArgsConstructor
@@ -88,6 +93,25 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .orderBy(createOrderSpecifiers(order, pageable));// TODO: 5/8/24 orderBy 내에 값은 추후 변경 예정
 
         return toPage(pageable, contentQuery, countQuery);
+    }
+
+    @Override
+    public Optional<OrderHistoryDetailDto> findHistoryDetailById(final Long orderId) {
+        final OrderHistoryDetailDto orderHistoryDetailDto = queryFactory.select(
+                        Projections.constructor(
+                                OrderHistoryDetailDto.class,
+                                getProductDto(),
+                                receipt.quantity,
+                                Projections.list(new QOptionSummaryResponse(receiptOption.optionName, receiptOption.optionDetailName))
+                        )
+                ).from(order)
+                .innerJoin(order.receipt, receipt)
+                .innerJoin(receipt.product, product)
+                .innerJoin(receiptOption).on(eqExpression(receiptOption.receipt.receiptId, receipt.receiptId))
+                .where(eqExpression(order.ordersId, orderId))
+                .fetchOne();
+
+        return Optional.ofNullable(orderHistoryDetailDto);
     }
 
     private QProductDto getProductDto() {
