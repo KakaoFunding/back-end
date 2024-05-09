@@ -43,7 +43,7 @@ public final class RepositoryUtils {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final T target) {
+    public static <T extends Number & Comparable<?>> BooleanExpression eqExpression(final NumberExpression<T> simpleExpression, final T target) {
         if (target == null) {
             return null;
         }
