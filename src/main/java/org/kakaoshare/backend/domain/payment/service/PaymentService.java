@@ -44,7 +44,7 @@ import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyRes
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
-import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentGiftSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
@@ -129,8 +129,8 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentSuccessResponse approve(final String providerId,
-                                          final PaymentSuccessRequest paymentSuccessRequest) {
+    public PaymentGiftSuccessResponse approve(final String providerId,
+                                              final PaymentSuccessRequest paymentSuccessRequest) {
         final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
         final Payment payment = saveAndGetPayment(approveResponse);
         final OrderDetails orderDetails = redisUtils.remove(approveResponse.partner_order_id(), OrderDetails.class);
@@ -144,7 +144,7 @@ public class PaymentService {
         saveOrders(payment, receipts);
 
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
-        return new PaymentSuccessResponse(Receiver.from(receiver), orderSummaries);
+        return new PaymentGiftSuccessResponse(Receiver.from(receiver), orderSummaries);
     }
 
     @Transactional

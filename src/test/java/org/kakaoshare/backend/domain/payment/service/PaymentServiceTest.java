@@ -37,7 +37,7 @@ import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyRes
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
-import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentGiftSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
@@ -223,8 +223,8 @@ class PaymentServiceTest {
                 new OrderSummaryResponse(coffeeSummaryResponse, coffeeStockQuantity, Collections.emptyList())
         );
         final Receiver receiver = Receiver.from(member);
-        final PaymentSuccessResponse expect = new PaymentSuccessResponse(receiver, orderSummaries);
-        final PaymentSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
+        final PaymentGiftSuccessResponse expect = new PaymentGiftSuccessResponse(receiver, orderSummaries);
+        final PaymentGiftSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
         assertThat(actual).isEqualTo(expect);   // TODO: 3/16/24 equals() 및 hashCode()가 재정의되있으므로 isEqualTo() 사용
     }
 
@@ -285,8 +285,8 @@ class PaymentServiceTest {
                 new OrderSummaryResponse(coffeeSummaryResponse, coffeeStockQuantity, Collections.emptyList())
         );
         final Receiver receiver = Receiver.from(receiverMember);
-        final PaymentSuccessResponse expect = new PaymentSuccessResponse(receiver, orderSummaries);
-        final PaymentSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
+        final PaymentGiftSuccessResponse expect = new PaymentGiftSuccessResponse(receiver, orderSummaries);
+        final PaymentGiftSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
         assertThat(actual).isEqualTo(expect);   // TODO: 3/16/24 equals() 및 hashCode()가 재정의되있으므로 isEqualTo() 사용
     }
 
