@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.domain.payment.exception;
 
-public class PaymentException extends RuntimeException {
-    private final PaymentErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public PaymentException(final PaymentErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+public class PaymentException extends BusinessException {
+    public PaymentException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }
