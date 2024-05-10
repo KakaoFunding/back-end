@@ -48,12 +48,10 @@ public class FundingController {
 
     @GetMapping("/members/funding/products")
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
-                                                     @EnumValue(enumClass = FundingStatus.class, ignoreCase = true, message = "존재하지 않는 상태입니다.")
-                                                     @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") String status,
+                                                     @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") FundingStatus status,
                                                      @PageableDefault(size = FUNDING_DEFAULT_SIZE) final Pageable pageable) {
 
-        FundingStatus fundingStatus = FundingStatus.valueOf(status.toUpperCase());
-        FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, fundingStatus, pageable);
+        FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
         return ResponseEntity.ok(response);
     }
 
