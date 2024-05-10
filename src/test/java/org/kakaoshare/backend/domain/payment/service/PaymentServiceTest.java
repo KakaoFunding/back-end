@@ -212,8 +212,8 @@ class PaymentServiceTest {
         doReturn(null).when(giftRepository).saveAll(any());
         doReturn(null).when(orderRepository).saveAll(any());  // TODO: 3/16/24 saveAll() 에서 new로 다른 객체가 생성되므로 any()로 대체
 
-        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPrice() * cakeStockQuantity);
-        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPrice() * coffeeStockQuantity);
+        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), coffee.getPhoto(), cake.getPrice() * cakeStockQuantity);
+        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto(), coffee.getPrice() * coffeeStockQuantity);
         doReturn(cakeSummaryResponse).when(productRepository).findAllProductSummaryById(cake.getProductId());
         doReturn(coffeeSummaryResponse).when(productRepository).findAllProductSummaryById(coffee.getProductId());
 
@@ -274,8 +274,8 @@ class PaymentServiceTest {
         doReturn(null).when(giftRepository).saveAll(any());
         doReturn(null).when(orderRepository).saveAll(any());  // TODO: 3/16/24 saveAll() 에서 new로 다른 객체가 생성되므로 any()로 대체
 
-        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPrice() * cakeStockQuantity);
-        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPrice() * coffeeStockQuantity);
+        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPhoto(), cake.getPrice() * cakeStockQuantity);
+        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto(), coffee.getPrice() * coffeeStockQuantity);
         doReturn(cakeSummaryResponse).when(productRepository).findAllProductSummaryById(cake.getProductId());
         doReturn(coffeeSummaryResponse).when(productRepository).findAllProductSummaryById(coffee.getProductId());
 
