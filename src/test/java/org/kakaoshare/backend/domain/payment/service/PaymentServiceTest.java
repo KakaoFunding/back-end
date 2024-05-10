@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.funding.dto.FundingSummaryResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
@@ -36,6 +37,7 @@ import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyI
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
@@ -212,8 +214,8 @@ class PaymentServiceTest {
         doReturn(null).when(giftRepository).saveAll(any());
         doReturn(null).when(orderRepository).saveAll(any());  // TODO: 3/16/24 saveAll() 에서 new로 다른 객체가 생성되므로 any()로 대체
 
-        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), coffee.getPhoto(), cake.getPrice() * cakeStockQuantity);
-        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto(), coffee.getPrice() * coffeeStockQuantity);
+        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), coffee.getPhoto());
+        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto());
         doReturn(cakeSummaryResponse).when(productRepository).findAllProductSummaryById(cake.getProductId());
         doReturn(coffeeSummaryResponse).when(productRepository).findAllProductSummaryById(coffee.getProductId());
 
@@ -274,8 +276,8 @@ class PaymentServiceTest {
         doReturn(null).when(giftRepository).saveAll(any());
         doReturn(null).when(orderRepository).saveAll(any());  // TODO: 3/16/24 saveAll() 에서 new로 다른 객체가 생성되므로 any()로 대체
 
-        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPhoto(), cake.getPrice() * cakeStockQuantity);
-        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto(), coffee.getPrice() * coffeeStockQuantity);
+        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPhoto());
+        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto());
         doReturn(cakeSummaryResponse).when(productRepository).findAllProductSummaryById(cake.getProductId());
         doReturn(coffeeSummaryResponse).when(productRepository).findAllProductSummaryById(coffee.getProductId());
 
@@ -325,9 +327,10 @@ class PaymentServiceTest {
         final Member creator = KAKAO.생성();
         final String providerId = contributor.getProviderId();
         final Product cake = CAKE.생성(1L);
+        final int attributeAmount = 200;
 
         final PaymentSuccessRequest paymentSuccessRequest = createPaymentSuccessRequest(pgToken, tid, orderDetailsKey);
-        final KakaoPayApproveResponse approveResponse = createApproveResponse(tid, orderDetailsKey, providerId, 200, cake.getName(), 1);
+        final KakaoPayApproveResponse approveResponse = createApproveResponse(tid, orderDetailsKey, providerId, attributeAmount, cake.getName(), 1);
         doReturn(approveResponse).when(webClientService).approve(providerId, paymentSuccessRequest);
 
         final FundingOrderDetail fundingOrderDetail = new FundingOrderDetail(1L);
@@ -337,8 +340,11 @@ class PaymentServiceTest {
         doReturn(Optional.empty()).when(fundingDetailRepository).findByFundingAndMember(funding, contributor);
         doReturn(Optional.of(contributor)).when(memberRepository).findMemberByProviderId(providerId);
 
-        final PaymentSuccessResponse expect = new PaymentSuccessResponse(Receiver.from(creator), Collections.emptyList());
-        final PaymentSuccessResponse actual = paymentService.approveFunding(providerId, paymentSuccessRequest);
+        final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(cake);
+        final FundingSummaryResponse summary = new FundingSummaryResponse(productSummaryResponse, (long) attributeAmount);
+
+        final PaymentFundingSuccessResponse expect = new PaymentFundingSuccessResponse(Receiver.from(creator),summary);
+        final PaymentFundingSuccessResponse actual = paymentService.approveFunding(providerId, paymentSuccessRequest);
 
         assertThat(actual).isEqualTo(expect);
     }

@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
+import org.kakaoshare.backend.domain.funding.dto.FundingSummaryResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode;
@@ -17,7 +18,6 @@ import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
-import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
@@ -38,12 +38,13 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDe
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
@@ -52,6 +53,7 @@ import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
 import org.kakaoshare.backend.domain.payment.exception.PaymentException;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
+import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
 import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
@@ -82,7 +84,6 @@ public class PaymentService {
     private final FundingDetailRepository fundingDetailRepository;
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
-    private final OAuthWebClientService oAuthWebClientService;
     private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final OrderRepository orderRepository;
@@ -148,7 +149,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentSuccessResponse approveFunding(final String providerId,
+    public PaymentFundingSuccessResponse approveFunding(final String providerId,
                                                  final PaymentSuccessRequest paymentSuccessRequest) {
         final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
         final Payment payment = approveResponse.toEntity();
@@ -163,8 +164,11 @@ public class PaymentService {
             funding.finish();
         }
 
+        final Product product = funding.getProduct();
+        final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(product);
+        final FundingSummaryResponse summary = new FundingSummaryResponse(productSummaryResponse, amount);
         final Receiver receiver = Receiver.from(funding.getMember());
-        return new PaymentSuccessResponse(receiver, Collections.emptyList());   // TODO: 4/20/24 펀딩 결제 완료 페이지 디자인이 없어 빈 리스트를 반환
+        return new PaymentFundingSuccessResponse(receiver, summary);
     }
 
     @Transactional
