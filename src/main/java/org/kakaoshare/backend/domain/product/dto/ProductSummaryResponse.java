@@ -1,6 +1,12 @@
 package org.kakaoshare.backend.domain.product.dto;
 
-public record ProductSummaryResponse(String brandName, String photo, String name, Long price) {
+import org.kakaoshare.backend.domain.product.entity.Product;
+
+public record ProductSummaryResponse(String brandName, String photo, String name) {
     public ProductSummaryResponse {
+    }
+
+    public static ProductSummaryResponse from(final Product product) {
+        return new ProductSummaryResponse(product.getBrandName(), product.getPhoto(), product.getName());
     }
 }
