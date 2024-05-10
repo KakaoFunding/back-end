@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
-import org.kakaoshare.backend.domain.funding.dto.FundingSummaryResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
@@ -31,9 +30,9 @@ import org.kakaoshare.backend.domain.payment.dto.kakaopay.Amount;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -341,9 +340,7 @@ class PaymentServiceTest {
         doReturn(Optional.of(contributor)).when(memberRepository).findMemberByProviderId(providerId);
 
         final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(cake);
-        final FundingSummaryResponse summary = new FundingSummaryResponse(productSummaryResponse, (long) attributeAmount);
-
-        final PaymentFundingSuccessResponse expect = new PaymentFundingSuccessResponse(Receiver.from(creator),summary);
+        final PaymentFundingSuccessResponse expect = new PaymentFundingSuccessResponse(Receiver.from(creator), productSummaryResponse, (long) attributeAmount);
         final PaymentFundingSuccessResponse actual = paymentService.approveFunding(providerId, paymentSuccessRequest);
 
         assertThat(actual).isEqualTo(expect);

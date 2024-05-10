@@ -1,6 +1,6 @@
 package org.kakaoshare.backend.domain.payment.dto.success.response;
 
-import org.kakaoshare.backend.domain.funding.dto.FundingSummaryResponse;
+import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
 
-public record PaymentFundingSuccessResponse(Receiver receiver, FundingSummaryResponse summary) {
+public record PaymentFundingSuccessResponse(Receiver receiver, ProductSummaryResponse product, Long attributeAmount) {
 }

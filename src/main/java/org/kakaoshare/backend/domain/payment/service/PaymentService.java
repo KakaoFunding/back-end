@@ -2,7 +2,6 @@ package org.kakaoshare.backend.domain.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
-import org.kakaoshare.backend.domain.funding.dto.FundingSummaryResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode;
@@ -166,9 +165,8 @@ public class PaymentService {
 
         final Product product = funding.getProduct();
         final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(product);
-        final FundingSummaryResponse summary = new FundingSummaryResponse(productSummaryResponse, amount);
         final Receiver receiver = Receiver.from(funding.getMember());
-        return new PaymentFundingSuccessResponse(receiver, summary);
+        return new PaymentFundingSuccessResponse(receiver, productSummaryResponse, amount);
     }
 
     @Transactional
