@@ -1,11 +1,19 @@
 package org.kakaoshare.backend.domain.product.exception;
 
-public enum ProductErrorCode {
-    NOT_FOUND_PRODUCT_ERROR("존재하지 않는 상품입니다."),
-    NOT_FOUND_THUMBNAIL_ERROR("존재하지 않는 썸네일입니다.");
+import lombok.Getter;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.springframework.http.HttpStatus;
+
+@Getter
+public enum ProductErrorCode implements ErrorCode {
+    NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
+    NOT_FOUND_THUMBNAIL_ERROR(HttpStatus.NOT_FOUND, "존재하지 않는 썸네일입니다.");
+
+    private final HttpStatus httpStatus;
     private final String message;
 
-    ProductErrorCode(String message) {
+    ProductErrorCode(final HttpStatus httpStatus, final String message) {
+        this.httpStatus = httpStatus;
         this.message = message;
     }
 }

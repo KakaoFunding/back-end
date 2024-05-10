@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.domain.funding.exception;
 
-public class FundingException extends RuntimeException {
-    private final FundingErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public FundingException(final FundingErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+public class FundingException extends BusinessException {
+    public FundingException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }

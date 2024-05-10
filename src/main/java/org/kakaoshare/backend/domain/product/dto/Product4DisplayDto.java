@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class Product4DisplayDto extends ProductDto {
-    private final String brandName;
     private final boolean isWished;
     private final Long wishCount;
 
@@ -14,8 +13,7 @@ public class Product4DisplayDto extends ProductDto {
                               final String photo, final Long price,
                               final String brandName, final Long wishCount,
                               final boolean isWished) {
-        super(productId, name, photo, price);
-        this.brandName = brandName;
+        super(productId, name, photo, price, brandName);
         this.wishCount = wishCount;
         this.isWished = isWished;
     }
