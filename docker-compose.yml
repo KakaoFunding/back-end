@@ -4,7 +4,6 @@ services:
     container_name: nginx
     image: nginx
     restart: always
-    user: "1001:1001"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt/live/fundina.shop/fullchain.pem:/etc/ssl/certs/fullchain.pem
@@ -20,9 +19,6 @@ services:
       - app1
       - app2
       - app3
-    read_only: true
-    tmpfs:
-      - /tmp
 
   app1:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
