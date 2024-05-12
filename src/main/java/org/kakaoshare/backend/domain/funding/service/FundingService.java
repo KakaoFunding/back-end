@@ -1,13 +1,21 @@
 package org.kakaoshare.backend.domain.funding.service;
 
+import com.querydsl.core.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.funding.dto.*;
+import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.common.vo.Date;
+import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
+import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
+import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
+import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
+import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
+import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
@@ -16,6 +24,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
 import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -31,6 +40,7 @@ public class FundingService {
     private final FundingRepository fundingRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
+    private final FundingDetailRepository fundingDetailRepository;
 
     @Transactional
     public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
@@ -79,6 +89,22 @@ public class FundingService {
         final Long productId = fundingProductDto.productId();
         final ProductDto productDto = findProductDtoByProductId(productId);
         return FundingPreviewResponse.of(productDto, fundingProductDto);
+    }
+
+    public PageResponse<?> lookUp(final String providerId,
+                                  final Date date,
+                                  final String status,
+                                  final Pageable pageable) {
+        final Page<?> page = getFundingDetailHistoryResponse(providerId, date, status, pageable);
+        return PageResponse.from(page);
+    }
+
+    private Page<?> getFundingDetailHistoryResponse(final String providerId, final Date date, final String status, final Pageable pageable) {
+        if (StringUtils.isNullOrEmpty(status)) {
+            return fundingDetailRepository.findHistoryByProviderIdAndDate(providerId, date, pageable);
+        }
+
+        return fundingDetailRepository.findHistoryByProviderIdAndDateAndStatus(providerId, date, status, pageable);
     }
 
     private Member findMemberByProviderId(String providerId) {
