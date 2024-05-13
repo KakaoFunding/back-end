@@ -3,6 +3,7 @@ package org.kakaoshare.backend.common.util;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.ComparableExpression;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -43,12 +44,20 @@ public final class RepositoryUtils {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    public static <T extends Number & Comparable<?>> BooleanExpression eqExpression(final NumberExpression<T> simpleExpression, final T target) {
+    public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final T target) {
         if (target == null) {
             return null;
         }
 
         return simpleExpression.eq(target);
+    }
+
+    public static <T extends Number & Comparable<?>> BooleanExpression eqExpression(final NumberExpression<T> numberExpression, final T target) {
+        if (target == null) {
+            return null;
+        }
+
+        return numberExpression.eq(target);
     }
 
     public static <T extends Comparable<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final SimpleExpression<T> target) {
