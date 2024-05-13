@@ -65,7 +65,7 @@ pay:
     approve: https://open-api.kakaopay.com/online/v1/payment/approve
     cancel: https://open-api.kakaopay.com/online/v1/payment/cancel
   redirect-url:
-    approval: http://localhost:8080/payments/success
-    cancel: http://localhost:8080/payments/cancel
-    fail: http://localhost:8080/payments/fail
+    approval: http://localhost:5173/payments/success
+    cancel: http://localhost:5173/payments/cancel
+    fail: http://localhost:5173/payments/fail
 

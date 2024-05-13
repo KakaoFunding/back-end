@@ -43,7 +43,9 @@ import java.util.stream.Stream;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.jpa.JPAExpressions.select;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
@@ -275,7 +277,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 product.productId,
                 product.name,
                 product.photo,
-                product.price);
+                product.price,
+                product.brandName);
     }
     
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {
@@ -336,9 +339,9 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                             Projections.constructor(
                                                     ProductOptionDetailResponse.class,
                                                     QOptionDetail.optionDetail.optionDetailId,
-                                                    QOptionDetail.optionDetail.name,
+                                                    QOptionDetail.optionDetail.photo,
                                                     QOptionDetail.optionDetail.additionalPrice,
-                                                    QOptionDetail.optionDetail.photo
+                                                    QOptionDetail.optionDetail.name
                                             )
                                     )
                             )
