@@ -81,6 +81,24 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
                 .fetch();
     }
 
+    public List<RankResponse> findProductsByReceived(TargetType targetType, int minPrice, int maxPrice, int limit) {
+        BooleanExpression genderCondition = createGenderCondition(targetType);
+        BooleanExpression priceCondition = product.price.between(minPrice, maxPrice);
+
+        return queryFactory
+                .select(Projections.constructor(RankResponse.class,
+                        product.productId,
+                        product.name,
+                        product.orderCount,
+                        product.photo
+                ))
+                .from(product)
+                .where(genderCondition.and(priceCondition))
+                .orderBy(product.orderCount.desc())
+                .limit(limit)
+                .fetch();
+    }
+
     private BooleanExpression createGenderCondition(TargetType targetType) {
         if (targetType == TargetType.MALE) {
             return member.gender.eq(Gender.MALE);
