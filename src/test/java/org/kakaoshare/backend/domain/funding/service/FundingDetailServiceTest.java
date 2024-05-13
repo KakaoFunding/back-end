@@ -7,10 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.dto.PageResponse;
-import org.kakaoshare.backend.common.vo.Date;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryDto;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryResponse;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
+import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
@@ -58,7 +58,7 @@ public class FundingDetailServiceTest {
     @ValueSource(strings = {"PROGRESS", "COMPLETE", "CANCEL_REFUND"})
     public void lookUp(final String status) throws Exception {
         final String providerId = contributor.getProviderId();
-        final Date date = new Date(
+        final FundingHistoryDate date = new FundingHistoryDate(
                 LocalDate.now().minusMonths(5L),
                 LocalDate.now()
         );
@@ -89,7 +89,7 @@ public class FundingDetailServiceTest {
     @DisplayName("내가 기여한 펀딩 내역 조회 (상태 필터링 X)")
     public void lookUpWithoutStatus() throws Exception {
         final String providerId = contributor.getProviderId();
-        final Date date = new Date(
+        final FundingHistoryDate date = new FundingHistoryDate(
                 LocalDate.now().minusMonths(5L),
                 LocalDate.now()
         );

@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
 @Getter
-public final class Date {
+public abstract class Date {
     private static final int MAX_DATE_PERIOD = 1;
 
     private final LocalDate startDate;
