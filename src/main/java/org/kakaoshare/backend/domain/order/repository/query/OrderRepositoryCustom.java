@@ -9,5 +9,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderRepositoryCustom {
     Page<RankResponse> findTopRankedProductsByOrders(LocalDateTime sixMonthsAgo, Pageable pageable);
-    List<RankResponse> findProductsByFilters(TargetType targetType, int minPrice, int maxPrice, int limit);
+    List<RankResponse> findProductsByWish(TargetType targetType, int minPrice, int maxPrice, int limit);
 }

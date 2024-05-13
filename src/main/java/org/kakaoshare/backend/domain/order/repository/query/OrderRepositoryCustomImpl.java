@@ -58,7 +58,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
 
         return RepositoryUtils.toPage(pageable, contentQuery, countQuery);
     }
-    public List<RankResponse> findProductsByFilters(TargetType targetType, int minPrice, int maxPrice, int limit) {
+    public List<RankResponse> findProductsByWish(TargetType targetType, int minPrice, int maxPrice, int limit) {
 
         BooleanExpression genderCondition = createGenderCondition(targetType);
         BooleanExpression priceCondition = product.price.between(minPrice, maxPrice);
