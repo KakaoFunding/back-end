@@ -75,6 +75,6 @@ class OrderServiceTest {
     }
 
     private ProductDto getProductDto(final Product product) {
-        return new ProductDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice());
+        return new ProductDto(product.getProductId(), product.getName(), product.getPhoto(), product.getPrice(), product.getBrandName());
     }
 }

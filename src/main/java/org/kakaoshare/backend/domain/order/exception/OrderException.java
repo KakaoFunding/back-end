@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.domain.order.exception;
 
-public class OrderException extends RuntimeException {
-    private final OrderErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public OrderException(final OrderErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+public class OrderException extends BusinessException {
+    public OrderException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }
