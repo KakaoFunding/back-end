@@ -339,9 +339,9 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                             Projections.constructor(
                                                     ProductOptionDetailResponse.class,
                                                     QOptionDetail.optionDetail.optionDetailId,
-                                                    QOptionDetail.optionDetail.name,
+                                                    QOptionDetail.optionDetail.photo,
                                                     QOptionDetail.optionDetail.additionalPrice,
-                                                    QOptionDetail.optionDetail.photo
+                                                    QOptionDetail.optionDetail.name
                                             )
                                     )
                             )
