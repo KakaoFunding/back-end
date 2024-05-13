@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - deploy    # deploy 브런치로 푸쉬했을 때 실행
+  pull_request:
+    branches:
+      - deploy
 
 env:
   AWS_REGION: ap-northeast-2
@@ -29,14 +32,14 @@ jobs:
       - name: gradlew에 실행 권한 부여
         run: chmod +x ./gradlew
 
-      - name: 설정파일 디코딩 및 저장
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application-prod.yml
-          find src
-
-      - name: 프로젝트 빌드
-        run: ./gradlew build -x test
+#      - name: 설정파일 디코딩 및 저장
+#        run: |
+#          mkdir -p src/main/resources
+#          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application-prod.yml
+#          find src
+#
+#      - name: 프로젝트 빌드
+#        run: ./gradlew build -x test
 
       - name: AWS credential 설정
         uses: aws-actions/configure-aws-credentials@v1
