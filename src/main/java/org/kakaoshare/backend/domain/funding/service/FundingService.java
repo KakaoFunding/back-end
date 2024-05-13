@@ -6,6 +6,7 @@ import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewR
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
@@ -57,31 +58,32 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
-    public FundingSliceResponse getMyAllFundingProducts(String providerId, Pageable pageable) {
+    public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status,
+                                                             Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        List<Funding> fundingList = fundingRepository.findAllByMemberId(member.getMemberId());
-        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(),
-                pageable);
-        List<FundingResponse> fundingResponses = allFundingSlices.getContent().stream().map(FundingResponse::from)
+        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithPage(
+                member.getMemberId(), status, pageable);
+        List<FundingResponse> fundingResponses = allFundingSlices
+                .getContent()
+                .stream()
+                .map(FundingResponse::from)
                 .toList();
 
-        return FundingSliceResponse.builder()
-                .fundingItems(fundingResponses)
-                .numberOfFundingItems(fundingList.size())
-                .page(allFundingSlices.getPageable().getPageNumber())
-                .isLast(allFundingSlices.isLast())
-                .build();
+        return FundingSliceResponse.of(
+                fundingResponses,
+                allFundingSlices.getNumberOfElements(),
+                allFundingSlices.getPageable().getPageNumber(),
+                allFundingSlices.isLast()
+        );
     }
+
 
     public FundingPreviewResponse preview(final FundingPreviewRequest fundingPreviewRequest) {
         final Long fundingId = fundingPreviewRequest.fundingId();
         final FundingProductDto fundingProductDto = findFundingProductDtoById(fundingId);
-        final Long attributeAmount = fundingPreviewRequest.attributeAmount();
-        validateAttributeAmount(fundingProductDto.remainAmount(), attributeAmount);
-
         final Long productId = fundingProductDto.productId();
         final ProductDto productDto = findProductDtoByProductId(productId);
-        return FundingPreviewResponse.of(productDto, attributeAmount);
+        return FundingPreviewResponse.of(productDto, fundingProductDto);
     }
 
     private Member findMemberByProviderId(String providerId) {
@@ -101,12 +103,6 @@ public class FundingService {
 
     private ProductDto findProductDtoByProductId(final Long productId) {
         return productRepository.findProductDtoById(productId)
-                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
-    }
-
-    private void validateAttributeAmount(final Long remainAmount, final Long attributeAmount) {
-        if (remainAmount < attributeAmount) {
-            throw new FundingException(FundingErrorCode.INVALID_ACCUMULATE_AMOUNT);
-        }
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
     }
 }

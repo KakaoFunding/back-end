@@ -17,4 +17,5 @@ public enum FundingStatus {
     public boolean canceled() {
         return this.equals(CANCEL);
     }
+
 }

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 
 public interface FundingRepository extends JpaRepository<Funding, Long>, FundingRepositoryCustom {
-    @Query("SELECT NEW org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto(f.goalAmount - f.accumulateAmount, f.product.productId) " +
+    @Query("SELECT NEW org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto(f.goalAmount, f.goalAmount - f.accumulateAmount, f.product.productId) " +
             "FROM Funding f " +
             "WHERE f.fundingId =:fundingId")
     Optional<FundingProductDto> findAccumulateAmountAndProductIdById(@Param("fundingId") final Long fundingId);
