@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.rank.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
@@ -32,6 +33,6 @@ public class RankService {
         if (rankType.equals(RankType.MANY_RECEIVE)) {
             return orderRepository.findProductsByReceived(targetType, minPrice, maxPrice, LIMIT_PRODUCT_COUNT);
         }
-        return null;
+        return Collections.emptyList();
     }
 }
