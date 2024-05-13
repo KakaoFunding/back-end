@@ -13,9 +13,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnumValue {
     Class<? extends Enum<?>> enumClass();
+
     String message() default "";
-    Class<?> [] groups() default {};
+
+    Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
+
     boolean ignoreCase() default false;
     boolean nullable() default false;
 }
