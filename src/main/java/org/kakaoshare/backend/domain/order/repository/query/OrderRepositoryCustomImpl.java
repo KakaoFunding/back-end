@@ -21,9 +21,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.eqExpression;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.periodExpression;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
 import static org.kakaoshare.backend.domain.member.entity.QMember.member;
 import static org.kakaoshare.backend.domain.order.entity.QOrder.order;
@@ -71,7 +71,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     public Page<OrderProductDto> findAllOrderProductDtoByDate(final LocalDate startDate, final LocalDate endDate, final Pageable pageable) {
         final JPAQuery<Long> countQuery = queryFactory.select(order.count())
                 .from(order)
-                .where(containsExpression(order.createdAt, startDate, endDate));
+                .where(periodExpression(order.createdAt, startDate, endDate));
 
         final JPAQuery<OrderProductDto> contentQuery = queryFactory.select(
                     new QOrderProductDto(
@@ -87,7 +87,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .innerJoin(order.receipt, receipt)
                 .innerJoin(receipt.product, product)
                 .innerJoin(receipt.receiver, member)
-                .where(containsExpression(receipt.createdAt, startDate, endDate))
+                .where(periodExpression(receipt.createdAt, startDate, endDate))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(createOrderSpecifiers(order, pageable));// TODO: 5/8/24 orderBy 내에 값은 추후 변경 예정

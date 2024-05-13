@@ -90,18 +90,18 @@ public final class RepositoryUtils {
         return numberExpression.between(min, max);
     }
 
-    public static BooleanExpression containsExpression(final DateTimePath<LocalDateTime> dateExpression,
-                                                       final LocalDate startDate,
-                                                       final LocalDate endDate) {
-        return dateExpression.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
-    }
-
     public static <T> BooleanExpression containsExpression(final SimpleExpression<T> simpleExpression, final List<T> items) {
         if (Collections.isEmpty(items)) {
             return null;
         }
 
         return simpleExpression.in(items);
+    }
+
+    public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
+                                                     final LocalDate startDate,
+                                                     final LocalDate endDate) {
+        return dateExpression.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
     }
 
     public static <T> OrderSpecifier<?>[] createOrderSpecifiers(final EntityPathBase<T> qClass, final Pageable pageable) {
