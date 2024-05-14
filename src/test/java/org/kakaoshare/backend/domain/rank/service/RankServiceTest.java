@@ -1,4 +1,5 @@
 package org.kakaoshare.backend.domain.rank.service;
+
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
+import org.kakaoshare.backend.domain.rank.entity.RankType;
+import org.kakaoshare.backend.domain.rank.entity.TargetType;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,25 +33,20 @@ public class RankServiceTest {
     @InjectMocks
     private RankService rankService;
 
-    private Pageable pageable;
-
-    @BeforeEach
-    void setUp() {
-        pageable = PageRequest.of(0, 10, Sort.by("totalSales").descending());
+    @Test
+    @DisplayName("랭킹 조회 성공 테스트")
+    public void testGetTopRankedProducts() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("totalSales").descending());
 
         RankResponse rank1 = new RankResponse(1L, "Product A", 15000.0, "thumbnail1.jpg");
         RankResponse rank2 = new RankResponse(2L, "Product B", 7500.0, "thumbnail2.jpg");
+
         List<RankResponse> rankResponses = Arrays.asList(rank1, rank2);
 
         Page<RankResponse> page = new PageImpl<>(rankResponses, pageable, rankResponses.size());
 
         when(orderRepository.findTopRankedProductsByOrders(any(LocalDateTime.class), eq(pageable)))
                 .thenReturn(page);
-    }
-
-    @Test
-    @DisplayName("랭킹 조회 성공 테스트")
-    public void testGetTopRankedProducts() {
         Page<RankResponse> results = rankService.getTopRankedProducts(pageable);
         assertNotNull(results);
         assertEquals(2, results.getTotalElements());
@@ -56,4 +54,38 @@ public class RankServiceTest {
         assertEquals("Product B", results.getContent().get(1).getProductName());
         verify(orderRepository).findTopRankedProductsByOrders(any(LocalDateTime.class), eq(pageable));
     }
+
+    @Test
+    @DisplayName("위시많은순 랭킹 조회")
+    public void testFindProductsByFiltersWithWishRankType() {
+        List<RankResponse> mockResponses = Arrays.asList(new RankResponse(1L, "Product1", 1000.0, "url1"));
+        when(orderRepository.findProductsByWish(any(TargetType.class), any(Integer.class), any(Integer.class), eq(20)))
+                .thenReturn(mockResponses);
+
+        // Execute
+        List<RankResponse> results = rankService.findProductsByFilters(RankType.MANY_WISH, TargetType.ALL, 0, 9999);
+
+        // Verify
+        verify(orderRepository).findProductsByWish(eq(TargetType.ALL), eq(0), eq(9999), eq(20));
+        assertEquals(mockResponses, results);
+    }
+
+    @Test
+    @DisplayName("선물많이 받은 순 랭킹 조회")
+    public void testFindProductsByFiltersWithReceiveRankType() {
+        // Setup
+        List<RankResponse> mockResponses = Arrays.asList(new RankResponse(2L, "Product2", 2000.0, "url2"));
+        when(orderRepository.findProductsByReceived(any(TargetType.class), any(Integer.class), any(Integer.class),
+                eq(20)))
+                .thenReturn(mockResponses);
+
+        // Execute
+        List<RankResponse> results = rankService.findProductsByFilters(RankType.MANY_RECEIVE, TargetType.ALL, 0, 9999);
+
+        // Verify
+        verify(orderRepository).findProductsByReceived(eq(TargetType.ALL), eq(0), eq(9999), eq(20));
+        assertEquals(mockResponses, results);
+    }
+
+
 }
