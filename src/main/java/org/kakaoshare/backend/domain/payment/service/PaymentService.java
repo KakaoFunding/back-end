@@ -100,7 +100,7 @@ public class PaymentService {
     public PaymentReadyResponse ready(final String providerId,
                                       final PaymentGiftReadyRequest paymentGiftReadyRequest) {
         final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
-        validateReceiverProviderId(paymentGiftReadyRequest);
+        validateReceiverProviderId(providerId, paymentGiftReadyRequest);
         validateTotalAmount(paymentGiftReadyItems);
         validateOptionDetailIds(paymentGiftReadyItems);
 
@@ -224,9 +224,16 @@ public class PaymentService {
                 .sum();
     }
 
-    private void validateReceiverProviderId(final PaymentGiftReadyRequest paymentGiftReadyRequest) {
+    private void validateReceiverProviderId(final String providerId,
+                                            final PaymentGiftReadyRequest paymentGiftReadyRequest) {
         final String socialAccessToken = paymentGiftReadyRequest.socialAccessToken();
         final String receiverProviderId = paymentGiftReadyRequest.receiverProviderId();
+
+        // TODO: 5/14/24 나에게 선물인 경우
+        if (providerId.equals(receiverProviderId)) {
+            return;
+        }
+
         final boolean isFriend = kakaoFriendService.isFriend(socialAccessToken, receiverProviderId);
         if (!isFriend) {
             throw new IllegalArgumentException();
