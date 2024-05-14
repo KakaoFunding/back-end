@@ -51,7 +51,7 @@ public class FundingGift {
     }
 
     private void validateFunding(final Funding funding) {
-        if (!funding.finished()) {
+        if (!funding.completed()) {
             throw new IllegalArgumentException();
         }
     }
