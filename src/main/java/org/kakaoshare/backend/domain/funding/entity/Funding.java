@@ -22,6 +22,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 
 import java.time.LocalDate;
 
+import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.BEFORE_PAYING_REMAINING;
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.CANCEL;
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.COMPLETE;
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.PROGRESS;
@@ -105,20 +106,42 @@ public class Funding extends BaseTimeEntity {
         this.accumulateAmount = 0L;
     }
 
-    public void finish() {
+    public void reflectStatus(final Long amount,
+                              final Long contributorId) {
         if (!satisfiedAccumulateAmount()) {
             return;
         }
 
-        this.status = COMPLETE;
+        this.status = BEFORE_PAYING_REMAINING;
+        if (isPayRemainingByCreator(amount, contributorId) || hasNoRemainingPay()) {
+            this.status = COMPLETE;
+        }
     }
 
     public boolean canceled() {
         return status.canceled();
     }
 
+    public boolean completed() {
+        return status.completed();
+    }
+
     public boolean satisfiedAccumulateAmount() {
         return goalAmount.equals(accumulateAmount);
+    }
+
+    private boolean hasNoRemainingPay() {
+        return product.getPrice().equals(goalAmount);
+    }
+
+    private boolean isPayRemainingByCreator(final Long amount,
+                                            final Long contributorId) {
+        final Long creatorId = member.getMemberId();
+        if (!creatorId.equals(contributorId)) {
+            return false;
+        }
+
+        return product.getPrice() == amount + goalAmount;
     }
 
     @Override
