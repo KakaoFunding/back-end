@@ -21,8 +21,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-//    private static final List<String> ORIGIN_PATTERN = List.of("https://kakao-funding-git-refactor-241-teamfunding.vercel.app");
-    private static final String ORIGIN_PATTERN = "*";
+    private static final List<String> ORIGIN_PATTERN = List.of("https://kakao-funding-git-refactor-241-teamfunding.vercel.app");
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
     public static final String API_V_1 = "/api/v1/";
     private static final List<String> ALLOWED_HEADERS = Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With");
@@ -58,32 +57,18 @@ public class SecurityConfig {
         return http.build();
     }
     
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        final CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(ORIGIN_PATTERN);
-//        configuration.addAllowedOrigin("*");
-//        configuration.setAllowedHeaders(ALLOWED_HEADERS);
-//        configuration.setAllowedMethods(ALLOWED_METHODS);
-//        configuration.setAllowCredentials(true);
-//
-//        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration(CORS_CONFIGURATION_PATTERN, configuration);
-//
-//        return source;
-//    }
-    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern(ORIGIN_PATTERN);
-        configuration.addAllowedHeader(ORIGIN_PATTERN);
-        configuration.addAllowedMethod(ORIGIN_PATTERN);
+//        configuration.setAllowedOrigins(ORIGIN_PATTERN);
+        configuration.addAllowedOrigin("*");
+        configuration.setAllowedHeaders(ALLOWED_HEADERS);
+        configuration.setAllowedMethods(ALLOWED_METHODS);
         configuration.setAllowCredentials(true);
-        
+
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration(CORS_CONFIGURATION_PATTERN, configuration);
-        
+
         return source;
     }
 }
