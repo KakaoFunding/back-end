@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum FundingStatus {
     PROGRESS("진행 중"),
+    BEFORE_PAYING_REMAINING("목표 금액 달성, 남은 금액 결제 전"),
     COMPLETE("완료"),
     CANCEL("취소");
 
@@ -16,5 +17,9 @@ public enum FundingStatus {
 
     public boolean canceled() {
         return this.equals(CANCEL);
+    }
+
+    public boolean completed() {
+        return this.equals(COMPLETE);
     }
 }
