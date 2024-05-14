@@ -14,6 +14,7 @@ env:
   AWS_CODE_BUCKET_NAME: funding-cicd
   AWS_CODE_DEPLOY_APPLICATION: funding-cd
   AWS_CODE_DEPLOY_GROUP: funding-publish
+  DOCKER_HUB_REPOSITORY: yeachan05/application
 
 jobs:
   build-with-gradle:
@@ -32,14 +33,23 @@ jobs:
       - name: gradlew에 실행 권한 부여
         run: chmod +x ./gradlew
 
-#      - name: 설정파일 디코딩 및 저장
-#        run: |
-#          mkdir -p src/main/resources
-#          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application-prod.yml
-#          find src
-#
-#      - name: 프로젝트 빌드
-#        run: ./gradlew build -x test
+      - name: 설정파일 디코딩 및 저장
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application-prod.yml
+          find src
+
+      - name: 프로젝트 빌드
+        run: ./gradlew build -x test
+
+      - name: Docker 이미지 빌드
+        run: docker build -t ${{ env.DOCKER_HUB_REPOSITORY }}:${{ github.sha }} .
+
+      - name: Docker Hub 로그인
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Docker 이미지 푸시
+        run: docker push ${{ env.DOCKER_HUB_REPOSITORY }}:${{ github.sha }}
 
       - name: AWS credential 설정
         uses: aws-actions/configure-aws-credentials@v1

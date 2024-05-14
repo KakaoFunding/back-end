@@ -26,9 +26,6 @@ services:
     container_name: "app1"
     ports:
       - "8081:8080"
-    build:
-      context: .
-      dockerfile: Dockerfile
     depends_on:
       - redis
     volumes:
@@ -40,9 +37,6 @@ services:
     container_name: "app2"
     ports:
       - "8082:8080"
-    build:
-      context: .
-      dockerfile: Dockerfile
     depends_on:
       - redis
     volumes:
@@ -54,9 +48,6 @@ services:
     container_name: "app3"
     ports:
       - "8083:8080"
-    build:
-      context: .
-      dockerfile: Dockerfile
     depends_on:
       - redis
     volumes:
