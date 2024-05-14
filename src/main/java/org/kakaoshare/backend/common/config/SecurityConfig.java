@@ -15,6 +15,7 @@ import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -58,32 +59,17 @@ public class SecurityConfig {
         return http.build();
     }
     
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        final CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(ORIGIN_PATTERN);
-//        configuration.addAllowedOrigin("*");
-//        configuration.setAllowedHeaders(ALLOWED_HEADERS);
-//        configuration.setAllowedMethods(ALLOWED_METHODS);
-//        configuration.setAllowCredentials(true);
-//
-//        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration(CORS_CONFIGURATION_PATTERN, configuration);
-//
-//        return source;
-//    }
-    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern(ORIGIN_PATTERN);
-        configuration.addAllowedHeader(ORIGIN_PATTERN);
-        configuration.addAllowedMethod(ORIGIN_PATTERN);
+        configuration.setAllowedOrigins(Collections.singletonList(ORIGIN_PATTERN));
+        configuration.setAllowedHeaders(ALLOWED_HEADERS);
+        configuration.setAllowedMethods(ALLOWED_METHODS);
         configuration.setAllowCredentials(true);
-        
+
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration(CORS_CONFIGURATION_PATTERN, configuration);
-        
+
         return source;
     }
 }
