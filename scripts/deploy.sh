@@ -9,7 +9,7 @@ if [ -z "$IMAGE_NAME" ]; then
 fi
 
 if [ -z "$IMAGE_TAG" ]; then
-    IMAGE_TAG=$(git rev-parse --short HEAD)
+    IMAGE_TAG="latest"
     export IMAGE_TAG
 fi
 
