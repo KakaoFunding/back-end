@@ -43,13 +43,13 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Docker 이미지 빌드
-        run: docker build -t ${{ env.DOCKER_HUB_REPOSITORY }}:${{ github.sha }} .
+        run: docker build -t ${{ env.DOCKER_HUB_REPOSITORY }}:latest .
 
       - name: Docker Hub 로그인
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
       - name: Docker 이미지 푸시
-        run: docker push ${{ env.DOCKER_HUB_REPOSITORY }}:${{ github.sha }}
+        run: docker push ${{ env.DOCKER_HUB_REPOSITORY }}:latest
 
       - name: AWS credential 설정
         uses: aws-actions/configure-aws-credentials@v1

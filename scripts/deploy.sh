@@ -3,21 +3,15 @@
 ROOT_PATH="/home/ec2-user/cicd"
 DOCKER_COMPOSE_PATH="$ROOT_PATH/docker-compose.yml"
 
-if [ -z "$IMAGE_NAME" ]; then
-    IMAGE_NAME="yeachan05/application"  # 여기에 Docker Hub 경로 작성
-    export IMAGE_NAME
-fi
-
-if [ -z "$IMAGE_TAG" ]; then
-    IMAGE_TAG="latest"
-    export IMAGE_TAG
-fi
+IMAGE_NAME="yeachan05/application"
+IMAGE_TAG="latest"
 
 START_LOG="$ROOT_PATH/start.log"
-BUILD_LOG="$ROOT_PATH/build.log"
+touch $START_LOG
 
-touch $START_LOG $BUILD_LOG
+echo "[$(date +%c)] Docker Compose 실행 시작 - 이미지: $IMAGE_NAME:$IMAGE_TAG" >> $START_LOG
 
+docker-compose -f $DOCKER_COMPOSE_PATH pull
 docker-compose -f $DOCKER_COMPOSE_PATH up -d
 
 if [ $? -eq 0 ]; then
