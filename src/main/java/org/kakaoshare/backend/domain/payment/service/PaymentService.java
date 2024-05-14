@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.payment.service;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.friend.service.KakaoFriendService;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
@@ -79,6 +80,7 @@ public class PaymentService {
     private final FundingRepository fundingRepository;
     private final FundingDetailRepository fundingDetailRepository;
     private final GiftRepository giftRepository;
+    private final KakaoFriendService kakaoFriendService;
     private final MemberRepository memberRepository;
     private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
@@ -98,6 +100,7 @@ public class PaymentService {
     public PaymentReadyResponse ready(final String providerId,
                                       final PaymentGiftReadyRequest paymentGiftReadyRequest) {
         final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
+        validateReceiverProviderId(paymentGiftReadyRequest);
         validateTotalAmount(paymentGiftReadyItems);
         validateOptionDetailIds(paymentGiftReadyItems);
 
@@ -219,6 +222,15 @@ public class PaymentService {
         return paymentPreviewRequests.stream()
                 .mapToLong(paymentPreviewRequest -> priceByIds.get(paymentPreviewRequest.productId()) * paymentPreviewRequest.quantity())
                 .sum();
+    }
+
+    private void validateReceiverProviderId(final PaymentGiftReadyRequest paymentGiftReadyRequest) {
+        final String socialAccessToken = paymentGiftReadyRequest.socialAccessToken();
+        final String receiverProviderId = paymentGiftReadyRequest.receiverProviderId();
+        final boolean isFriend = kakaoFriendService.isFriend(socialAccessToken, receiverProviderId);
+        if (!isFriend) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private void validateTotalAmount(final List<PaymentGiftReadyItem> paymentGiftReadyItems) {
