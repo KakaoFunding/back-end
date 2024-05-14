@@ -89,7 +89,7 @@ public class Funding extends BaseTimeEntity {
     }
 
     public void increaseAccumulateAmount(final Long amount) {
-        if (amount != null) {
+        if (amount != null && !satisfiedAccumulateAmount()) {
             this.accumulateAmount += amount;
         }
     }
