@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
+import org.kakaoshare.backend.domain.funding.entity.FundingGift;
 import org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingDetailException;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
+import org.kakaoshare.backend.domain.funding.repository.FundingGiftRepository;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.exception.GiftErrorCode;
 import org.kakaoshare.backend.domain.gift.exception.GiftException;
@@ -17,7 +19,6 @@ import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
-import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
 import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
@@ -38,9 +39,9 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDe
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -69,6 +70,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ACCUMULATE_AMOUNT;
+import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ATTRIBUTE_AMOUNT;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.ALREADY_REFUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
@@ -80,9 +82,9 @@ import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.I
 public class PaymentService {
     private final FundingRepository fundingRepository;
     private final FundingDetailRepository fundingDetailRepository;
+    private final FundingGiftRepository fundingGiftRepository;
     private final GiftRepository giftRepository;
     private final MemberRepository memberRepository;
-    private final OAuthWebClientService oAuthWebClientService;
     private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final OrderRepository orderRepository;
@@ -159,8 +161,13 @@ public class PaymentService {
         saveOrReflectFundingDetail(payment, funding, member, amount);
         funding.increaseAccumulateAmount(amount);
 
+        // TODO: 5/10/24 결제 후 목표 금액 달성 시
         if (funding.satisfiedAccumulateAmount()) {
-            funding.finish();
+            funding.reflectStatus(amount, member.getMemberId());    // TODO: 5/14/24 잔여 금액 여부에 따라 "펀딩 완료", "남은 금액 결제 전"으로 상태를 수정
+        }
+
+        if (funding.completed()) {
+            createAndSaveFundingGift(funding);
         }
 
         final Receiver receiver = Receiver.from(funding.getMember());
@@ -372,7 +379,25 @@ public class PaymentService {
         webClientService.cancel(paymentCancelDto);
     }
 
+    private void createAndSaveFundingGift(final Funding funding) {
+        final FundingGift fundingGift = FundingGift.builder()
+                .funding(funding)
+                .expiredAt(LocalDateTime.now().plusMonths(6L))
+                .build();
+        fundingGiftRepository.save(fundingGift);
+    }
+
     private void validateFundingAmount(final Funding funding, final int attributeAmount) {
+        // TODO: 5/10/24 펀딩 완료 후 기여자가 잔여금액 결제시 금액 검증
+        if (funding.satisfiedAccumulateAmount()) {
+            final Long productAmount = funding.getProduct().getPrice();
+            final long paymentAmount = productAmount - funding.getAccumulateAmount();
+            if (paymentAmount != attributeAmount) {
+                throw new FundingException(INVALID_ATTRIBUTE_AMOUNT);
+            }
+            return;
+        }
+
         final long remainAmount = funding.getGoalAmount() - funding.getAccumulateAmount();
         if (remainAmount < attributeAmount) {
             throw new FundingException(INVALID_ACCUMULATE_AMOUNT);
