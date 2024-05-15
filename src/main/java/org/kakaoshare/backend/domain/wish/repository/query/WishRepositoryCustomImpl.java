@@ -1,11 +1,14 @@
 package org.kakaoshare.backend.domain.wish.repository.query;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.entity.Member;
-import org.kakaoshare.backend.domain.wish.dto.WishDetail;
+import org.kakaoshare.backend.domain.wish.dto.FriendWishDetail;
+import org.kakaoshare.backend.domain.wish.dto.MyWishDetail;
+import org.kakaoshare.backend.domain.wish.dto.QFriendWishDetail;
+import org.kakaoshare.backend.domain.wish.dto.QMyWishDetail;
 import org.kakaoshare.backend.domain.wish.entity.QWish;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.springframework.stereotype.Repository;
@@ -22,11 +25,10 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     
     @Override
-    public List<WishDetail> findWishDetailsByProviderId(final String providerId) {
+    public List<MyWishDetail> findWishDetailsByProviderId(final String providerId) {
         return queryFactory
                 .select(
-                        Projections.constructor(
-                                WishDetail.class,
+                        new QMyWishDetail(
                                 wish.wishId,
                                 product.productId,
                                 product.name,
@@ -37,6 +39,34 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                 .join(wish.member, member)
                 .on(wish.member.providerId.eq(providerId))
                 .join(wish.product, product)
+                .fetch();
+    }
+    
+    @Override
+    public List<FriendWishDetail> findWishDetailsByFriendProviderId(final String providerId,
+                                                                    final String friendsProviderId) {
+        QWish friendWish = new QWish("friendWish");
+        QWish myWish = new QWish("myWish");
+        
+        return queryFactory
+                .select(
+                        new QFriendWishDetail(
+                                friendWish.wishId,
+                                product.productId,
+                                product.name,
+                                product.price,
+                                product.photo,
+                                JPAExpressions.select(myWish.count())
+                                        .from(myWish)
+                                        .where(myWish.member.providerId.eq(providerId)
+                                                .and(myWish.product.eq(friendWish.product)))
+                                        .gt(0L).as("isWished")
+                        ))
+                .from(friendWish)
+                .join(friendWish.member, member)
+                .on(member.providerId.eq(friendsProviderId)
+                        .and(friendWish.isPublic.isTrue()))
+                .join(friendWish.product, product)
                 .fetch();
     }
     
