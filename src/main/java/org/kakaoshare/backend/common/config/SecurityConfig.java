@@ -1,6 +1,8 @@
 package org.kakaoshare.backend.common.config;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.error.handler.AuthenticationAccessDeniedHandler;
+import org.kakaoshare.backend.common.error.handler.CustomAuthenticationEntryPoint;
 import org.kakaoshare.backend.common.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,8 @@ public class SecurityConfig {
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
     public static final String API_V_1 = "/api/v1/";
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationAccessDeniedHandler authenticationAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
@@ -47,7 +51,11 @@ public class SecurityConfig {
                 )
                 .headers().frameOptions().disable()
                 .and()
-                .cors();
+                .cors()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(authenticationAccessDeniedHandler);
         
         return http.build();
     }
