@@ -121,6 +121,11 @@ public class Funding extends BaseTimeEntity {
         return goalAmount.equals(accumulateAmount);
     }
 
+    public boolean attributable(final int attributeAmount) {
+        final long remainAmount = goalAmount - accumulateAmount;
+        return remainAmount >= attributeAmount;
+    }
+
     @Override
     public String toString() {
         return "Funding{" +
