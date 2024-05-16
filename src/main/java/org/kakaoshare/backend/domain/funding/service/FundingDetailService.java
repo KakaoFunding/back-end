@@ -21,7 +21,7 @@ public class FundingDetailService {
                                   final ContributedFundingHistoryRequest contributedFundingHistoryRequest,
                                   final Pageable pageable) {
         final String status = contributedFundingHistoryRequest.getStatus();
-        final FundingHistoryDate date = contributedFundingHistoryRequest.getDate();
+        final FundingHistoryDate date = contributedFundingHistoryRequest.toDate();
         final Page<?> page = getFundingDetailHistoryResponse(providerId, date, status, pageable);
         return PageResponse.from(page);
     }

@@ -59,16 +59,15 @@ public class FundingDetailServiceTest {
     @ValueSource(strings = {"PROGRESS", "COMPLETE", "CANCEL_REFUND"})
     public void lookUp(final String status) throws Exception {
         final String providerId = contributor.getProviderId();
-        final FundingHistoryDate date = new FundingHistoryDate(
-                LocalDate.now().minusMonths(5L),
-                LocalDate.now()
-        );
+        final LocalDate startDate = LocalDate.now().minusMonths(5L);
+        final LocalDate endDate = LocalDate.now();
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
 
         final Product cake = CAKE.생성();
         final Product coffee = COFFEE.생성();
 
-        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(status, date);
+        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
+        final FundingHistoryDate date = contributedFundingHistoryRequest.toDate();
         final List<ContributedFundingHistoryResponse> content = List.of(
                 new ContributedFundingHistoryResponse(
                         getProductDto(cake),
@@ -91,17 +90,16 @@ public class FundingDetailServiceTest {
     @DisplayName("내가 기여한 펀딩 내역 조회 (상태 필터링 X)")
     public void lookUpWithoutStatus() throws Exception {
         final String providerId = contributor.getProviderId();
-        final FundingHistoryDate date = new FundingHistoryDate(
-                LocalDate.now().minusMonths(5L),
-                LocalDate.now()
-        );
+        final LocalDate startDate = LocalDate.now().minusMonths(5L);
+        final LocalDate endDate = LocalDate.now();
         final String status = null;
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
 
         final Product cake = CAKE.생성();
         final Product coffee = COFFEE.생성();
 
-        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(status, date);
+        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
+        final FundingHistoryDate date = contributedFundingHistoryRequest.toDate();
         final List<ContributedFundingHistoryResponse> content = List.of(
                 new ContributedFundingHistoryResponse(
                         getProductDto(cake),
@@ -120,7 +118,7 @@ public class FundingDetailServiceTest {
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
-    public ProductDto getProductDto(final Product product) {
+    private ProductDto getProductDto(final Product product) {
         return new ProductDto(
                 product.getProductId(),
                 product.getName(),
@@ -130,7 +128,7 @@ public class FundingDetailServiceTest {
         );
     }
 
-    public ContributedFundingHistoryDto getFundingHistoryDto(final Long fundingId,
+    private ContributedFundingHistoryDto getFundingHistoryDto(final Long fundingId,
                                                              final Long fundingDetailId,
                                                              final LocalDateTime attributedAt,
                                                              final String creatorName, final String status) {

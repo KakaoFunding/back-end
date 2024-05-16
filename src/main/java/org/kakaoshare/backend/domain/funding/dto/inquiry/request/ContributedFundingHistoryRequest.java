@@ -1,18 +1,27 @@
 package org.kakaoshare.backend.domain.funding.dto.inquiry.request;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.kakaoshare.backend.common.util.EnumValue;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetailStatus;
 import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
-@Getter
+import java.time.LocalDate;
+
+@AllArgsConstructor
+@Data
 public final class ContributedFundingHistoryRequest {
-    @EnumValue(enumClass = FundingDetailStatus.class, ignoreCase = true, nullable = true)
-    private final String status;
-    private final FundingHistoryDate date;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate startDate;
 
-    public ContributedFundingHistoryRequest(final String status, final FundingHistoryDate date) {
-        this.status = status;
-        this.date = date;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate endDate;
+
+    @EnumValue(enumClass = FundingDetailStatus.class, ignoreCase = true, nullable = true)
+    private String status;
+
+    public FundingHistoryDate toDate() {
+        return new FundingHistoryDate(startDate, endDate);
     }
 }
