@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryDto;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryResponse;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -67,6 +68,7 @@ public class FundingDetailServiceTest {
         final Product cake = CAKE.생성();
         final Product coffee = COFFEE.생성();
 
+        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(status, date);
         final List<ContributedFundingHistoryResponse> content = List.of(
                 new ContributedFundingHistoryResponse(
                         getProductDto(cake),
@@ -80,7 +82,7 @@ public class FundingDetailServiceTest {
         final Page<?> page = new PageImpl<>(content, pageable, content.size());
         doReturn(page).when(fundingDetailRepository).findHistoryByProviderIdAndDateAndStatus(providerId, date, status, pageable);
 
-        final PageResponse<?> actual = fundingDetailService.lookUp(providerId, date, status, pageable);
+        final PageResponse<?> actual = fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable);
         final PageResponse<?> expect = PageResponse.from(page);
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
@@ -99,6 +101,7 @@ public class FundingDetailServiceTest {
         final Product cake = CAKE.생성();
         final Product coffee = COFFEE.생성();
 
+        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(status, date);
         final List<ContributedFundingHistoryResponse> content = List.of(
                 new ContributedFundingHistoryResponse(
                         getProductDto(cake),
@@ -112,7 +115,7 @@ public class FundingDetailServiceTest {
         final Page<?> page = new PageImpl<>(content, pageable, content.size());
         doReturn(page).when(fundingDetailRepository).findHistoryByProviderIdAndDate(providerId, date, pageable);
 
-        final PageResponse<?> actual = fundingDetailService.lookUp(providerId, date, status, pageable);
+        final PageResponse<?> actual = fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable);
         final PageResponse<?> expect = PageResponse.from(page);
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }

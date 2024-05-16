@@ -3,6 +3,7 @@ package org.kakaoshare.backend.domain.funding.service;
 import com.querydsl.core.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
 import org.springframework.data.domain.Page;
@@ -17,9 +18,10 @@ public class FundingDetailService {
     private final FundingDetailRepository fundingDetailRepository;
 
     public PageResponse<?> lookUp(final String providerId,
-                                  final FundingHistoryDate date,
-                                  final String status,
+                                  final ContributedFundingHistoryRequest contributedFundingHistoryRequest,
                                   final Pageable pageable) {
+        final String status = contributedFundingHistoryRequest.getStatus();
+        final FundingHistoryDate date = contributedFundingHistoryRequest.getDate();
         final Page<?> page = getFundingDetailHistoryResponse(providerId, date, status, pageable);
         return PageResponse.from(page);
     }

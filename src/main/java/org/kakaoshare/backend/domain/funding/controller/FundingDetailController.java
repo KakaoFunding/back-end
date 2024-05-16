@@ -1,10 +1,8 @@
 package org.kakaoshare.backend.domain.funding.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.common.util.EnumValue;
-import org.kakaoshare.backend.domain.funding.entity.FundingDetailStatus;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
 import org.kakaoshare.backend.domain.funding.service.FundingDetailService;
-import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,12 +25,11 @@ public class FundingDetailController {
 
     @GetMapping
     public ResponseEntity<?> lookUp(@LoggedInMember final String providerId,
-                                    @ModelAttribute final FundingHistoryDate date,
-                                    @EnumValue(enumClass = FundingDetailStatus.class, ignoreCase = true, nullable = true) final String status,
+                                    @ModelAttribute final ContributedFundingHistoryRequest contributedFundingHistoryRequest,
                                     @PageableDefault(size = DEFAULT_HISTORY_SIZE, sort = DEFAULT_HISTORY_SORT_VALUE, direction = Sort.Direction.DESC) final Pageable pageable
     ) {
         return ResponseEntity.ok(
-                fundingDetailService.lookUp(providerId, date, status, pageable)
+                fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable)
         );
     }
 }
