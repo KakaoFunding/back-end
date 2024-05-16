@@ -121,7 +121,7 @@ public class PaymentService {
         final int amount = paymentFundingReadyRequest.amount();
         final Long fundingId = paymentFundingReadyRequest.fundingId();
         final Funding funding = findFundingById(fundingId);
-        validateFundingAmount(funding, amount);
+        validateAttributeAmount(funding, amount);
         final String name = funding.getProduct().getName();
         final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, amount);// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, List.of(paymentReadyProductDto), orderDetailKey);
@@ -374,9 +374,8 @@ public class PaymentService {
         webClientService.cancel(paymentCancelDto);
     }
 
-    private void validateFundingAmount(final Funding funding, final int attributeAmount) {
-        final long remainAmount = funding.getGoalAmount() - funding.getAccumulateAmount();
-        if (remainAmount < attributeAmount) {
+    private void validateAttributeAmount(final Funding funding, final int attributeAmount) {
+        if (!funding.attributable((attributeAmount))) {
             throw new FundingException(INVALID_ACCUMULATE_AMOUNT);
         }
     }
