@@ -14,7 +14,7 @@ import static org.kakaoshare.backend.domain.gift.entity.GiftStatus.NOT_USED;
 public class FundingGift {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fundingReceiptId;
+    private Long fundingGiftId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funding_id", nullable = false)
