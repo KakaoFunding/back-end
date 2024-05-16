@@ -31,6 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
 
+    private static void printLog(final JwtException e) {
+        log.error("\nException Class = {}\nResponse Code = {}\nMessage = {}",
+                e.getClass(),
+                e.getErrorCode().getHttpStatus().value(),
+                e.getMessage());
+    }
+    
     @Override
     protected void doFilterInternal(final HttpServletRequest request,
                                     final HttpServletResponse response,
@@ -45,10 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (JwtException e) {
             handleJwtException(response, e);
-            log.error("\nException Class = {}\nResponse Code = {}\nMessage = {}",
-                    e.getClass(),
-                    e.getErrorCode().getHttpStatus().value(),
-                    e.getMessage());
+            printLog(e);
         }
     }
     
