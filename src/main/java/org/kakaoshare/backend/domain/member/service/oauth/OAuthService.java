@@ -64,8 +64,8 @@ public class OAuthService {
         final UserDetails userDetails = findUserDetailsByProviderId(providerId);
         final String accessToken = jwtProvider.createAccessToken(userDetails);
         final RefreshToken newRefreshToken = refreshTokenProvider.createToken(providerId);
-        refreshTokenRepository.save(newRefreshToken);
         refreshTokenRepository.delete(refreshToken);
+        refreshTokenRepository.save(newRefreshToken);
 
         return OAuthReissueResponse.of(accessToken, newRefreshToken);
     }
