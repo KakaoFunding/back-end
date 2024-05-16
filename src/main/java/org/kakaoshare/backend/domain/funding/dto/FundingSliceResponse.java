@@ -15,4 +15,14 @@ public class FundingSliceResponse {
     private final long page;
     @JsonProperty(value = "isLast")
     private final Boolean isLast;
+
+    public static FundingSliceResponse of(List<FundingResponse> fundingResponses, int numberOfItems, long pageNumber,
+                                          boolean last) {
+        return FundingSliceResponse.builder()
+                .fundingItems(fundingResponses)
+                .numberOfFundingItems(numberOfItems)
+                .page(pageNumber)
+                .isLast(last)
+                .build();
+    }
 }
