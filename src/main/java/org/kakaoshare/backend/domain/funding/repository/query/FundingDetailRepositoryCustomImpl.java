@@ -24,41 +24,20 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
 
     @Override
     public Page<ContributedFundingHistoryResponse> findHistoryByProviderIdAndDateAndStatus(final String providerId, final Date date, final String status, final Pageable pageable) {
-        final JPAQuery<Long> countQuery = queryFactory.select(fundingDetail.count())
-                .from(fundingDetail)
-                .innerJoin(fundingDetail.funding, funding)
-                .innerJoin(funding.member, new QMember("creator"))
-                .innerJoin(fundingDetail.member, member)
-                .innerJoin(funding.product, product)
-                .where(
-                        eqExpression(member.providerId, providerId),
-                        eqExpression(fundingDetail.status.stringValue(), status),
-                        periodExpression(fundingDetail.createdAt, date)
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
-
-        final JPAQuery<ContributedFundingHistoryResponse> contentQuery = queryFactory.select(new QContributedFundingHistoryResponse(getProductDto(), getContributedFundingHistoryDto()))
-                .from(fundingDetail)
-                .innerJoin(fundingDetail.funding, funding)
-                .innerJoin(funding.member, new QMember("creator"))
-                .innerJoin(fundingDetail.member, member)
-                .innerJoin(funding.product, product)
-                .where(
-                        eqExpression(member.providerId, providerId),
-                        eqExpression(fundingDetail.status.stringValue(), status),
-                        periodExpression(fundingDetail.createdAt, date)
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(createOrderSpecifiers(fundingDetail, pageable));
-
+        final JPAQuery<Long> countQuery = createCountQuery(providerId, date, status, pageable);
+        final JPAQuery<ContributedFundingHistoryResponse> contentQuery = createContentQuery(providerId, date, status, pageable);
         return toPage(pageable, contentQuery, countQuery);
     }
 
     @Override
     public Page<ContributedFundingHistoryResponse> findHistoryByProviderIdAndDate(final String providerId, final Date date, final Pageable pageable) {
-        final JPAQuery<Long> countQuery = queryFactory.select(fundingDetail.count())
+        final JPAQuery<Long> countQuery = createCountQuery(providerId, date, pageable);
+        final JPAQuery<ContributedFundingHistoryResponse> contentQuery = createContentQuery(providerId, date, pageable);
+        return toPage(pageable, contentQuery, countQuery);
+    }
+
+    private JPAQuery<?> createBaseQuery(final String providerId, final Date date) {
+        return queryFactory
                 .from(fundingDetail)
                 .innerJoin(fundingDetail.funding, funding)
                 .innerJoin(funding.member, new QMember("creator"))
@@ -67,25 +46,52 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
                 .where(
                         eqExpression(member.providerId, providerId),
                         periodExpression(fundingDetail.createdAt, date)
-                )
+                );
+    }
+
+    private JPAQuery<?> createBaseQuery(final String providerId, final Date date, final String status) {
+        return createBaseQuery(providerId, date)
+                .where(eqExpression(fundingDetail.status.stringValue(), status));
+    }
+
+    private JPAQuery<Long> createCountQuery(final String providerId,
+                                            final Date date,
+                                            final String status,
+                                            final Pageable pageable) {
+        return createBaseQuery(providerId, date, status)
+                .select(funding.count())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
+    }
 
-        final JPAQuery<ContributedFundingHistoryResponse> contentQuery = queryFactory.select(new QContributedFundingHistoryResponse(getProductDto(), getContributedFundingHistoryDto()))
-                .from(fundingDetail)
-                .innerJoin(fundingDetail.funding, funding)
-                .innerJoin(funding.member, new QMember("creator"))
-                .innerJoin(fundingDetail.member, member)
-                .innerJoin(funding.product, product)
-                .where(
-                        eqExpression(member.providerId, providerId),
-                        periodExpression(fundingDetail.createdAt, date)
-                )
+    private JPAQuery<Long> createCountQuery(final String providerId,
+                                            final Date date,
+                                            final Pageable pageable) {
+        return createBaseQuery(providerId, date)
+                .select(funding.count())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+    }
+
+    private JPAQuery<ContributedFundingHistoryResponse> createContentQuery(final String providerId,
+                                                                           final Date date,
+                                                                           final Pageable pageable) {
+        return createBaseQuery(providerId, date)
+                .select(new QContributedFundingHistoryResponse(getProductDto(), getContributedFundingHistoryDto()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(createOrderSpecifiers(fundingDetail, pageable));
+    }
 
-        return toPage(pageable, contentQuery, countQuery);
+    private JPAQuery<ContributedFundingHistoryResponse> createContentQuery(final String providerId,
+                                                                           final Date date,
+                                                                           final String status,
+                                                                           final Pageable pageable) {
+        return createBaseQuery(providerId, date, status)
+                .select(new QContributedFundingHistoryResponse(getProductDto(), getContributedFundingHistoryDto()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(createOrderSpecifiers(fundingDetail, pageable));
     }
 
     private QProductDto getProductDto() {
