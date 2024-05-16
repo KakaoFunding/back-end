@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
-import org.kakaoshare.backend.domain.funding.entity.FundingGift;
+import org.kakaoshare.backend.domain.gift.entity.FundingGift;
 import org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingDetailException;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
