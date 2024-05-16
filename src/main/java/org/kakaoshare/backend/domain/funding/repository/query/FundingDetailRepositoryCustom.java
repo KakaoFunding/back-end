@@ -6,6 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface FundingDetailRepositoryCustom {
-    Page<ContributedFundingHistoryResponse> findHistoryByProviderIdAndDateAndStatus(final String providerId, final Date date, final String status, final Pageable pageable);
-    Page<ContributedFundingHistoryResponse> findHistoryByProviderIdAndDate(final String providerId, final Date date, final Pageable pageable);
+    Page<ContributedFundingHistoryResponse> findHistoryByCondition(final String providerId, final Date date, final String status, final Pageable pageable);
+    Page<ContributedFundingHistoryResponse> findHistoryByConditionWithoutStatus(final String providerId, final Date date, final Pageable pageable);
 }

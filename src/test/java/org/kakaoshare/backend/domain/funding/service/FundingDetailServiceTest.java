@@ -79,7 +79,7 @@ public class FundingDetailServiceTest {
                 )
         );
         final Page<?> page = new PageImpl<>(content, pageable, content.size());
-        doReturn(page).when(fundingDetailRepository).findHistoryByProviderIdAndDateAndStatus(providerId, date, status, pageable);
+        doReturn(page).when(fundingDetailRepository).findHistoryByCondition(providerId, date, status, pageable);
 
         final PageResponse<?> actual = fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable);
         final PageResponse<?> expect = PageResponse.from(page);
@@ -111,7 +111,7 @@ public class FundingDetailServiceTest {
                         )
                 ));
         final Page<?> page = new PageImpl<>(content, pageable, content.size());
-        doReturn(page).when(fundingDetailRepository).findHistoryByProviderIdAndDate(providerId, date, pageable);
+        doReturn(page).when(fundingDetailRepository).findHistoryByConditionWithoutStatus(providerId, date, pageable);
 
         final PageResponse<?> actual = fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable);
         final PageResponse<?> expect = PageResponse.from(page);

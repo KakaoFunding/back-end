@@ -23,14 +23,14 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<ContributedFundingHistoryResponse> findHistoryByProviderIdAndDateAndStatus(final String providerId, final Date date, final String status, final Pageable pageable) {
+    public Page<ContributedFundingHistoryResponse> findHistoryByCondition(final String providerId, final Date date, final String status, final Pageable pageable) {
         final JPAQuery<Long> countQuery = createCountQuery(providerId, date, status, pageable);
         final JPAQuery<ContributedFundingHistoryResponse> contentQuery = createContentQuery(providerId, date, status, pageable);
         return toPage(pageable, contentQuery, countQuery);
     }
 
     @Override
-    public Page<ContributedFundingHistoryResponse> findHistoryByProviderIdAndDate(final String providerId, final Date date, final Pageable pageable) {
+    public Page<ContributedFundingHistoryResponse> findHistoryByConditionWithoutStatus(final String providerId, final Date date, final Pageable pageable) {
         final JPAQuery<Long> countQuery = createCountQuery(providerId, date, pageable);
         final JPAQuery<ContributedFundingHistoryResponse> contentQuery = createContentQuery(providerId, date, pageable);
         return toPage(pageable, contentQuery, countQuery);

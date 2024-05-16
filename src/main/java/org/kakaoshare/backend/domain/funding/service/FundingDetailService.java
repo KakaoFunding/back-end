@@ -28,9 +28,9 @@ public class FundingDetailService {
 
     private Page<?> getFundingDetailHistoryResponse(final String providerId, final FundingHistoryDate date, final String status, final Pageable pageable) {
         if (StringUtils.isNullOrEmpty(status)) {
-            return fundingDetailRepository.findHistoryByProviderIdAndDate(providerId, date, pageable);
+            return fundingDetailRepository.findHistoryByConditionWithoutStatus(providerId, date, pageable);
         }
 
-        return fundingDetailRepository.findHistoryByProviderIdAndDateAndStatus(providerId, date, status, pageable);
+        return fundingDetailRepository.findHistoryByCondition(providerId, date, status, pageable);
     }
 }
