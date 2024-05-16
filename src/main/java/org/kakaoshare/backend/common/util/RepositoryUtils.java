@@ -98,8 +98,7 @@ public final class RepositoryUtils {
         return simpleExpression.in(items);
     }
 
-
-    public static BooleanExpression containsExpression(final DateTimePath<LocalDateTime> dateExpression,
+    public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
                                                        final Date date) {
         return dateExpression.between(date.getStartDateTime(), date.getEndDateTime());
     }

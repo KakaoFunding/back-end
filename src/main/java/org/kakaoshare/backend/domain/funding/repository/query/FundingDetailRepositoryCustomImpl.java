@@ -12,10 +12,7 @@ import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.eqExpression;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.funding.entity.QFunding.funding;
 import static org.kakaoshare.backend.domain.funding.entity.QFundingDetail.fundingDetail;
 import static org.kakaoshare.backend.domain.member.entity.QMember.member;
@@ -36,7 +33,7 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
                 .where(
                         eqExpression(member.providerId, providerId),
                         eqExpression(fundingDetail.status.stringValue(), status),
-                        containsExpression(fundingDetail.createdAt, date)
+                        periodExpression(fundingDetail.createdAt, date)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -50,7 +47,7 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
                 .where(
                         eqExpression(member.providerId, providerId),
                         eqExpression(fundingDetail.status.stringValue(), status),
-                        containsExpression(fundingDetail.createdAt, date)
+                        periodExpression(fundingDetail.createdAt, date)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -69,7 +66,7 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
                 .innerJoin(funding.product, product)
                 .where(
                         eqExpression(member.providerId, providerId),
-                        containsExpression(fundingDetail.createdAt, date)
+                        periodExpression(fundingDetail.createdAt, date)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -82,7 +79,7 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
                 .innerJoin(funding.product, product)
                 .where(
                         eqExpression(member.providerId, providerId),
-                        containsExpression(fundingDetail.createdAt, date)
+                        periodExpression(fundingDetail.createdAt, date)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
