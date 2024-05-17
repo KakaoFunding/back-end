@@ -20,12 +20,13 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
-
+    @Transactional
     public CartRegisterResponse registerItem(Long productId, String providerId) {
         Member member = findMemberByProviderId(providerId);
         Product product = findProductByProductId(productId);
 
-        Cart existingCart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId()).orElse(null);
+        Cart existingCart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId())
+                .orElse(null);
         if (existingCart != null) {
             existingCart.updateItemCount(existingCart.getItemCount() + 1);
             cartRepository.save(existingCart);
@@ -42,6 +43,23 @@ public class CartService {
                 .message("상품이 장바구니에 추가되었습니다.")
                 .build();
     }
+
+    @Transactional
+    public CartRegisterResponse updateItem(Long productId, String providerId, int newQuantity) {
+        Member member = findMemberByProviderId(providerId);
+        Product product = findProductByProductId(productId);
+
+        Cart cart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("No cart item"));
+
+        cart.updateItemCount(newQuantity - cart.getItemCount());
+        cartRepository.save(cart);
+
+        return CartRegisterResponse.builder()
+                .message("장바구니 상품의 수량이 업데이트되었습니다.")
+                .build();
+    }
+
     private Member findMemberByProviderId(String providerId) {
         return memberRepository.findMemberByProviderId(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid providerId"));
