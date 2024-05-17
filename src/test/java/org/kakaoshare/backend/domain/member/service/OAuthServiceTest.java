@@ -5,8 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.IssuedTokenResult;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -93,8 +94,8 @@ class OAuthServiceTest {
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
         doReturn(refreshToken).when(refreshTokenRepository).save(any());
 
-        final OAuthLoginResult expect = OAuthLoginResult.of(accessToken, refreshToken.getValue(), oAuthProfile);
-        final OAuthLoginResult actual = oAuthService.login(request);
+        final OAuthLoginResponse expect = OAuthLoginResponse.of(accessToken, refreshToken, oAuthProfile);
+        final OAuthLoginResponse actual = oAuthService.login(request);
         assertThat(expect).isEqualTo(actual);
     }
 
@@ -114,8 +115,8 @@ class OAuthServiceTest {
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
         doReturn(refreshToken).when(refreshTokenRepository).save(any());
 
-        final OAuthLoginResult expect = OAuthLoginResult.of(accessToken, refreshToken.getValue(), oAuthProfile);
-        final OAuthLoginResult actual = oAuthService.login(request);
+        final OAuthLoginResponse expect = OAuthLoginResponse.of(accessToken, refreshToken, oAuthProfile);
+        final OAuthLoginResponse actual = oAuthService.login(request);
         assertThat(expect).isEqualTo(actual);
     }
 
@@ -131,8 +132,9 @@ class OAuthServiceTest {
         doReturn(newRefreshToken).when(refreshTokenProvider).createToken(providerId);
         doReturn(newRefreshToken).when(refreshTokenRepository).save(newRefreshToken);
 
-        final IssuedTokenResult actual = oAuthService.reissue(refreshTokenValue);
-        final IssuedTokenResult expect = IssuedTokenResult.of(accessToken, newRefreshToken);
+        final OAuthReissueRequest oAuthReissueRequest = new OAuthReissueRequest(refreshTokenValue);
+        final OAuthReissueResponse actual = oAuthService.reissue(oAuthReissueRequest);
+        final OAuthReissueResponse expect = OAuthReissueResponse.of(accessToken, newRefreshToken);
 
         assertThat(actual).isEqualTo(expect);
     }
