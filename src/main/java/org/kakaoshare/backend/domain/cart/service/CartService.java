@@ -10,6 +10,10 @@ import org.kakaoshare.backend.domain.cart.entity.Cart;
 import org.kakaoshare.backend.domain.cart.repository.CartRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
+import org.kakaoshare.backend.domain.option.entity.Option;
+import org.kakaoshare.backend.domain.option.entity.OptionDetail;
+import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
+import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.product.service.ProductService;
@@ -23,11 +27,15 @@ public class CartService {
     private final CartRepository cartRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
+    private final OptionRepository optionRepository;
+    private final OptionDetailRepository optionDetailRepository;
 
     @Transactional
-    public CartRegisterResponse registerItem(Long productId, String providerId) {
+    public CartRegisterResponse registerItem(Long productId, Long optionId, Long optionDetailId, String providerId) {
         Member member = findMemberByProviderId(providerId);
         Product product = findProductByProductId(productId);
+        Option option = optionId != null ? findOptionById(optionId) : null;
+        OptionDetail optionDetail = optionDetailId != null ? findOptionDetailById(optionDetailId) : null;
 
         Cart existingCart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId())
                 .orElse(null);
@@ -38,6 +46,8 @@ public class CartService {
             Cart newCart = Cart.builder()
                     .member(member)
                     .product(product)
+                    .option(option)
+                    .optionDetail(optionDetail)
                     .itemCount(1)
                     .build();
             cartRepository.save(newCart);
@@ -105,5 +115,14 @@ public class CartService {
     private Product findProductByProductId(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+    }
+
+    private Option findOptionById(Long optionId) {
+        return optionRepository.findById(optionId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid option ID"));
+    }
+    private OptionDetail findOptionDetailById(Long optionDetailId) {
+        return optionDetailRepository.findById(optionDetailId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid option detail ID"));
     }
 }
