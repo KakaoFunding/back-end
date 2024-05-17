@@ -7,6 +7,7 @@ import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
+import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
@@ -48,18 +49,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.kakaoshare.backend.fixture.BrandFixture.STARBUCKS;
 import static org.kakaoshare.backend.fixture.FundingFixture.SAMPLE_FUNDING;
-import static org.kakaoshare.backend.fixture.MemberFixture.HAN;
-import static org.kakaoshare.backend.fixture.MemberFixture.KAKAO;
-import static org.kakaoshare.backend.fixture.MemberFixture.KIM;
+import static org.kakaoshare.backend.fixture.MemberFixture.*;
 import static org.kakaoshare.backend.fixture.ProductFixture.CAKE;
 import static org.kakaoshare.backend.fixture.ProductFixture.COFFEE;
 import static org.mockito.ArgumentMatchers.any;
@@ -312,6 +308,36 @@ class PaymentServiceTest {
         final PaymentReadyResponse actual = paymentService.readyFunding(providerId, paymentFundingReadyRequest);
 
         assertThat(actual).isEqualTo(expect);
+    }
+
+    @Test
+    @DisplayName("펀딩 결제 준비시 결제 금액이 남은 금액보다 작으면 예외 발생")
+    public void readyFundingWhenInvalidAttributeAmount() throws Exception {
+        final Member contributor = KIM.생성();
+        final Member creator = KAKAO.생성();
+        final String providerId = contributor.getProviderId();
+        final Product cake = CAKE.가격_설정_생성(10_000L);
+        final Funding funding = SAMPLE_FUNDING.생성(creator, cake, 10_000L, 0L);
+
+        final PaymentFundingReadyRequest paymentFundingReadyRequest = new PaymentFundingReadyRequest(funding.getFundingId(), 12_000);
+
+        assertThatThrownBy(() -> paymentService.readyFunding(providerId, paymentFundingReadyRequest))
+                .isInstanceOf(FundingException.class);
+    }
+
+    @Test
+    @DisplayName("펀딩 목표 금액 달성 후 잔여 금액 결제 준비시 결제 금액이 잔여 금액보다 작으면 예외 발생")
+    public void readyFundingWhenInvalidRemainingPayAmount() throws Exception {
+        final Member contributor = KIM.생성();
+        final Member creator = KAKAO.생성();
+        final String providerId = contributor.getProviderId();
+        final Product cake = CAKE.가격_설정_생성(10_000L);
+        final Funding funding = SAMPLE_FUNDING.생성(creator, cake, 9_000L, 9_000L);
+
+        final PaymentFundingReadyRequest paymentFundingReadyRequest = new PaymentFundingReadyRequest(funding.getFundingId(), 12_000);
+
+        assertThatThrownBy(() -> paymentService.readyFunding(providerId, paymentFundingReadyRequest))
+                .isInstanceOf(FundingException.class);
     }
 
     @Test
