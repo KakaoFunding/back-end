@@ -121,6 +121,11 @@ public class Funding extends BaseTimeEntity {
     public boolean attributable() {
         return status.attributable();
     }
+
+    public boolean isAttributableAmount(final int attributeAmount) {
+        return getRemainAmount() >= attributeAmount;
+    }
+
     public boolean canceled() {
         return status.canceled();
     }
@@ -131,6 +136,14 @@ public class Funding extends BaseTimeEntity {
 
     public boolean satisfiedAccumulateAmount() {
         return goalAmount.equals(accumulateAmount);
+    }
+
+    private long getRemainAmount() {
+        if (satisfiedAccumulateAmount()) {
+            return product.getPrice() - goalAmount;
+        }
+
+        return goalAmount - accumulateAmount;
     }
 
     private boolean hasNoRemainingPay() {
