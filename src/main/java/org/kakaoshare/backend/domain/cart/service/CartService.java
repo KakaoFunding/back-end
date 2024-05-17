@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.cart.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.cart.dto.CartClearResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartResponse;
@@ -84,6 +85,16 @@ public class CartService {
         return carts.stream()
                 .map(CartResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public CartClearResponse clearCartItems(String providerId) {
+        Member member = findMemberByProviderId(providerId);
+        cartRepository.deleteByMemberId(member.getMemberId());
+        return CartClearResponse.builder()
+                .success(true)
+                .message("장바구니의 모든 상품이 삭제 되었습니다.")
+                .build();
     }
 
     private Member findMemberByProviderId(String providerId) {
