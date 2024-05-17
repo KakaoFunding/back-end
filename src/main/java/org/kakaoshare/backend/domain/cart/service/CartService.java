@@ -1,8 +1,10 @@
 package org.kakaoshare.backend.domain.cart.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
+import org.kakaoshare.backend.domain.cart.dto.CartResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
 import org.kakaoshare.backend.domain.cart.repository.CartRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -74,6 +76,14 @@ public class CartService {
                 .cartId(cart.getCartId())
                 .message("장바구니 상품이 삭제되었습니다.")
                 .build();
+    }
+
+    public List<CartResponse> getCartItems(String providerId) {
+        Member member = findMemberByProviderId(providerId);
+        List<Cart> carts = cartRepository.findByMemberId(member.getMemberId());
+        return carts.stream()
+                .map(CartResponse::from)
+                .toList();
     }
 
     private Member findMemberByProviderId(String providerId) {
