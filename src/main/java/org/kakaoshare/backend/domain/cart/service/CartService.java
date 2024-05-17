@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.cart.service;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
 import org.kakaoshare.backend.domain.cart.repository.CartRepository;
@@ -57,6 +58,21 @@ public class CartService {
 
         return CartRegisterResponse.builder()
                 .message("장바구니 상품의 수량이 업데이트되었습니다.")
+                .build();
+    }
+
+    @Transactional
+    public CartDeleteResponse deleteItem(Long productId, String providerId) {
+        Member member = findMemberByProviderId(providerId);
+        Product product = findProductByProductId(productId);
+
+        Cart cart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("No cart item"));
+
+        cartRepository.delete(cart);
+        return CartDeleteResponse.builder()
+                .cartId(cart.getCartId())
+                .message("장바구니 상품이 삭제되었습니다.")
                 .build();
     }
 
