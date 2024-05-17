@@ -6,10 +6,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum FundingErrorCode implements ErrorCode {
-    INVALID_ACCUMULATE_AMOUNT(HttpStatus.BAD_REQUEST, "기여 금액은 잔여 금액보다 클 수 없습니다."),
     INVALID_ATTRIBUTE_AMOUNT(HttpStatus.BAD_REQUEST, "기여 금액이 잘못되었습니다."),
-    INVALID_STATUS(HttpStatus.BAD_REQUEST, "해당 펀딩은 진행중이 아닙니다."),
-    NOT_FOUND(HttpStatus.NOT_FOUND, "펀딩 내역을 찾을 수 없습니다.");
+    NOT_FOUND(HttpStatus.NOT_FOUND, "펀딩 내역을 찾을 수 없습니다."),
+    INVALID_STATUS(HttpStatus.BAD_REQUEST,"올바른 펀딩의 상태 값이 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
