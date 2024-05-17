@@ -13,15 +13,24 @@ public class CartResponse {
     private int quantity;
     private Long price;
     private String imageUrl;
+    private String optionName;
+    private String optionDetailName;
+    private Long optionAdditionalPrice;
 
     public static CartResponse from(Cart cart){
+        Long additionalPrice = cart.getOptionDetail() != null ? cart.getOptionDetail().getAdditionalPrice() : 0;
+        Long totalPrice = cart.getItemCount() * (cart.getProduct().getPrice() + additionalPrice);
+
         return CartResponse.builder()
                 .cartId(cart.getCartId())
                 .productName(cart.getProduct().getName())
                 .quantity(cart.getItemCount())
                 .brandName(cart.getProduct().getBrandName())
-                .price(cart.getItemCount() * cart.getProduct().getPrice())
+                .price(totalPrice)
                 .imageUrl(cart.getProduct().getPhoto())
+                .optionName(cart.getOption() != null ? cart.getOption().getName() : null)
+                .optionDetailName(cart.getOptionDetail() != null ? cart.getOptionDetail().getName() : null)
+                .optionAdditionalPrice(additionalPrice)
                 .build();
     }
 }
