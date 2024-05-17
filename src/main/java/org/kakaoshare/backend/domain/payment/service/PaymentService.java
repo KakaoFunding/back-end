@@ -37,13 +37,14 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDe
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
 import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
-import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentGiftSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
@@ -51,6 +52,7 @@ import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
 import org.kakaoshare.backend.domain.payment.exception.PaymentException;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductSummaryResponse;
+import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
 import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
@@ -67,6 +69,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ACCUMULATE_AMOUNT;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.ALREADY_REFUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
@@ -115,17 +118,19 @@ public class PaymentService {
         final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
         final FundingOrderDetail fundingOrderDetail = FundingOrderDetail.from(paymentFundingReadyRequest);
         redisUtils.save(orderDetailKey, fundingOrderDetail);
+        final int amount = paymentFundingReadyRequest.amount();
         final Long fundingId = paymentFundingReadyRequest.fundingId();
         final Funding funding = findFundingById(fundingId);
+        validateAttributeAmount(funding, amount);
         final String name = funding.getProduct().getName();
-        final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, paymentFundingReadyRequest.amount());// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
+        final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, amount);// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, List.of(paymentReadyProductDto), orderDetailKey);
         return new PaymentReadyResponse(kakaoPayReadyResponse.tid(), kakaoPayReadyResponse.next_redirect_pc_url(), orderDetailKey);
     }
 
     @Transactional
-    public PaymentSuccessResponse approve(final String providerId,
-                                          final PaymentSuccessRequest paymentSuccessRequest) {
+    public PaymentGiftSuccessResponse approve(final String providerId,
+                                              final PaymentSuccessRequest paymentSuccessRequest) {
         final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
         final Payment payment = saveAndGetPayment(approveResponse);
         final OrderDetails orderDetails = redisUtils.remove(approveResponse.partner_order_id(), OrderDetails.class);
@@ -139,11 +144,11 @@ public class PaymentService {
         saveOrders(payment, receipts);
 
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
-        return new PaymentSuccessResponse(Receiver.from(receiver), orderSummaries);
+        return new PaymentGiftSuccessResponse(Receiver.from(receiver), orderSummaries);
     }
 
     @Transactional
-    public PaymentSuccessResponse approveFunding(final String providerId,
+    public PaymentFundingSuccessResponse approveFunding(final String providerId,
                                                  final PaymentSuccessRequest paymentSuccessRequest) {
         final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
         final Payment payment = approveResponse.toEntity();
@@ -153,8 +158,15 @@ public class PaymentService {
         final Long amount = payment.getTotalPrice();
         saveOrReflectFundingDetail(payment, funding, member, amount);
         funding.increaseAccumulateAmount(amount);
+
+        if (funding.satisfiedAccumulateAmount()) {
+            funding.finish();
+        }
+
+        final Product product = funding.getProduct();
+        final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(product);
         final Receiver receiver = Receiver.from(funding.getMember());
-        return new PaymentSuccessResponse(receiver, Collections.emptyList());   // TODO: 4/20/24 펀딩 결제 완료 페이지 디자인이 없어 빈 리스트를 반환
+        return new PaymentFundingSuccessResponse(receiver, productSummaryResponse, amount);
     }
 
     @Transactional
@@ -360,6 +372,12 @@ public class PaymentService {
 
         final PaymentCancelDto paymentCancelDto = PaymentCancelDto.of(payment, refundAmount);
         webClientService.cancel(paymentCancelDto);
+    }
+
+    private void validateAttributeAmount(final Funding funding, final int attributeAmount) {
+        if (!funding.attributable((attributeAmount))) {
+            throw new FundingException(INVALID_ACCUMULATE_AMOUNT);
+        }
     }
 
     private <T> void validateAlreadyCanceled(final T item, final Function<T, Boolean> mapper) {
