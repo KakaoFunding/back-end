@@ -13,10 +13,11 @@ public class CartResponse {
     private String productName;
     private String brandName;
     private int quantity;
-    private Long price;
+    private Long productPrice;
     private String imageUrl;
     private String optionName;
     private String optionDetailName;
+    private Long totalPrice;
 
     public static CartResponse from(Cart cart){
         Long additionalPrice = cart.getOptionDetail() != null ? cart.getOptionDetail().getAdditionalPrice() : 0;
@@ -29,8 +30,9 @@ public class CartResponse {
                 .productName(cart.getProduct().getName())
                 .quantity(cart.getItemCount())
                 .brandName(cart.getProduct().getBrandName())
-                .price(totalPrice)
+                .productPrice(cart.getProduct().getPrice())
                 .imageUrl(cart.getProduct().getPhoto())
+                .totalPrice(totalPrice)
                 .optionName(cart.getOption() != null ? cart.getOption().getName() : null)
                 .optionDetailName(cart.getOptionDetail() != null ? cart.getOptionDetail().getName() : null)
                 .build();
