@@ -8,6 +8,8 @@ import org.kakaoshare.backend.domain.cart.entity.Cart;
 @Builder
 public class CartResponse {
     private Long cartId;
+    private Long optionId;
+    private Long optionDetailId;
     private String productName;
     private String brandName;
     private int quantity;
@@ -23,6 +25,8 @@ public class CartResponse {
 
         return CartResponse.builder()
                 .cartId(cart.getCartId())
+                .optionId(cart.getOption().getOptionsId())
+                .optionDetailId(cart.getOptionDetail().getOptionDetailId())
                 .productName(cart.getProduct().getName())
                 .quantity(cart.getItemCount())
                 .brandName(cart.getProduct().getBrandName())
