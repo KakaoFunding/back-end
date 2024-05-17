@@ -1,13 +1,17 @@
 package org.kakaoshare.backend.common.vo;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
+@EqualsAndHashCode
 @Getter
+@ToString
 public abstract class Date {
     private static final int MAX_DATE_PERIOD = 1;
 
