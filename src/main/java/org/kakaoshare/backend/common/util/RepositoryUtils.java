@@ -9,9 +9,11 @@ import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.SimpleExpression;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.jsonwebtoken.lang.Collections;
+import org.kakaoshare.backend.common.vo.Date;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -60,6 +62,14 @@ public final class RepositoryUtils {
         return numberExpression.eq(target);
     }
 
+    public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(final StringExpression stringExpression, final String target) {
+        if (target == null) {
+            return null;
+        }
+
+        return stringExpression.eq(target);
+    }
+
     public static <T extends Comparable<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final SimpleExpression<T> target) {
         return simpleExpression.eq(target);
     }
@@ -96,6 +106,11 @@ public final class RepositoryUtils {
         }
 
         return simpleExpression.in(items);
+    }
+
+    public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
+                                                       final Date date) {
+        return dateExpression.between(date.getStartDateTime(), date.getEndDateTime());
     }
 
     public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
