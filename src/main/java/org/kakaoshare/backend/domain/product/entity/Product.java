@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
+import org.kakaoshare.backend.domain.cart.entity.Cart;
 import org.kakaoshare.backend.domain.category.entity.Category;
 
 import java.util.List;
@@ -78,6 +79,8 @@ public class Product extends BaseTimeEntity {
     
     @OneToMany(mappedBy = "product",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<ProductThumbnail> productThumbnails;
+    @OneToMany(mappedBy = "cart",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Cart> carts;
     
     public void increaseWishCount(){
         this.wishCount++;
