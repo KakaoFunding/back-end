@@ -71,6 +71,7 @@ import java.util.function.Function;
 
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ACCUMULATE_AMOUNT;
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ATTRIBUTE_AMOUNT;
+import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_STATUS;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.ALREADY_REFUND;
 import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
@@ -117,13 +118,16 @@ public class PaymentService {
 
     public PaymentReadyResponse readyFunding(final String providerId,
                                              final PaymentFundingReadyRequest paymentFundingReadyRequest) {
-        final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
-        final FundingOrderDetail fundingOrderDetail = FundingOrderDetail.from(paymentFundingReadyRequest);
-        redisUtils.save(orderDetailKey, fundingOrderDetail);
         final int amount = paymentFundingReadyRequest.amount();
         final Long fundingId = paymentFundingReadyRequest.fundingId();
         final Funding funding = findFundingById(fundingId);
         validateFundingAmount(funding, amount);
+        validateFundingStatus(funding);
+
+        final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
+        final FundingOrderDetail fundingOrderDetail = FundingOrderDetail.from(paymentFundingReadyRequest);
+        redisUtils.save(orderDetailKey, fundingOrderDetail);
+
         final String name = funding.getProduct().getName();
         final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, amount);// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, List.of(paymentReadyProductDto), orderDetailKey);
@@ -401,6 +405,12 @@ public class PaymentService {
         final long remainAmount = funding.getGoalAmount() - funding.getAccumulateAmount();
         if (remainAmount < attributeAmount) {
             throw new FundingException(INVALID_ACCUMULATE_AMOUNT);
+        }
+    }
+
+    private void validateFundingStatus(final Funding funding) {
+        if (!funding.attributable()) {
+            throw new FundingException(INVALID_STATUS);
         }
     }
 
