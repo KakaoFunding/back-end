@@ -15,6 +15,10 @@ public enum FundingStatus {
         this.description = description;
     }
 
+    public boolean attributable() {
+        return this.equals(PROGRESS) || this.equals(BEFORE_PAYING_REMAINING);
+    }
+
     public boolean canceled() {
         return this.equals(CANCEL);
     }

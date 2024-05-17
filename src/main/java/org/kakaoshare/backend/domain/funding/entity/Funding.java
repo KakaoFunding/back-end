@@ -118,6 +118,9 @@ public class Funding extends BaseTimeEntity {
         }
     }
 
+    public boolean attributable() {
+        return status.attributable();
+    }
     public boolean canceled() {
         return status.canceled();
     }
