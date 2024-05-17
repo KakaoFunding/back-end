@@ -38,10 +38,7 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCa
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.*;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -102,7 +99,7 @@ public class PaymentService {
     public PaymentReadyResponse ready(final String providerId,
                                       final PaymentGiftReadyRequest paymentGiftReadyRequest) {
         final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
-        validateReceiverProviderId(providerId, paymentGiftReadyRequest);
+        validateReceiver(providerId, paymentGiftReadyRequest.receiver());
         validateTotalAmount(paymentGiftReadyItems);
         validateOptionDetailIds(paymentGiftReadyItems);
 
@@ -235,10 +232,10 @@ public class PaymentService {
                 .sum();
     }
 
-    private void validateReceiverProviderId(final String providerId,
-                                            final PaymentGiftReadyRequest paymentGiftReadyRequest) {
-        final String socialAccessToken = paymentGiftReadyRequest.socialAccessToken();
-        final String receiverProviderId = paymentGiftReadyRequest.receiverProviderId();
+    private void validateReceiver(final String providerId,
+                                  final PaymentGiftReadyReceiver paymentGiftReadyReceiver) {
+        final String socialAccessToken = paymentGiftReadyReceiver.socialAccessToken();
+        final String receiverProviderId = paymentGiftReadyReceiver.providerId();
 
         // TODO: 5/14/24 나에게 선물인 경우
         if (providerId.equals(receiverProviderId)) {
@@ -302,7 +299,8 @@ public class PaymentService {
 
     private OrderDetails getOrderDetails(final PaymentGiftReadyRequest paymentGiftReadyRequest) {
         final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
-        final String receiverProviderId = paymentGiftReadyRequest.receiverProviderId();
+        final String receiverProviderId = paymentGiftReadyRequest.receiver()
+                .providerId();
         final List<OrderDetail> orderDetails = paymentGiftReadyItems.stream()
                 .map(paymentGiftReadyItem -> paymentGiftReadyItem.toOrderDetail(orderNumberProvider.createOrderNumber()))
                 .toList();
