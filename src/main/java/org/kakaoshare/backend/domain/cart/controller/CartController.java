@@ -1,12 +1,14 @@
 package org.kakaoshare.backend.domain.cart.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.service.CartService;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,6 +34,13 @@ public class CartController {
                                                                @LoggedInMember String providerId,
                                                                @RequestParam("quantity") int quantity) {
         CartRegisterResponse response = cartService.updateItem(productId, providerId, quantity);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<CartDeleteResponse> deleteItem(@PathVariable Long productId,
+                                                         @LoggedInMember String providerId) {
+        CartDeleteResponse response = cartService.deleteItem(productId, providerId);
         return ResponseEntity.ok(response);
     }
 }
