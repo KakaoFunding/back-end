@@ -27,14 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartController {
     private final CartService cartService;
 
-    @PostMapping("/{productId}/{optionId}/{optionDetailId}")
+    @PostMapping("/register/{productId}/{optionId}/{optionDetailId}")
     public ResponseEntity<?> registerItem(@PathVariable Long productId, @PathVariable Long optionId,
                                           @PathVariable Long optionDetailId, @LoggedInMember String providerId) {
         CartRegisterResponse response = cartService.registerItem(productId, optionId, optionDetailId, providerId);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{productId}/update")
+    @PutMapping("/update/{productId}")
     public ResponseEntity<CartRegisterResponse> updateCartItem(@PathVariable Long productId,
                                                                @LoggedInMember String providerId,
                                                                @RequestParam("quantity") int quantity) {
