@@ -1,14 +1,17 @@
 package org.kakaoshare.backend.domain.cart.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
+import org.kakaoshare.backend.domain.cart.dto.CartResponse;
 import org.kakaoshare.backend.domain.cart.service.CartService;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,4 +46,11 @@ public class CartController {
         CartDeleteResponse response = cartService.deleteItem(productId, providerId);
         return ResponseEntity.ok(response);
     }
+    @GetMapping
+    public ResponseEntity<?> getCartItems(@LoggedInMember String providerId) {
+        List<CartResponse> cartItems = cartService.getCartItems(providerId);
+        return ResponseEntity.ok(cartItems);
+    }
+
+
 }
