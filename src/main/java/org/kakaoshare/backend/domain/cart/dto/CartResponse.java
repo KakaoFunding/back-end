@@ -17,7 +17,6 @@ public class CartResponse {
     private String imageUrl;
     private String optionName;
     private String optionDetailName;
-    private Long optionAdditionalPrice;
 
     public static CartResponse from(Cart cart){
         Long additionalPrice = cart.getOptionDetail() != null ? cart.getOptionDetail().getAdditionalPrice() : 0;
@@ -34,7 +33,6 @@ public class CartResponse {
                 .imageUrl(cart.getProduct().getPhoto())
                 .optionName(cart.getOption() != null ? cart.getOption().getName() : null)
                 .optionDetailName(cart.getOptionDetail() != null ? cart.getOptionDetail().getName() : null)
-                .optionAdditionalPrice(additionalPrice)
                 .build();
     }
 }
