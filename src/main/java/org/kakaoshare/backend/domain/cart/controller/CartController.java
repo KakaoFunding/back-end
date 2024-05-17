@@ -9,8 +9,10 @@ import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,9 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
+
     @PostMapping("/{productId}")
     public ResponseEntity<?> registerItem(@PathVariable Long productId, @LoggedInMember String providerId) {
-        CartRegisterResponse response = cartService.registerItem(productId,providerId);
+        CartRegisterResponse response = cartService.registerItem(productId, providerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{productId}/update")
+    public ResponseEntity<CartRegisterResponse> updateCartItem(@PathVariable Long productId,
+                                                               @LoggedInMember String providerId,
+                                                               @RequestParam("quantity") int quantity) {
+        CartRegisterResponse response = cartService.updateItem(productId, providerId, quantity);
         return ResponseEntity.ok(response);
     }
 }
