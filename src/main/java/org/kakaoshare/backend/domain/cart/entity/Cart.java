@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.option.entity.Option;
+import org.kakaoshare.backend.domain.option.entity.OptionDetail;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Entity
@@ -49,6 +50,9 @@ public class Cart extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "option_id")
     private Option option;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "option_detail_id")
+    private OptionDetail optionDetail;
 
     public void updateItemCount(int additionalCount) {
         this.itemCount += additionalCount;
