@@ -8,6 +8,7 @@ import org.kakaoshare.backend.domain.cart.entity.Cart;
 @Builder
 public class CartRegisterResponse {
     private Long cartId;
+    private String message;
 
     public static CartRegisterResponse from(Cart cart){
         return CartRegisterResponse.builder()
