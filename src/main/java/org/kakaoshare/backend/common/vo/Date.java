@@ -7,14 +7,11 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 @EqualsAndHashCode
 @Getter
 @ToString
 public abstract class Date {
-    private static final int MAX_DATE_PERIOD = 1;
-
     private final LocalDate startDate;
     private final LocalDate endDate;
 
@@ -42,10 +39,6 @@ public abstract class Date {
         }
 
         if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException();
-        }
-
-        if (ChronoUnit.YEARS.between(endDate, startDate) >= MAX_DATE_PERIOD) {
             throw new IllegalArgumentException();
         }
     }
