@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.cart.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.cart.dto.CartClearResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartResponse;
@@ -51,6 +52,10 @@ public class CartController {
         List<CartResponse> cartItems = cartService.getCartItems(providerId);
         return ResponseEntity.ok(cartItems);
     }
-
+    @DeleteMapping("/clear")
+    public ResponseEntity<CartClearResponse> clearCart(@LoggedInMember String providerId) {
+        CartClearResponse response = cartService.clearCartItems(providerId);
+        return ResponseEntity.ok(response);
+    }
 
 }
