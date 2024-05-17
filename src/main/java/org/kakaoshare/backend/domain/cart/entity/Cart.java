@@ -26,8 +26,8 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 @Builder
 @Table(
         indexes = {
-                @Index(name = "idx_funding_member_id",columnList = "member_id",unique = true),
-                @Index(name = "idx_funding_product_id",columnList = "product_id",unique = true),
+                @Index(name = "idx_cart_member_id", columnList = "member_id"),
+                @Index(name = "idx_cart_product_id", columnList = "product_id")
         }
 )
 public class Cart extends BaseTimeEntity {
