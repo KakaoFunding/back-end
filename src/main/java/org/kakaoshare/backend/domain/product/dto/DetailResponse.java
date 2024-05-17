@@ -3,7 +3,6 @@ package org.kakaoshare.backend.domain.product.dto;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.option.dto.OptionResponse;
-import org.kakaoshare.backend.domain.option.entity.Option;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 import java.util.List;
@@ -26,7 +25,7 @@ public class DetailResponse {
     private final String deliverDescription;
     private final String billingNotice;
     private final String caution;
-    private final List<ProductThumbnail> productThumbnails;
+    private final List<String> productThumbnails;
     public static DetailResponse of(final Product product,List<OptionResponse> optionsResponses) {
         String origin = product.getProductDetail() != null ? product.getProductDetail().getOrigin() : "정보 없음";
         String manufacturer = product.getProductDetail() != null ? product.getProductDetail().getManufacturer() : "정보 없음";
@@ -34,6 +33,16 @@ public class DetailResponse {
         String deliverDescription = product.getProductDetail() != null ? product.getProductDetail().getDeliverDescription() : "정보 없음";
         String billingNotice = product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : "정보 없음";
         String caution = product.getProductDetail() != null ? product.getProductDetail().getCaution() : "정보 없음";
+
+        List<String> thumbnails;
+        if (product.getProductThumbnails().isEmpty() && product.getPhoto() != null) {
+            thumbnails = List.of(product.getPhoto());
+        } else {
+            thumbnails = product.getProductThumbnails().stream()
+                    .map(ProductThumbnail::getThumbnailUrl)
+                    .toList();
+        }
+
 
         return DetailResponse.builder()
                 .productId(product.getProductId())
@@ -47,7 +56,7 @@ public class DetailResponse {
                 .deliverDescription(deliverDescription)
                 .billingNotice(billingNotice)
                 .caution(caution)
-                .productThumbnails(product.getProductThumbnails())
+                .productThumbnails(thumbnails)
                 .options(optionsResponses)
                 .brandName(product.getBrandName())
                 .brandId(product.getBrand().getBrandId())
