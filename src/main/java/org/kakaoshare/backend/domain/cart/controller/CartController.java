@@ -27,9 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartController {
     private final CartService cartService;
 
-    @PostMapping("/{productId}")
-    public ResponseEntity<?> registerItem(@PathVariable Long productId, @LoggedInMember String providerId) {
-        CartRegisterResponse response = cartService.registerItem(productId, providerId);
+    @PostMapping("/{productId}/{optionId}/{optionDetailId}")
+    public ResponseEntity<?> registerItem(@PathVariable Long productId, @PathVariable Long optionId,
+                                          @PathVariable Long optionDetailId, @LoggedInMember String providerId) {
+        CartRegisterResponse response = cartService.registerItem(productId, optionId, optionDetailId, providerId);
         return ResponseEntity.ok(response);
     }
 
@@ -43,15 +44,17 @@ public class CartController {
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<CartDeleteResponse> deleteCartItem(@PathVariable Long productId,
-                                                         @LoggedInMember String providerId) {
+                                                             @LoggedInMember String providerId) {
         CartDeleteResponse response = cartService.deleteItem(productId, providerId);
         return ResponseEntity.ok(response);
     }
+
     @GetMapping
     public ResponseEntity<?> getCartItems(@LoggedInMember String providerId) {
         List<CartResponse> cartItems = cartService.getCartItems(providerId);
         return ResponseEntity.ok(cartItems);
     }
+
     @DeleteMapping("/clear")
     public ResponseEntity<CartClearResponse> clearCart(@LoggedInMember String providerId) {
         CartClearResponse response = cartService.clearCartItems(providerId);
