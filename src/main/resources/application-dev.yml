@@ -55,6 +55,8 @@ security:
       expire-time: 3600000
     refresh:
       expire-time: 86400000
+friend:
+  request-url: https://kapi.kakao.com/v1/api/talk/friends
 pay:
   client:
     id: TC0ONETIME

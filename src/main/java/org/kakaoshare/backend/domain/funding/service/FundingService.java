@@ -1,11 +1,16 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.funding.dto.*;
+import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
+import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
+import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
+import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
+import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
@@ -57,21 +62,25 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
-    public FundingSliceResponse getMyAllFundingProducts(String providerId, Pageable pageable) {
+    public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status,
+                                                             Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        List<Funding> fundingList = fundingRepository.findAllByMemberId(member.getMemberId());
-        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdWithSlice(member.getMemberId(),
-                pageable);
-        List<FundingResponse> fundingResponses = allFundingSlices.getContent().stream().map(FundingResponse::from)
+        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithPage(
+                member.getMemberId(), status, pageable);
+        List<FundingResponse> fundingResponses = allFundingSlices
+                .getContent()
+                .stream()
+                .map(FundingResponse::from)
                 .toList();
 
-        return FundingSliceResponse.builder()
-                .fundingItems(fundingResponses)
-                .numberOfFundingItems(fundingList.size())
-                .page(allFundingSlices.getPageable().getPageNumber())
-                .isLast(allFundingSlices.isLast())
-                .build();
+        return FundingSliceResponse.of(
+                fundingResponses,
+                allFundingSlices.getNumberOfElements(),
+                allFundingSlices.getPageable().getPageNumber(),
+                allFundingSlices.isLast()
+        );
     }
+
 
     public FundingPreviewResponse preview(final FundingPreviewRequest fundingPreviewRequest) {
         final Long fundingId = fundingPreviewRequest.fundingId();

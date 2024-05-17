@@ -4,5 +4,5 @@ import org.kakaoshare.backend.domain.order.dto.OrderSummaryResponse;
 
 import java.util.List;
 
-public record PaymentSuccessResponse(Receiver receiver, List<OrderSummaryResponse> orders) {
+public record PaymentGiftSuccessResponse(Receiver receiver, List<OrderSummaryResponse> orders) {
 }
