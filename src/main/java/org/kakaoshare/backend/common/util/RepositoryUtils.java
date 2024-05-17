@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -56,8 +55,8 @@ public final class RepositoryUtils {
         if (target == null) {
             return null;
         }
-
         return stringExpression.eq(target);
+
     }
 
     public static <T extends Comparable<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final SimpleExpression<T> target) {
@@ -101,6 +100,7 @@ public final class RepositoryUtils {
     public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
                                                        final Date date) {
         return dateExpression.between(date.getStartDateTime(), date.getEndDateTime());
+
     }
 
     public static <T> OrderSpecifier<?>[] createOrderSpecifiers(final EntityPathBase<T> qClass, final Pageable pageable) {
