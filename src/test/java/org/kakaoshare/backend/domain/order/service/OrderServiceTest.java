@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.order.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,11 +9,13 @@ import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailResponse;
+import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryRequest;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewRequest;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewResponse;
 import org.kakaoshare.backend.domain.order.exception.OrderException;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
+import org.kakaoshare.backend.domain.order.vo.OrderHistoryDate;
 import org.kakaoshare.backend.domain.payment.dto.inquiry.PaymentHistoryDto;
 import org.kakaoshare.backend.domain.payment.repository.PaymentRepository;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
@@ -21,11 +24,7 @@ import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,6 +55,13 @@ class OrderServiceTest {
 
     @InjectMocks
     private OrderService orderService;
+
+    String providerId;
+
+    @BeforeEach
+    public void setUp() {
+        providerId = "providerId";
+    }
 
     @Test
     @DisplayName("주문 페이지에서 주문할 상품 조회")
@@ -105,16 +111,18 @@ class OrderServiceTest {
         final Product cake = CAKE.생성();
         final Product coffee = COFFEE.생성();
 
+        final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final List<OrderProductDto> orderProductDtos = List.of(
                 new OrderProductDto(1L, "123", "받는이1", getProductDto(cake), 1, LocalDateTime.of(2024, 1, 1, 0, 0), COMPLETE_PAYMENT.getDescription()),
                 new OrderProductDto(2L, "456", "받는이2", getProductDto(coffee), 2, LocalDateTime.of(2024, 1, 3, 0, 0), COMPLETE_PAYMENT.getDescription())
         );
 
+        final OrderHistoryDate date = orderHistoryRequest.toDate();
         final Page<OrderProductDto> page = new PageImpl<>(orderProductDtos, pageable, orderProductDtos.size());
-        doReturn(page).when(orderRepository).findAllOrderProductDtoByDate(startDate, endDate, pageable);
+        doReturn(page).when(orderRepository).findAllOrderProductDtoByCondition(providerId, date, pageable);
 
         final PageResponse<?> expect = PageResponse.from(page);
-        final PageResponse<?> actual = orderService.lookUp(startDate, endDate, pageable);
+        final PageResponse<?> actual = orderService.lookUp(providerId, orderHistoryRequest, pageable);
 
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
@@ -124,9 +132,10 @@ class OrderServiceTest {
     public void lookUpWhenDateIsNull() throws Exception {
         final LocalDate startDate = null;
         final LocalDate endDate = null;
+        final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
-        assertThatThrownBy(() -> orderService.lookUp(startDate, endDate, pageable))
-                .isInstanceOf(OrderException.class);
+        assertThatThrownBy(() -> orderService.lookUp(providerId, orderHistoryRequest, pageable))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -134,9 +143,10 @@ class OrderServiceTest {
     public void lookUpWhenInvalidDate() throws Exception {
         final LocalDate startDate = LocalDate.of(2024, 2, 1);
         final LocalDate endDate = LocalDate.of(2024, 1, 1);
+        final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
-        assertThatThrownBy(() -> orderService.lookUp(startDate, endDate, pageable))
-                .isInstanceOf(OrderException.class);
+        assertThatThrownBy(() -> orderService.lookUp(providerId, orderHistoryRequest, pageable))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -144,9 +154,10 @@ class OrderServiceTest {
     public void lookUpWhenInvalidDateRange() throws Exception {
         final LocalDate startDate = LocalDate.of(2025, 9, 1);
         final LocalDate endDate = LocalDate.of(2024, 9, 1);
+        final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
-        assertThatThrownBy(() -> orderService.lookUp(startDate, endDate, pageable))
-                .isInstanceOf(OrderException.class);
+        assertThatThrownBy(() -> orderService.lookUp(providerId, orderHistoryRequest, pageable))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
