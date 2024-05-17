@@ -2,6 +2,8 @@ package org.kakaoshare.backend.domain.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RedisUtils;
+import org.kakaoshare.backend.domain.friend.exception.FriendException;
+import org.kakaoshare.backend.domain.friend.service.KakaoFriendService;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode;
@@ -36,10 +38,7 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCa
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.*;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -71,9 +70,7 @@ import java.util.function.Function;
 
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ACCUMULATE_AMOUNT;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
-import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.ALREADY_REFUND;
-import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
-import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_OPTION;
+import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -82,6 +79,7 @@ public class PaymentService {
     private final FundingRepository fundingRepository;
     private final FundingDetailRepository fundingDetailRepository;
     private final GiftRepository giftRepository;
+    private final KakaoFriendService kakaoFriendService;
     private final MemberRepository memberRepository;
     private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
@@ -101,6 +99,7 @@ public class PaymentService {
     public PaymentReadyResponse ready(final String providerId,
                                       final PaymentGiftReadyRequest paymentGiftReadyRequest) {
         final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
+        validateReceiver(providerId, paymentGiftReadyRequest.receiver());
         validateTotalAmount(paymentGiftReadyItems);
         validateOptionDetailIds(paymentGiftReadyItems);
 
@@ -233,6 +232,22 @@ public class PaymentService {
                 .sum();
     }
 
+    private void validateReceiver(final String providerId,
+                                  final PaymentGiftReadyReceiver paymentGiftReadyReceiver) {
+        final String socialAccessToken = paymentGiftReadyReceiver.socialAccessToken();
+        final String receiverProviderId = paymentGiftReadyReceiver.providerId();
+
+        // TODO: 5/14/24 나에게 선물인 경우
+        if (providerId.equals(receiverProviderId)) {
+            return;
+        }
+
+        final boolean isFriend = kakaoFriendService.isFriend(socialAccessToken, receiverProviderId);
+        if (!isFriend) {
+            throw new FriendException(NOT_FOUND);
+        }
+    }
+
     private void validateTotalAmount(final List<PaymentGiftReadyItem> paymentGiftReadyItems) {
         final List<Long> productIds = extractedProductIds(paymentGiftReadyItems, PaymentGiftReadyItem::productId);
         final Map<Long, Long> priceByIds = productRepository.findAllPriceByIdsGroupById(productIds);
@@ -284,7 +299,8 @@ public class PaymentService {
 
     private OrderDetails getOrderDetails(final PaymentGiftReadyRequest paymentGiftReadyRequest) {
         final List<PaymentGiftReadyItem> paymentGiftReadyItems = paymentGiftReadyRequest.items();
-        final String receiverProviderId = paymentGiftReadyRequest.receiverProviderId();
+        final String receiverProviderId = paymentGiftReadyRequest.receiver()
+                .providerId();
         final List<OrderDetail> orderDetails = paymentGiftReadyItems.stream()
                 .map(paymentGiftReadyItem -> paymentGiftReadyItem.toOrderDetail(orderNumberProvider.createOrderNumber()))
                 .toList();

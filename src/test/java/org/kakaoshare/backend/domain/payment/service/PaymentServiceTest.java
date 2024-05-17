@@ -29,10 +29,7 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDe
 import org.kakaoshare.backend.domain.payment.dto.kakaopay.Amount;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.*;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -138,6 +135,7 @@ class PaymentServiceTest {
     public void ready() throws Exception {
         final String providerId = "1234";
         final String orderDetailsKey = "12345678";
+        final String socialAccessToken = "socialAccessToken";
 
         final Product cake = CAKE.생성(1L);
         final int cakeQuantity = 1;
@@ -149,7 +147,8 @@ class PaymentServiceTest {
                 createPaymentReadyRequest(cake, cakeQuantity),
                 createPaymentReadyRequest(coffee, coffeeQuantity)
         );
-        final PaymentGiftReadyRequest paymentGiftReadyRequest = new PaymentGiftReadyRequest(providerId, items);
+        final PaymentGiftReadyReceiver paymentGiftReadyReceiver = new PaymentGiftReadyReceiver(providerId, socialAccessToken);
+        final PaymentGiftReadyRequest paymentGiftReadyRequest = new PaymentGiftReadyRequest(paymentGiftReadyReceiver, items);
 
         final List<PaymentReadyProductDto> paymentReadyProductDtos = List.of(
                 new PaymentReadyProductDto(cake.getName(), cakeQuantity, cake.getPrice().intValue()),
