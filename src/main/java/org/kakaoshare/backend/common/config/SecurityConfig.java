@@ -22,7 +22,7 @@ public class SecurityConfig {
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
     public static final String API_V_1 = "/api/v1/";
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    
+
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http.httpBasic().disable()
@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .requestMatchers(API_V_1 + "oauth/login").permitAll()
                 .requestMatchers(API_V_1 + "oauth/logout").authenticated()
+                .requestMatchers(API_V_1 + "oauth/reissue").permitAll()
                 .requestMatchers(API_V_1 + "categories/**").permitAll()
                 .requestMatchers(API_V_1 + "products/**").permitAll()
                 .requestMatchers(API_V_1 + "products/*/wishes").authenticated()
