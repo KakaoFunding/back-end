@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.common.util;
 
+import com.querydsl.core.util.StringUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -18,6 +19,10 @@ public class EnumValidator implements ConstraintValidator<EnumValue, String> {
         final Enum<?>[] enumConstants = enumValue.enumClass().getEnumConstants();
         if (enumConstants == null) {
             return false;
+        }
+
+        if (StringUtils.isNullOrEmpty(value) && enumValue.nullable()) {
+            return true;
         }
 
         return Arrays.stream(enumConstants)

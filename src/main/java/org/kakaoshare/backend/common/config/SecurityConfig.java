@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .requestMatchers(API_V_1 + "oauth/login").permitAll()
                 .requestMatchers(API_V_1 + "oauth/logout").authenticated()
+                .requestMatchers(API_V_1 + "oauth/reissue").permitAll()
                 .requestMatchers(API_V_1 + "categories/**").permitAll()
                 .requestMatchers(API_V_1 + "products/**").permitAll()
                 .requestMatchers(API_V_1 + "products/*/wishes").authenticated()
