@@ -81,10 +81,7 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("No cart item"));
 
         cartRepository.delete(cart);
-        return CartDeleteResponse.builder()
-                .cartId(cart.getCartId())
-                .message("장바구니 상품이 삭제되었습니다.")
-                .build();
+        return CartDeleteResponse.from(cart);
     }
 
     public List<CartResponse> getCartItems(String providerId) {
@@ -99,10 +96,7 @@ public class CartService {
     public CartClearResponse clearCartItems(String providerId) {
         Member member = findMemberByProviderId(providerId);
         cartRepository.deleteByMemberId(member.getMemberId());
-        return CartClearResponse.builder()
-                .success(true)
-                .message("장바구니의 모든 상품이 삭제 되었습니다.")
-                .build();
+        return CartClearResponse.from();
     }
 
     private Member findMemberByProviderId(String providerId) {
