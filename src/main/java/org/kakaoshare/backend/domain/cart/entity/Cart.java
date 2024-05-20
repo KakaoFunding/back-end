@@ -57,4 +57,16 @@ public class Cart extends BaseTimeEntity {
     public void updateItemCount(int additionalCount) {
         this.itemCount += additionalCount;
     }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "cartId=" + cartId +
+                ", itemCount=" + itemCount +
+                ", member=" + member +
+                ", product=" + product +
+                ", option=" + option +
+                ", optionDetail=" + optionDetail +
+                '}';
+    }
 }
