@@ -3,16 +3,14 @@ package org.kakaoshare.backend.domain.rank.service;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.Month;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.domain.rank.dto.PriceRange;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
-import org.kakaoshare.backend.domain.rank.entity.RankType;
-import org.kakaoshare.backend.domain.rank.entity.TargetType;
+import org.kakaoshare.backend.domain.rank.util.RankType;
+import org.kakaoshare.backend.domain.rank.util.TargetType;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;

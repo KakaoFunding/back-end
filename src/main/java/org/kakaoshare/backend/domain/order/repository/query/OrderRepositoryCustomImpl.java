@@ -10,7 +10,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,9 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.domain.member.entity.Gender;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
-import org.kakaoshare.backend.domain.rank.entity.TargetType;
+import org.kakaoshare.backend.domain.rank.util.TargetType;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
