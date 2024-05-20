@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
+import org.kakaoshare.backend.domain.rank.dto.PriceRange;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
 import org.kakaoshare.backend.domain.rank.entity.RankType;
 import org.kakaoshare.backend.domain.rank.entity.TargetType;
@@ -59,11 +60,15 @@ public class RankServiceTest {
     @DisplayName("위시많은순 랭킹 조회")
     public void testFindProductsByFiltersWithWishRankType() {
         List<RankResponse> mockResponses = Arrays.asList(new RankResponse(1L, "Product1", 1000.0, "url1"));
-        when(orderRepository.findProductsByWish(any(TargetType.class), any(Integer.class), any(Integer.class), eq(20)))
+        PriceRange priceRange = PriceRange.builder()
+                .maxPrice(9999)
+                .minPrice(0)
+                .build();
+        when(orderRepository.findProductsByWish(any(TargetType.class), eq(priceRange.getMinPrice()), eq(priceRange.getMaxPrice()), eq(20)))
                 .thenReturn(mockResponses);
 
         // Execute
-        List<RankResponse> results = rankService.findProductsByFilters(RankType.MANY_WISH, TargetType.ALL, 0, 9999);
+        List<RankResponse> results = rankService.findProductsByFilters(RankType.MANY_WISH, TargetType.ALL, priceRange);
 
         // Verify
         verify(orderRepository).findProductsByWish(eq(TargetType.ALL), eq(0), eq(9999), eq(20));
@@ -75,12 +80,15 @@ public class RankServiceTest {
     public void testFindProductsByFiltersWithReceiveRankType() {
         // Setup
         List<RankResponse> mockResponses = Arrays.asList(new RankResponse(2L, "Product2", 2000.0, "url2"));
-        when(orderRepository.findProductsByReceived(any(TargetType.class), any(Integer.class), any(Integer.class),
-                eq(20)))
+        PriceRange priceRange = PriceRange.builder()
+                .maxPrice(9999)
+                .minPrice(0)
+                .build();
+        when(orderRepository.findProductsByReceived(any(TargetType.class), eq(priceRange.getMinPrice()), eq(priceRange.getMaxPrice()), eq(20)))
                 .thenReturn(mockResponses);
 
         // Execute
-        List<RankResponse> results = rankService.findProductsByFilters(RankType.MANY_RECEIVE, TargetType.ALL, 0, 9999);
+        List<RankResponse> results = rankService.findProductsByFilters(RankType.MANY_RECEIVE, TargetType.ALL, priceRange);
 
         // Verify
         verify(orderRepository).findProductsByReceived(eq(TargetType.ALL), eq(0), eq(9999), eq(20));

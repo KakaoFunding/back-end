@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
+import org.kakaoshare.backend.domain.rank.dto.PriceRange;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
 import org.kakaoshare.backend.domain.rank.entity.RankType;
 import org.kakaoshare.backend.domain.rank.entity.TargetType;
@@ -25,13 +26,12 @@ public class RankService {
         return orderRepository.findTopRankedProductsByOrders(LocalDateTime.now().minusMonths(MONTH_VALUE), pageable);
     }
 
-    public List<RankResponse> findProductsByFilters(RankType rankType, TargetType targetType, int minPrice,
-                                                    int maxPrice) {
+    public List<RankResponse> findProductsByFilters(RankType rankType, TargetType targetType, PriceRange priceRange) {
         if (rankType.equals(RankType.MANY_WISH)) {
-            return orderRepository.findProductsByWish(targetType, minPrice, maxPrice, LIMIT_PRODUCT_COUNT);
+            return orderRepository.findProductsByWish(targetType, priceRange.getMinPrice(), priceRange.getMaxPrice(), LIMIT_PRODUCT_COUNT);
         }
         if (rankType.equals(RankType.MANY_RECEIVE)) {
-            return orderRepository.findProductsByReceived(targetType, minPrice, maxPrice, LIMIT_PRODUCT_COUNT);
+            return orderRepository.findProductsByReceived(targetType, priceRange.getMinPrice(), priceRange.getMaxPrice(), LIMIT_PRODUCT_COUNT);
         }
         return Collections.emptyList();
     }
