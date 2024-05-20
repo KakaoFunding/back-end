@@ -34,8 +34,8 @@ public class CartService {
     public CartRegisterResponse registerItem(Long productId, Long optionId, Long optionDetailId, String providerId) {
         Member member = findMemberByProviderId(providerId);
         Product product = findProductByProductId(productId);
-        Option option = optionId != null ? findOptionById(optionId) : null;
-        OptionDetail optionDetail = optionDetailId != null ? findOptionDetailById(optionDetailId) : null;
+        Option option = getOptionById(optionId);
+        OptionDetail optionDetail = getOptionDetailById(optionDetailId);
 
         Cart existingCart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId())
                 .orElse(null);
@@ -121,8 +121,20 @@ public class CartService {
         return optionRepository.findById(optionId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid option ID"));
     }
+
     private OptionDetail findOptionDetailById(Long optionDetailId) {
         return optionDetailRepository.findById(optionDetailId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid option detail ID"));
     }
+
+    private Option getOptionById(Long optionId) {
+        return optionId != null ? optionRepository.findById(optionId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid option ID")) : null;
+    }
+
+    private OptionDetail getOptionDetailById(Long optionDetailId) {
+        return optionDetailId != null ? optionDetailRepository.findById(optionDetailId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid option detail ID")) : null;
+    }
+
 }
