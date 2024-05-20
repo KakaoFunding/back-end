@@ -2,8 +2,10 @@ package org.kakaoshare.backend.domain.member.service.oauth;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.IssuedTokenResult;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
@@ -36,7 +38,7 @@ public class OAuthService {
     private final OAuthWebClientService webClientService;
 
     @Transactional
-    public OAuthLoginResult login(final OAuthLoginRequest oAuthLoginRequest) {
+    public OAuthLoginResponse login(final OAuthLoginRequest oAuthLoginRequest) {
         final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(oAuthLoginRequest.provider());
         final OAuthProfile oAuthProfile = getProfile(oAuthLoginRequest, registration);
         final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
@@ -44,20 +46,28 @@ public class OAuthService {
         final RefreshToken refreshToken = refreshTokenProvider.createToken(userDetails.getUsername());
         refreshTokenRepository.save(refreshToken);
 
-        return OAuthLoginResult.of(accessToken, refreshToken.getValue(), oAuthProfile);
+        return OAuthLoginResponse.of(accessToken, refreshToken, oAuthProfile);
     }
 
     @Transactional
-    public IssuedTokenResult reissue(final String refreshTokenValue) {
+    public void logout(final OAuthLogoutRequest oAuthLogoutRequest) {
+        final String refreshTokenValue = oAuthLogoutRequest.refreshToken();
+        final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
+        refreshTokenRepository.delete(refreshToken);
+    }
+
+    @Transactional
+    public OAuthReissueResponse reissue(final OAuthReissueRequest oAuthReissueRequest) {
+        final String refreshTokenValue = oAuthReissueRequest.refreshToken();
         final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
         final String providerId = refreshToken.getProviderId();
         final UserDetails userDetails = findUserDetailsByProviderId(providerId);
         final String accessToken = jwtProvider.createAccessToken(userDetails);
         final RefreshToken newRefreshToken = refreshTokenProvider.createToken(providerId);
-        refreshTokenRepository.save(newRefreshToken);
         refreshTokenRepository.delete(refreshToken);
+        refreshTokenRepository.save(newRefreshToken);
 
-        return IssuedTokenResult.of(accessToken, newRefreshToken);
+        return OAuthReissueResponse.of(accessToken, newRefreshToken);
     }
 
     private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {
