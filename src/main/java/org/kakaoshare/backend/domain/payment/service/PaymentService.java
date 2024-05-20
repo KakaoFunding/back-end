@@ -11,7 +11,9 @@ import org.kakaoshare.backend.domain.funding.exception.FundingDetailException;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
+import org.kakaoshare.backend.domain.funding.repository.FundingGiftRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
+import org.kakaoshare.backend.domain.gift.entity.FundingGift;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.exception.GiftErrorCode;
 import org.kakaoshare.backend.domain.gift.exception.GiftException;
@@ -68,9 +70,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ACCUMULATE_AMOUNT;
+import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ATTRIBUTE_AMOUNT;
+import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_STATUS;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
-import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.*;
+import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.ALREADY_REFUND;
+import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_AMOUNT;
+import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.INVALID_OPTION;
 
 @RequiredArgsConstructor
 @Service
@@ -78,6 +83,7 @@ import static org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode.*
 public class PaymentService {
     private final FundingRepository fundingRepository;
     private final FundingDetailRepository fundingDetailRepository;
+    private final FundingGiftRepository fundingGiftRepository;
     private final GiftRepository giftRepository;
     private final KakaoFriendService kakaoFriendService;
     private final MemberRepository memberRepository;
@@ -114,13 +120,16 @@ public class PaymentService {
 
     public PaymentReadyResponse readyFunding(final String providerId,
                                              final PaymentFundingReadyRequest paymentFundingReadyRequest) {
-        final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
-        final FundingOrderDetail fundingOrderDetail = FundingOrderDetail.from(paymentFundingReadyRequest);
-        redisUtils.save(orderDetailKey, fundingOrderDetail);
         final int amount = paymentFundingReadyRequest.amount();
         final Long fundingId = paymentFundingReadyRequest.fundingId();
         final Funding funding = findFundingById(fundingId);
-        validateAttributeAmount(funding, amount);
+        validateFundingAmount(funding, amount);
+        validateFundingStatus(funding);
+
+        final String orderDetailKey = orderNumberProvider.createOrderDetailKey();
+        final FundingOrderDetail fundingOrderDetail = FundingOrderDetail.from(paymentFundingReadyRequest);
+        redisUtils.save(orderDetailKey, fundingOrderDetail);
+
         final String name = funding.getProduct().getName();
         final PaymentReadyProductDto paymentReadyProductDto = new PaymentReadyProductDto(name, 1, amount);// TODO: 4/20/24 펀딩 결제는 단일 상품이므로 수량은 1개
         final KakaoPayReadyResponse kakaoPayReadyResponse = webClientService.ready(providerId, List.of(paymentReadyProductDto), orderDetailKey);
@@ -148,7 +157,7 @@ public class PaymentService {
 
     @Transactional
     public PaymentFundingSuccessResponse approveFunding(final String providerId,
-                                                 final PaymentSuccessRequest paymentSuccessRequest) {
+                                                        final PaymentSuccessRequest paymentSuccessRequest) {
         final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
         final Payment payment = approveResponse.toEntity();
         final FundingOrderDetail fundingOrderDetail = redisUtils.remove(approveResponse.partner_order_id(), FundingOrderDetail.class);
@@ -158,8 +167,13 @@ public class PaymentService {
         saveOrReflectFundingDetail(payment, funding, member, amount);
         funding.increaseAccumulateAmount(amount);
 
+        // TODO: 5/10/24 결제 후 목표 금액 달성 시
         if (funding.satisfiedAccumulateAmount()) {
-            funding.finish();
+            funding.reflectStatus(amount, member.getMemberId());    // TODO: 5/14/24 잔여 금액 여부에 따라 "펀딩 완료", "남은 금액 결제 전"으로 상태를 수정
+        }
+
+        if (funding.completed()) {
+            createAndSaveFundingGift(funding);
         }
 
         final Product product = funding.getProduct();
@@ -390,9 +404,23 @@ public class PaymentService {
         webClientService.cancel(paymentCancelDto);
     }
 
-    private void validateAttributeAmount(final Funding funding, final int attributeAmount) {
-        if (!funding.attributable((attributeAmount))) {
-            throw new FundingException(INVALID_ACCUMULATE_AMOUNT);
+    private void createAndSaveFundingGift(final Funding funding) {
+        final FundingGift fundingGift = FundingGift.builder()
+                .funding(funding)
+                .expiredAt(LocalDateTime.now().plusMonths(6L))
+                .build();
+        fundingGiftRepository.save(fundingGift);
+    }
+
+    private void validateFundingAmount(final Funding funding, final int attributeAmount) {
+        if (!funding.isAttributableAmount(attributeAmount)) {
+            throw new FundingException(INVALID_ATTRIBUTE_AMOUNT);
+        }
+    }
+
+    private void validateFundingStatus(final Funding funding) {
+        if (!funding.attributable()) {
+            throw new FundingException(INVALID_STATUS);
         }
     }
 
