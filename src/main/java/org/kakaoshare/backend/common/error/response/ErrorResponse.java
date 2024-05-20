@@ -1,21 +1,16 @@
 package org.kakaoshare.backend.common.error.response;
 
 import lombok.Builder;
+import org.kakaoshare.backend.common.error.ErrorCode;
 
 @Builder
 public record ErrorResponse(String message,
                             int code
-//                            @JsonInclude(JsonInclude.Include.NON_EMPTY)
-//                            List<ValidationError> errors
 ) {
-//    @Builder
-//    public record ValidationError(String field, String message) {
-//
-//        public static ValidationError of(final FieldError fieldError) {
-//            return ValidationError.builder()
-//                    .field(fieldError.getField())
-//                    .message(fieldError.getDefaultMessage())
-//                    .build();
-//        }
-//    }
+    public static ErrorResponse from(ErrorCode errorCode) {
+        return ErrorResponse.builder()
+                .code(errorCode.getHttpStatus().value())
+                .message(errorCode.getMessage())
+                .build();
+    }
 }
