@@ -58,6 +58,12 @@ public class Cart extends BaseTimeEntity {
         this.itemCount += additionalCount;
     }
 
+    public Long calculateTotalPrice() {
+        Long productPrice = product != null ? product.getPrice() : 0L;
+        Long additionalPrice = optionDetail != null ? optionDetail.getAdditionalPrice() : 0L;
+        return itemCount * (productPrice + additionalPrice);
+    }
+
     @Override
     public String toString() {
         return "Cart{" +

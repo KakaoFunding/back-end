@@ -21,8 +21,7 @@ public class CartResponse {
     private Long totalPrice;
 
     public static CartResponse from(Cart cart){
-        Long additionalPrice = cart.getOptionDetail() != null ? cart.getOptionDetail().getAdditionalPrice() : 0;
-        Long totalPrice = cart.getItemCount() * (cart.getProduct().getPrice() + additionalPrice);
+        Long totalPrice = cart.calculateTotalPrice();
 
         return CartResponse.builder()
                 .cartId(cart.getCartId())
