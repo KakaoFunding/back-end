@@ -42,6 +42,7 @@ public class CartService {
         if (existingCart != null) {
             existingCart.updateItemCount(existingCart.getItemCount() + 1);
             cartRepository.save(existingCart);
+            return CartRegisterResponse.from(existingCart);
         } else {
             Cart newCart = Cart.builder()
                     .member(member)
@@ -51,11 +52,8 @@ public class CartService {
                     .itemCount(1)
                     .build();
             cartRepository.save(newCart);
+            return CartRegisterResponse.from(newCart);
         }
-
-        return CartRegisterResponse.builder()
-                .message("상품이 장바구니에 추가되었습니다.")
-                .build();
     }
 
     @Transactional

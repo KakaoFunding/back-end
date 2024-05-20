@@ -13,6 +13,7 @@ public class CartRegisterResponse {
     public static CartRegisterResponse from(Cart cart){
         return CartRegisterResponse.builder()
                 .cartId(cart.getCartId())
+                .message("상품이 장바구니에 추가되었습니다.")
                 .build();
     }
 }
