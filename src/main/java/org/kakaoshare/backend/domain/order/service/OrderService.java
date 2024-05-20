@@ -6,12 +6,14 @@ import org.kakaoshare.backend.domain.option.dto.OptionSummaryRequest;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailResponse;
+import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryRequest;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewRequest;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewResponse;
 import org.kakaoshare.backend.domain.order.exception.OrderErrorCode;
 import org.kakaoshare.backend.domain.order.exception.OrderException;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
+import org.kakaoshare.backend.domain.order.vo.OrderHistoryDate;
 import org.kakaoshare.backend.domain.payment.dto.inquiry.PaymentHistoryDto;
 import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
 import org.kakaoshare.backend.domain.payment.exception.PaymentException;
@@ -58,12 +60,11 @@ public class OrderService {
         return PageResponse.from(page); // TODO: 4/15/24 동일한 상품이 여러 개인 경우를 처리하지 못함
     }
 
-    public PageResponse<?> lookUp(final LocalDate startDate,
-                                  final LocalDate endDate,
+    public PageResponse<?> lookUp(final String providerId,
+                                  final OrderHistoryRequest orderHistoryRequest,
                                   final Pageable pageable) {
-        validateDateRange(startDate, endDate);
-
-        final Page<OrderProductDto> page = orderRepository.findAllOrderProductDtoByDate(startDate, endDate, pageable);
+        final OrderHistoryDate date = orderHistoryRequest.toDate();
+        final Page<OrderProductDto> page = orderRepository.findAllOrderProductDtoByCondition(providerId, date, pageable);
         return PageResponse.from(page);
     }
 

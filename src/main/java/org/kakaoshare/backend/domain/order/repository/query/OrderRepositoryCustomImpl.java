@@ -11,20 +11,17 @@ import org.kakaoshare.backend.domain.option.dto.QOptionSummaryResponse;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
 import org.kakaoshare.backend.domain.order.dto.inquiry.QOrderProductDto;
+import org.kakaoshare.backend.domain.order.vo.OrderHistoryDate;
 import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.eqExpression;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.periodExpression;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.member.entity.QMember.member;
 import static org.kakaoshare.backend.domain.order.entity.QOrder.order;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
@@ -68,30 +65,9 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public Page<OrderProductDto> findAllOrderProductDtoByDate(final LocalDate startDate, final LocalDate endDate, final Pageable pageable) {
-        final JPAQuery<Long> countQuery = queryFactory.select(order.count())
-                .from(order)
-                .where(periodExpression(order.createdAt, startDate, endDate));
-
-        final JPAQuery<OrderProductDto> contentQuery = queryFactory.select(
-                    new QOrderProductDto(
-                            order.ordersId,
-                            receipt.orderNumber,
-                            member.name,
-                            getProductDto(),
-                            receipt.quantity,
-                            order.createdAt,
-                            order.status.stringValue()
-                    )
-                ).from(order)
-                .innerJoin(order.receipt, receipt)
-                .innerJoin(receipt.product, product)
-                .innerJoin(receipt.receiver, member)
-                .where(periodExpression(receipt.createdAt, startDate, endDate))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(createOrderSpecifiers(order, pageable));// TODO: 5/8/24 orderBy 내에 값은 추후 변경 예정
-
+    public Page<OrderProductDto> findAllOrderProductDtoByCondition(final String providerId, final OrderHistoryDate date, final Pageable pageable) {
+        final JPAQuery<Long> countQuery = createOrderProductDtoCountQuery(providerId, date, pageable);
+        final JPAQuery<OrderProductDto> contentQuery = createOrderProductDtoContentQuery(providerId, date, pageable);
         return toPage(pageable, contentQuery, countQuery);
     }
 
@@ -112,6 +88,42 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .fetchOne();
 
         return Optional.ofNullable(orderHistoryDetailDto);
+    }
+
+    private JPAQuery<?> createOrderProductDtoBaseQuery(final String providerId, final OrderHistoryDate date, final Pageable pageable) {
+        return queryFactory.from(order)
+                .innerJoin(order.receipt, receipt)
+                .innerJoin(receipt.product, product)
+                .innerJoin(receipt.receiver, member)
+                .where(
+                        periodExpression(receipt.createdAt, date),
+                        eqExpression(member.providerId, providerId)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+    }
+
+    private JPAQuery<Long> createOrderProductDtoCountQuery(final String providerId, final OrderHistoryDate date, final Pageable pageable) {
+        return createOrderProductDtoBaseQuery(providerId, date, pageable)
+                .select(order.count());
+    }
+
+    private JPAQuery<OrderProductDto> createOrderProductDtoContentQuery(final String providerId, final OrderHistoryDate date, final Pageable pageable) {
+        return createOrderProductDtoBaseQuery(providerId, date, pageable)
+                .select(getOrderProductDto())
+                .orderBy(createOrderSpecifiers(order, pageable));// TODO: 5/8/24 orderBy 내에 값은 추후 변경 예정
+    }
+
+    private QOrderProductDto getOrderProductDto() {
+        return new QOrderProductDto(
+                order.ordersId,
+                receipt.orderNumber,
+                member.name,
+                getProductDto(),
+                receipt.quantity,
+                order.createdAt,
+                order.status.stringValue()
+        );
     }
 
     private QProductDto getProductDto() {
