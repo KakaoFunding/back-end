@@ -126,13 +126,20 @@ public class CartService {
     }
 
     private Option getOptionById(Long optionId) {
-        return optionId != null ? optionRepository.findById(optionId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid option ID")) : null;
+        if (optionId != null) {
+            return findOptionById(optionId);
+        } else {
+            return null;
+        }
     }
 
     private OptionDetail getOptionDetailById(Long optionDetailId) {
-        return optionDetailId != null ? optionDetailRepository.findById(optionDetailId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid option detail ID")) : null;
+        if (optionDetailId != null) {
+            return findOptionDetailById(optionDetailId);
+        } else {
+            return null;
+        }
     }
+
 
 }
