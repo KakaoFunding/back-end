@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.cart.dto.CartClearResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
+import org.kakaoshare.backend.domain.cart.dto.CartRegisterRequest;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
@@ -31,11 +32,11 @@ public class CartService {
     private final OptionDetailRepository optionDetailRepository;
 
     @Transactional
-    public CartRegisterResponse registerItem(Long productId, Long optionId, Long optionDetailId, String providerId) {
+    public CartRegisterResponse registerItem(CartRegisterRequest request, String providerId) {
         Member member = findMemberByProviderId(providerId);
-        Product product = findProductByProductId(productId);
-        Option option = getOptionById(optionId);
-        OptionDetail optionDetail = getOptionDetailById(optionDetailId);
+        Product product = findProductByProductId(request.getProductId());
+        Option option = getOptionById(request.getOptionId());
+        OptionDetail optionDetail = getOptionDetailById(request.getOptionDetailId());
 
         Cart existingCart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId())
                 .orElse(null);

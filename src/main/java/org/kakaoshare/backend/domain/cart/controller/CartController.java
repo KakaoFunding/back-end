@@ -4,8 +4,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.cart.dto.CartClearResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
+import org.kakaoshare.backend.domain.cart.dto.CartRegisterRequest;
 import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.dto.CartResponse;
+import org.kakaoshare.backend.domain.cart.entity.Cart;
 import org.kakaoshare.backend.domain.cart.service.CartService;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
@@ -27,10 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartController {
     private final CartService cartService;
 
-    @PostMapping("/register/{productId}/{optionId}/{optionDetailId}")
-    public ResponseEntity<?> registerItem(@PathVariable Long productId, @PathVariable Long optionId,
-                                          @PathVariable Long optionDetailId, @LoggedInMember String providerId) {
-        CartRegisterResponse response = cartService.registerItem(productId, optionId, optionDetailId, providerId);
+    @PostMapping()
+    public ResponseEntity<?> registerItem(@RequestBody CartRegisterRequest request, @LoggedInMember String providerId) {
+        CartRegisterResponse response = cartService.registerItem(request, providerId);
         return ResponseEntity.ok(response);
     }
 
