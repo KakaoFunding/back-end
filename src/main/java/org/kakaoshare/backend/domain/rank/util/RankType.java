@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.rank.entity;
+package org.kakaoshare.backend.domain.rank.util;
 
 public enum RankType {
     MANY_WISH("위시가 많은 순"),

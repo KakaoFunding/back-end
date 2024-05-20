@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.rank.entity;
+package org.kakaoshare.backend.domain.rank.util;
 
 public enum TargetType {
     ALL("전체"),
