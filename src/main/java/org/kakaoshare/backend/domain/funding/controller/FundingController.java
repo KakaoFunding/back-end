@@ -1,7 +1,6 @@
 package org.kakaoshare.backend.domain.funding.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.common.util.EnumValue;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
@@ -9,11 +8,8 @@ import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
-import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
-import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.service.FundingService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -50,11 +46,9 @@ public class FundingController {
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                      @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") FundingStatus status,
                                                      @PageableDefault(size = FUNDING_DEFAULT_SIZE) final Pageable pageable) {
-
         FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/funding/preview")
     public ResponseEntity<?> preview(@RequestBody final FundingPreviewRequest fundingPreviewRequest) {
