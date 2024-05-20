@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.fixture;
 
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
@@ -23,6 +24,7 @@ public enum FundingFixture {
     public Funding 생성(final Long fundingId,
                       final Member member,
                       final Product product,
+                      final Long goalAmount,
                       final Long accumulateAmount) {
         final Funding funding = Funding.builder()
                 .fundingId(fundingId)
@@ -33,6 +35,20 @@ public enum FundingFixture {
                 .build();
         funding.increaseAccumulateAmount(accumulateAmount);
         return funding;
+    }
+
+    public Funding 생성(final Member member,
+                      final Product product,
+                      final Long goalAmount,
+                      final Long accumulateAmount) {
+        return 생성(null, member, product, goalAmount, accumulateAmount);
+    }
+
+    public Funding 생성(final Long fundingId,
+                      final Member member,
+                      final Product product,
+                      final Long accumulateAmount) {
+        return 생성(fundingId, member, product, goalAmount, accumulateAmount);
     }
 
     public Funding 생성(final Member member,
@@ -50,5 +66,20 @@ public enum FundingFixture {
                       final Member member,
                       final Product product) {
         return 생성(fundingId, member, product, accumulateAmount);
+    }
+
+    public Funding 생성(final Long fundingId,
+                      final Member member,
+                      final Product product,
+                      final FundingStatus status) {
+        final Funding funding = Funding.builder()
+                .fundingId(fundingId)
+                .expiredAt(expiredAt)
+                .goalAmount(goalAmount)
+                .member(member)
+                .product(product)
+                .build();
+        funding.increaseAccumulateAmount(accumulateAmount);
+        return funding;
     }
 }
