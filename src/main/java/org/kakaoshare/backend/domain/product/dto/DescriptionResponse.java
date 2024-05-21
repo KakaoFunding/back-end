@@ -28,6 +28,16 @@ public class DescriptionResponse {
 
     public static DescriptionResponse of(final Product product, List<String> descriptionPhotosUrls,
                                            List<OptionResponse> optionsResponses, List<String> productThumbnailsUrls) {
+
+        List<String> thumbnails;
+        if (product.getProductThumbnails().isEmpty() && product.getPhoto() != null) {
+            thumbnails = List.of(product.getPhoto());
+        } else {
+            thumbnails = product.getProductThumbnails().stream()
+                    .map(ProductThumbnail::getThumbnailUrl)
+                    .toList();
+        }
+
         return DescriptionResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
@@ -37,7 +47,7 @@ public class DescriptionResponse {
                 .descriptionPhotos(descriptionPhotosUrls)
                 .productName(product.getName())
                 .options(optionsResponses)
-                .productThumbnails(productThumbnailsUrls)
+                .productThumbnails(thumbnails)
                 .brandName(product.getBrand().getName())
                 .brandId(product.getBrand().getBrandId())
                 .brandThumbnail(product.getBrand().getIconPhoto())
