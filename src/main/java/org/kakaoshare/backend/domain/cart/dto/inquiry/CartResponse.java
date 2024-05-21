@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.cart.dto;
+package org.kakaoshare.backend.domain.cart.dto.inquiry;
 
 import lombok.Builder;
 import lombok.Getter;

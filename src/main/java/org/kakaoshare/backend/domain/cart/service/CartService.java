@@ -2,11 +2,11 @@ package org.kakaoshare.backend.domain.cart.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.cart.dto.CartClearResponse;
-import org.kakaoshare.backend.domain.cart.dto.CartDeleteResponse;
-import org.kakaoshare.backend.domain.cart.dto.CartRegisterRequest;
-import org.kakaoshare.backend.domain.cart.dto.CartRegisterResponse;
-import org.kakaoshare.backend.domain.cart.dto.CartResponse;
+import org.kakaoshare.backend.domain.cart.dto.delete.CartClearResponse;
+import org.kakaoshare.backend.domain.cart.dto.delete.CartDeleteResponse;
+import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterRequest;
+import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterResponse;
+import org.kakaoshare.backend.domain.cart.dto.inquiry.CartResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
 import org.kakaoshare.backend.domain.cart.repository.CartRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -17,7 +17,6 @@ import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.option.repository.OptionRepository;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
-import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

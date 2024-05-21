@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.cart.dto;
+package org.kakaoshare.backend.domain.cart.dto.register;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,11 +6,11 @@ import org.kakaoshare.backend.domain.cart.entity.Cart;
 
 @Getter
 @Builder
-public class CartDeleteResponse {
+public class CartRegisterResponse {
     private Long cartId;
 
-    public static CartDeleteResponse from(Cart cart){
-        return CartDeleteResponse.builder()
+    public static CartRegisterResponse from(Cart cart){
+        return CartRegisterResponse.builder()
                 .cartId(cart.getCartId())
                 .build();
     }
