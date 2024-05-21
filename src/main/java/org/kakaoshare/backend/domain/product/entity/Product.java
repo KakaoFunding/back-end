@@ -99,12 +99,12 @@ public class Product extends BaseTimeEntity {
                 '}';
     }
     public List<String> getThumbnailUrls() {
-        if (productThumbnails.isEmpty() && photo != null) {
+        if (productThumbnails.isEmpty()) {
             return List.of(photo);
-        } else {
-            return productThumbnails.stream()
-                    .map(ProductThumbnail::getThumbnailUrl)
-                    .toList();
         }
+
+        return productThumbnails.stream()
+                .map(ProductThumbnail::getThumbnailUrl)
+                .toList();
     }
 }
