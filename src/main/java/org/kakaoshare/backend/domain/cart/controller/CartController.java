@@ -15,6 +15,7 @@ import org.kakaoshare.backend.jwt.util.LoggedInMember;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,7 +36,7 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/update/{productId}")
+    @PatchMapping("/{productId}")
     public ResponseEntity<CartRegisterResponse> updateCartItem(@PathVariable Long productId,
                                                                @LoggedInMember String providerId,
                                                                @RequestParam("quantity") int quantity) {
