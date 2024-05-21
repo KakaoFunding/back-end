@@ -98,4 +98,13 @@ public class Product extends BaseTimeEntity {
                 ", brandName='" + brandName + '\'' +
                 '}';
     }
+    public List<String> getThumbnailUrls() {
+        if (productThumbnails.isEmpty() && photo != null) {
+            return List.of(photo);
+        } else {
+            return productThumbnails.stream()
+                    .map(ProductThumbnail::getThumbnailUrl)
+                    .toList();
+        }
+    }
 }

@@ -34,16 +34,6 @@ public class DetailResponse {
         String billingNotice = product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : "정보 없음";
         String caution = product.getProductDetail() != null ? product.getProductDetail().getCaution() : "정보 없음";
 
-        List<String> thumbnails;
-        if (product.getProductThumbnails().isEmpty() && product.getPhoto() != null) {
-            thumbnails = List.of(product.getPhoto());
-        } else {
-            thumbnails = product.getProductThumbnails().stream()
-                    .map(ProductThumbnail::getThumbnailUrl)
-                    .toList();
-        }
-
-
         return DetailResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
@@ -56,7 +46,7 @@ public class DetailResponse {
                 .deliverDescription(deliverDescription)
                 .billingNotice(billingNotice)
                 .caution(caution)
-                .productThumbnails(thumbnails)
+                .productThumbnails(product.getThumbnailUrls())
                 .options(optionsResponses)
                 .brandName(product.getBrandName())
                 .brandId(product.getBrand().getBrandId())
