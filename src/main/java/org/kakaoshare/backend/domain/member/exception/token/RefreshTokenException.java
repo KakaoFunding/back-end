@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.domain.member.exception.token;
 
-public class RefreshTokenException extends RuntimeException {
-    private final RefreshTokenErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public RefreshTokenException(final RefreshTokenErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+public class RefreshTokenException extends BusinessException {
+    public RefreshTokenException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }

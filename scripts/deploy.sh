@@ -1,19 +1,23 @@
 #!/bin/bash
 
-ROOT_PATH="/home/ec2-user/back-end"
-JAR="$ROOT_PATH/application.jar"
+ROOT_PATH="/home/ec2-user/cicd"
+DOCKER_COMPOSE_PATH="$ROOT_PATH/docker-compose.yml"
 
-APP_LOG="$ROOT_PATH/application.log"
-ERROR_LOG="$ROOT_PATH/error.log"
+IMAGE_NAME="yeachan05/application"
+IMAGE_TAG="latest"
+
 START_LOG="$ROOT_PATH/start.log"
+touch $START_LOG
 
-NOW=$(date +%c)
+echo "[$(date +%c)] Docker Compose 실행 시작 - 이미지: $IMAGE_NAME:$IMAGE_TAG" >> $START_LOG
 
-echo "[$NOW] $JAR 복사" >> $START_LOG
-cp $ROOT_PATH/build/libs/*.jar $JAR
+docker-compose -f $DOCKER_COMPOSE_PATH pull
+docker-compose -f $DOCKER_COMPOSE_PATH up -d
 
-echo "[$NOW] > $JAR 실행" >> $START_LOG
-nohup java -jar $JAR > $APP_LOG 2> $ERROR_LOG &
-
-SERVICE_PID=$(pgrep -f $JAR)
-echo "[$NOW] > 서비스 PID: $SERVICE_PID" >> $START_LOG
+if [ $? -eq 0 ]; then
+    echo "[$(date +%c)] Docker Compose로 애플리케이션 시작 성공" >> $START_LOG
+else
+    echo "[$(date +%c)] Docker Compose로 애플리케이션 시작 실패" >> $START_LOG
+    echo "[$(date +%c)] Docker Compose 오류 로그:" >> $START_LOG
+    docker-compose -f $DOCKER_COMPOSE_PATH logs >> $START_LOG 2>&1
+fi

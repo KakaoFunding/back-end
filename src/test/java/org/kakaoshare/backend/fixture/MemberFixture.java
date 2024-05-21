@@ -3,11 +3,13 @@ package org.kakaoshare.backend.fixture;
 import org.kakaoshare.backend.domain.member.entity.Gender;
 import org.kakaoshare.backend.domain.member.entity.Member;
 
+import static org.kakaoshare.backend.domain.member.entity.Gender.FEMALE;
 import static org.kakaoshare.backend.domain.member.entity.Gender.MALE;
 
 public enum MemberFixture {
     KAKAO("카카오", MALE, "01012341234", "123"),
-    KIM("김민우", MALE, "01011111111", "456");
+    KIM("김민우", MALE, "01011111111", "456"),
+    HAN("한", FEMALE, "01022222222", "789");
 
     private final String name;
     private final Gender gender;

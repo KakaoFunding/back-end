@@ -12,8 +12,8 @@ import org.kakaoshare.backend.domain.product.dto.WishCancelEvent;
 import org.kakaoshare.backend.domain.product.dto.WishResponse;
 import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.entity.Product;
-import org.kakaoshare.backend.domain.product.error.ProductErrorCode;
-import org.kakaoshare.backend.domain.product.error.exception.ProductException;
+import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
+import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.wish.dto.WishReservationEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -47,8 +47,8 @@ public class ProductService {
         return detailResponse;
     }
     
-    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable) {
-        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable);
+    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {
+        Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable,providerId);
         if (productDtos.isEmpty()) {
             throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }

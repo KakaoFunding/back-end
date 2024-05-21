@@ -25,6 +25,11 @@ public class KakaoProfile extends OAuthProfile {
     }
 
     @Override
+    public String getProfileImageUrl() {
+        return String.valueOf(getProfile().get("profile_image_url"));
+    }
+
+    @Override
     public String getProvider() {
         return "KAKAO";
     }

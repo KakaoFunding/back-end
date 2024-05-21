@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.fixture;
 
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
@@ -20,9 +21,13 @@ public enum FundingFixture {
         this.accumulateAmount = accumulateAmount;
     }
 
-    public Funding 생성(final Member member,
-                      final Product product) {
+    public Funding 생성(final Long fundingId,
+                      final Member member,
+                      final Product product,
+                      final Long goalAmount,
+                      final Long accumulateAmount) {
         final Funding funding = Funding.builder()
+                .fundingId(fundingId)
                 .expiredAt(expiredAt)
                 .goalAmount(goalAmount)
                 .member(member)
@@ -32,9 +37,41 @@ public enum FundingFixture {
         return funding;
     }
 
+    public Funding 생성(final Member member,
+                      final Product product,
+                      final Long goalAmount,
+                      final Long accumulateAmount) {
+        return 생성(null, member, product, goalAmount, accumulateAmount);
+    }
+
+    public Funding 생성(final Long fundingId,
+                      final Member member,
+                      final Product product,
+                      final Long accumulateAmount) {
+        return 생성(fundingId, member, product, goalAmount, accumulateAmount);
+    }
+
+    public Funding 생성(final Member member,
+                      final Product product,
+                      final Long accumulateAmount) {
+        return 생성(null, member, product, accumulateAmount);
+    }
+
+    public Funding 생성(final Member member,
+                      final Product product) {
+        return 생성(null, member, product);
+    }
+
     public Funding 생성(final Long fundingId,
                       final Member member,
                       final Product product) {
+        return 생성(fundingId, member, product, accumulateAmount);
+    }
+
+    public Funding 생성(final Long fundingId,
+                      final Member member,
+                      final Product product,
+                      final FundingStatus status) {
         final Funding funding = Funding.builder()
                 .fundingId(fundingId)
                 .expiredAt(expiredAt)

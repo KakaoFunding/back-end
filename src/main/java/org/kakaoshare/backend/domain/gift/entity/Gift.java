@@ -18,6 +18,7 @@ import org.kakaoshare.backend.domain.receipt.entity.Receipt;
 
 import java.time.LocalDateTime;
 
+import static org.kakaoshare.backend.domain.gift.entity.GiftStatus.CANCEL_REFUND;
 import static org.kakaoshare.backend.domain.gift.entity.GiftStatus.NOT_USED;
 
 
@@ -52,8 +53,17 @@ public class Gift extends BaseTimeEntity {
 
     @Builder
     public Gift(final LocalDateTime expiredAt, final Receipt receipt) {
+        validateExpiredAt(expiredAt);
         this.expiredAt = expiredAt;
         this.receipt = receipt;
+    }
+
+    public void cancel() {
+        this.status = CANCEL_REFUND;
+    }
+
+    public boolean canceled() {
+        return status.canceled();
     }
 
     @Override
@@ -66,5 +76,11 @@ public class Gift extends BaseTimeEntity {
                 ", expiredAt=" + expiredAt +
                 ", receipt=" + receipt +
                 '}';
+    }
+
+    private void validateExpiredAt(final LocalDateTime expiredAt) {
+        if (!expiredAt.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException();
+        }
     }
 }

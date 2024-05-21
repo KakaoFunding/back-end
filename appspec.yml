@@ -6,14 +6,37 @@ files:
     destination: /home/ec2-user/cicd
     overwrite: yes
 
+file_exists_behavior: OVERWRITE
+
 permissions:
-  - object: /
+  - object: /home/ec2-user/cicd/scripts/*.sh
+    mode: 755
     pattern: "**"
     owner: ec2-user
     group: ec2-user
+  - object: /home/ec2-user/cicd
+    mode: 664
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
+    type:
+      - file
+      - directory
+  - object: /home/ec2-user/cicd/*.log
+    mode: 664
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
+    type:
+      - file
 
 hooks:
-  AfterInstall:
-    - location: scripts/deploy.sh
+  ApplicationStop:
+    - location: scripts/stop.sh
       timeout: 60
+      runas: ec2-user
+
+  ApplicationStart:
+    - location: scripts/deploy.sh
+      timeout: 600
       runas: ec2-user
