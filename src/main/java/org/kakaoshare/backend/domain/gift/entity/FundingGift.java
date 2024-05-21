@@ -22,8 +22,8 @@ public class FundingGift extends BaseTimeEntity {
     private Funding funding;
 
     @Builder.Default
-    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private GiftStatus status = NOT_USED;
 
     @Column(nullable = false)

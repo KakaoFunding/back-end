@@ -10,7 +10,7 @@ import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.product.service.ProductService;
-import org.kakaoshare.backend.domain.wish.dto.MyWishDetail;
+import org.kakaoshare.backend.domain.wish.dto.WishDetail;
 import org.kakaoshare.backend.domain.wish.dto.WishReservationEvent;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.kakaoshare.backend.domain.wish.error.WishErrorCode;
@@ -159,7 +159,7 @@ class WishServiceTest {
         // given
         Wish wish = WishFixture.TEST_WISH3.생성();//isPublic=true
         Boolean isPublic = wish.getIsPublic();
-        MyWishDetail myWishDetail = new MyWishDetail(
+        WishDetail wishDetail = new WishDetail(
                 wish.getWishId(),
                 product.getProductId(),
                 product.getName(),
@@ -169,7 +169,7 @@ class WishServiceTest {
         when(wishRepository.findById(any()))
                 .thenReturn(Optional.of(wish));
         when(wishRepository.findWishDetailsByProviderId(any()))
-                .thenReturn(List.of(myWishDetail));
+                .thenReturn(List.of(wishDetail));
         
         // when
         wishService.changeWishType(member.getProviderId(), wish.getWishId());
