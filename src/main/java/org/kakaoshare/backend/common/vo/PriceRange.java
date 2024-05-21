@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PriceRange {
+public abstract class PriceRange {
     private int minPrice;
     private int maxPrice;
     public PriceRange(final int minPrice, final int maxPrice) {
