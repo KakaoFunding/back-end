@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import static org.kakaoshare.backend.common.error.GlobalErrorCode.INTERNAL_SERVER_ERROR;
@@ -43,20 +42,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(errorCode);
     }
     
-    @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        GlobalErrorCode errorCode = GlobalErrorCode.RESOURCE_NOT_FOUND;
-        logException(ex, errorCode);
-        return handleExceptionInternal(errorCode);
-    }
-    
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<?> handleBusinessException(BusinessException e) {
         ErrorCode errorCode = e.getErrorCode();
         logException(e, errorCode);
         return handleExceptionInternal(errorCode);
     }
-    
+
     @ExceptionHandler(WebClientResponseException.class)
     protected ResponseEntity<?> handleWebClientResponseException(final WebClientResponseException exception) {
         logException(exception, INTERNAL_SERVER_ERROR, exception.getResponseBodyAsString());
@@ -66,7 +58,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(ErrorResponse.from(errorCode));
+                .body(errorResponseOf(errorCode));
+    }
+    
+    private ErrorResponse errorResponseOf(ErrorCode errorCode) {
+        return ErrorResponse.builder()
+                .code(errorCode.getHttpStatus().value())
+                .message(errorCode.getMessage())
+                .build();
     }
     
     private void logException(final Exception e, final ErrorCode errorCode) {
@@ -75,7 +74,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 errorCode.getHttpStatus().value(),
                 errorCode.getMessage());
     }
-    
+
     /**
      * ErrorCode가 아닌 예외 객체의 특정 값이 필요한 경우 사용하는 로깅 메서드
      * @param e 예외 클래스
