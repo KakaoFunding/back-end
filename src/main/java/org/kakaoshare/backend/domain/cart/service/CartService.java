@@ -68,9 +68,7 @@ public class CartService {
         cart.updateItemCount(newQuantity - cart.getItemCount());
         cartRepository.save(cart);
 
-        return CartRegisterResponse.builder()
-                .message("장바구니 상품의 수량이 업데이트되었습니다.")
-                .build();
+        return CartRegisterResponse.from(cart);
     }
 
     @Transactional
