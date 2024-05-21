@@ -8,12 +8,10 @@ import org.kakaoshare.backend.domain.cart.entity.Cart;
 @Builder
 public class CartRegisterResponse {
     private Long cartId;
-    private String message;
 
     public static CartRegisterResponse from(Cart cart){
         return CartRegisterResponse.builder()
                 .cartId(cart.getCartId())
-                .message("상품이 장바구니에 추가되었습니다.")
                 .build();
     }
 }
