@@ -21,44 +21,37 @@ services:
       - app3
 
   app1:
-    image: "${IMAGE_NAME}:${IMAGE_TAG}"
+    image: "yeachan05/application:latest"
     restart: always
     container_name: "app1"
     ports:
       - "8081:8080"
-    build:
-      context: .
-      dockerfile: Dockerfile
     depends_on:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
 
   app2:
-    image: "${IMAGE_NAME}:${IMAGE_TAG}"
+    image: "yeachan05/application:latest"
     restart: always
     container_name: "app2"
     ports:
       - "8082:8080"
-    build:
-      context: .
-      dockerfile: Dockerfile
     depends_on:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
 
   app3:
-    image: "${IMAGE_NAME}:${IMAGE_TAG}"
+    image: "yeachan05/application:latest"
     restart: always
     container_name: "app3"
     ports:
       - "8083:8080"
-    build:
-      context: .
-      dockerfile: Dockerfile
     depends_on:
       - redis
+    volumes:
+      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
 
   redis:
     container_name: redis
@@ -66,5 +59,3 @@ services:
     restart: always
     ports:
       - "6379:6379"
-    volumes:
-      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
