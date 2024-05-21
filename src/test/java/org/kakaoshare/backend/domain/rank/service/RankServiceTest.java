@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
-import org.kakaoshare.backend.domain.rank.dto.PriceRange;
+import org.kakaoshare.backend.common.vo.PriceRange;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
 import org.kakaoshare.backend.domain.rank.util.RankType;
 import org.kakaoshare.backend.domain.rank.util.TargetType;

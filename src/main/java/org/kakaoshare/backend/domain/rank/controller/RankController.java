@@ -3,7 +3,7 @@ package org.kakaoshare.backend.domain.rank.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kakaoshare.backend.domain.rank.dto.PriceRange;
+import org.kakaoshare.backend.common.vo.PriceRange;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
 import org.kakaoshare.backend.domain.rank.util.RankType;
 import org.kakaoshare.backend.domain.rank.util.TargetType;
