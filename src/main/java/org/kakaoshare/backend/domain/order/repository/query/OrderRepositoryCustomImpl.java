@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.order.repository.query;
 
+import static org.kakaoshare.backend.common.util.RepositoryUtils.priceExpression;
 import static org.kakaoshare.backend.domain.member.entity.QMember.member;
 import static org.kakaoshare.backend.domain.order.entity.QOrder.order;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
@@ -15,7 +16,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RepositoryUtils;
+import org.kakaoshare.backend.common.vo.PriceRange;
 import org.kakaoshare.backend.domain.member.entity.Gender;
+import org.kakaoshare.backend.domain.rank.dto.RankPriceRange;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
 import org.kakaoshare.backend.domain.rank.util.TargetType;
 import org.springframework.data.domain.Page;
@@ -24,8 +27,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
+public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+
     public Page<RankResponse> findTopRankedProductsByOrders(LocalDateTime term, Pageable pageable) {
         var subQuery = JPAExpressions
                 .select(order.ordersId)
@@ -56,11 +60,11 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom{
 
         return RepositoryUtils.toPage(pageable, contentQuery, countQuery);
     }
+
     public List<RankResponse> findProductsByWish(TargetType targetType, int minPrice, int maxPrice, int limit) {
-
+        PriceRange priceRange = new RankPriceRange(minPrice, maxPrice);
         BooleanExpression genderCondition = createGenderCondition(targetType);
-        BooleanExpression priceCondition = product.price.between(minPrice, maxPrice);
-
+        BooleanExpression priceCondition = priceExpression(product.price, priceRange);
 
         return queryFactory
                 .select(Projections.constructor(RankResponse.class,
