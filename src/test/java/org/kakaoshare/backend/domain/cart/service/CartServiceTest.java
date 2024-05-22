@@ -2,11 +2,13 @@ package org.kakaoshare.backend.domain.cart.service;
 
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.kakaoshare.backend.domain.cart.dto.inquiry.CartResponse;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterRequest;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
@@ -95,5 +97,23 @@ public class CartServiceTest {
 
         assertNotNull(response);
         verify(cartRepository).save(any(Cart.class));
+    }
+
+    @Test
+    @DisplayName("옵션이 없는 장바구니 아이템 조회")
+    void getCartItems() {
+        String providerId = "provider123";
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L);
+        List<Cart> carts = List.of(new Cart(1L, 2, member, product, null, null));
+
+        when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
+        when(cartRepository.findByMemberId(member.getMemberId())).thenReturn(carts);
+
+        List<CartResponse> responses = cartService.getCartItems(providerId);
+
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
+        verify(cartRepository).findByMemberId(member.getMemberId());
     }
 }
