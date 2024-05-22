@@ -140,4 +140,24 @@ public class CartServiceTest {
         assertEquals("빨강", responses.get(0).getOptionDetailName());
         verify(cartRepository).findByMemberId(member.getMemberId());
     }
+    @Test
+    @DisplayName("장바구니 아이템 수량 수정")
+    void updateCartItem() {
+        Long productId = 1L;
+        String providerId = "provider123";
+        int newQuantity = 3;
+
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L);
+        Cart cart = new Cart(1L, 2, member, product, null, null);
+
+        when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(cartRepository.findByMemberIdAndProductId(member.getMemberId(), productId)).thenReturn(Optional.of(cart));
+
+        cartService.updateItem(productId, providerId, newQuantity);
+
+        assertEquals(newQuantity, cart.getItemCount());
+        verify(cartRepository).save(cart);
+    }
 }
