@@ -11,6 +11,7 @@ import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.jsonwebtoken.lang.Collections;
+import org.kakaoshare.backend.common.vo.PriceRange;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,7 +25,8 @@ public final class RepositoryUtils {
 
     }
 
-    public static <T> Page<T> toPage(final Pageable pageable, final JPAQuery<T> contentQuery, final JPAQuery<Long> countQuery) {
+    public static <T> Page<T> toPage(final Pageable pageable, final JPAQuery<T> contentQuery,
+                                     final JPAQuery<Long> countQuery) {
         if (countQuery.fetchFirst() == null) {
             return Page.empty();
         }
@@ -40,7 +42,8 @@ public final class RepositoryUtils {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final T target) {
+    public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(
+            final SimpleExpression<T> simpleExpression, final T target) {
         if (target == null) {
             return null;
         }
@@ -48,7 +51,8 @@ public final class RepositoryUtils {
         return simpleExpression.eq(target);
     }
 
-    public static <T extends Comparable<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final SimpleExpression<T> target) {
+    public static <T extends Comparable<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression,
+                                                                           final SimpleExpression<T> target) {
         return simpleExpression.eq(target);
     }
 
@@ -60,9 +64,10 @@ public final class RepositoryUtils {
         return stringPath.contains(keyword);
     }
 
-    public static <T extends Number & Comparable<?>> BooleanExpression containsExpression(final NumberExpression<T> numberExpression,
-                                                                                          final Integer min,
-                                                                                          final Integer max) {
+    public static <T extends Number & Comparable<?>> BooleanExpression containsExpression(
+            final NumberExpression<T> numberExpression,
+            final Integer min,
+            final Integer max) {
         if (min == null && max == null) {
             return null;
         }
@@ -78,7 +83,8 @@ public final class RepositoryUtils {
         return numberExpression.between(min, max);
     }
 
-    public static <T> BooleanExpression containsExpression(final SimpleExpression<T> simpleExpression, final List<T> items) {
+    public static <T> BooleanExpression containsExpression(final SimpleExpression<T> simpleExpression,
+                                                           final List<T> items) {
         if (Collections.isEmpty(items)) {
             return null;
         }
@@ -86,7 +92,8 @@ public final class RepositoryUtils {
         return simpleExpression.in(items);
     }
 
-    public static <T> OrderSpecifier<?>[] createOrderSpecifiers(final EntityPathBase<T> qClass, final Pageable pageable) {
+    public static <T> OrderSpecifier<?>[] createOrderSpecifiers(final EntityPathBase<T> qClass,
+                                                                final Pageable pageable) {
         return pageable.getSort()
                 .stream()
                 .map(sort -> toOrderSpecifier(qClass, sort))
@@ -105,5 +112,10 @@ public final class RepositoryUtils {
         }
 
         return Order.DESC;
+    }
+
+    public static <T extends Number & Comparable<?>> BooleanExpression priceExpression(
+            final NumberExpression<T> numberExpression, PriceRange priceRange) {
+        return numberExpression.between(priceRange.getMinPrice(), priceRange.getMaxPrice());
     }
 }
