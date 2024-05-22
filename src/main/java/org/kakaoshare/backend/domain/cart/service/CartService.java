@@ -49,7 +49,7 @@ public class CartService {
                     .product(product)
                     .option(option)
                     .optionDetail(optionDetail)
-                    .itemCount(1)
+                    .itemCount(request.getItemCount())
                     .build();
             cartRepository.save(newCart);
             return CartRegisterResponse.from(newCart);
