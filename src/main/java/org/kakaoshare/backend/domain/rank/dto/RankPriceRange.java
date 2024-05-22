@@ -14,7 +14,7 @@ public class RankPriceRange extends PriceRange {
 
     private void validatePriceRange(int minPrice, int maxPrice) {
         if (minPrice < 0 || minPrice > maxPrice) {
-            throw new RankException(RankErrorCode.INCORRECT_PRICE_RANGE);
+            throw new RankException(RankErrorCode.INVALID_PRICE_RANGE);
         }
     }
 }
