@@ -116,4 +116,28 @@ public class CartServiceTest {
         assertEquals(1, responses.size());
         verify(cartRepository).findByMemberId(member.getMemberId());
     }
+
+    @Test
+    @DisplayName("옵션이 있는 장바구니 아이템 조회")
+    void getCartItemsWithOption() {
+        String providerId = "provider123";
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L);
+        Option option = new Option(1L, "색상", product);
+        OptionDetail optionDetail = new OptionDetail(1L, "빨강", 1, 1000L, "url", option);
+
+        List<Cart> carts = List.of(new Cart(1L, 3, member, product, option, optionDetail));
+
+        when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
+        when(cartRepository.findByMemberId(member.getMemberId())).thenReturn(carts);
+
+        List<CartResponse> responses = cartService.getCartItems(providerId);
+
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
+        assertEquals(3, responses.get(0).getQuantity());
+        assertEquals("색상", responses.get(0).getOptionName());
+        assertEquals("빨강", responses.get(0).getOptionDetailName());
+        verify(cartRepository).findByMemberId(member.getMemberId());
+    }
 }
