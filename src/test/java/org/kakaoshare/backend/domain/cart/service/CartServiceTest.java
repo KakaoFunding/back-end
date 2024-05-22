@@ -67,4 +67,33 @@ public class CartServiceTest {
         assertNotNull(response);
         verify(cartRepository).save(any(Cart.class));
     }
+
+    @Test
+    @DisplayName("카트 아이템 등록 - 옵션 선택 포함")
+    void registerItemWithOption() {
+        Long productId = 1L;
+        Long optionId = 1L;
+        Long optionDetailId = 1L;
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L);
+        Option mockOption = Mockito.mock(Option.class);
+        OptionDetail mockOptionDetail = Mockito.mock(OptionDetail.class);
+
+        when(memberRepository.findMemberByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(optionRepository.findById(optionId)).thenReturn(Optional.of(mockOption));
+        when(optionDetailRepository.findById(optionDetailId)).thenReturn(Optional.of(mockOptionDetail));
+        when(cartRepository.findByMemberIdAndProductId(member.getMemberId(), productId)).thenReturn(Optional.empty());
+
+        CartRegisterRequest request = CartRegisterRequest.builder()
+                .productId(productId)
+                .optionId(optionId)
+                .optionDetailId(optionDetailId)
+                .build();
+
+        CartRegisterResponse response = cartService.registerItem(request, member.getProviderId());
+
+        assertNotNull(response);
+        verify(cartRepository).save(any(Cart.class));
+    }
 }
