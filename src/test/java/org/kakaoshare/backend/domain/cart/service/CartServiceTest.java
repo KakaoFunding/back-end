@@ -160,4 +160,23 @@ public class CartServiceTest {
         assertEquals(newQuantity, cart.getItemCount());
         verify(cartRepository).save(cart);
     }
+
+    @Test
+    @DisplayName("장바구니 아이템 삭제")
+    void deleteCartItem() {
+        Long productId = 1L;
+        String providerId = "provider123";
+
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L);
+        Cart cart = new Cart(1L, 2, member, product, null, null);
+
+        when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(cartRepository.findByMemberIdAndProductId(member.getMemberId(), productId)).thenReturn(Optional.of(cart));
+
+        cartService.deleteItem(productId, providerId);
+
+        verify(cartRepository).delete(cart);
+    }
 }
