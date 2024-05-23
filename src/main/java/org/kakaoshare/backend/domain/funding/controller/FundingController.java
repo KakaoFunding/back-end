@@ -45,7 +45,7 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/funding/friends/active")
+    @GetMapping("/funding/friends")
     public ResponseEntity<?> getFriendsActiveFundingItems(@LoggedInMember String providerId,
                                                           @RequestBody FriendFundingItemRequest fundingRequest) {
         List<FundingResponse> activeFundings = fundingService.getFriendsActiveFundingItems(providerId, fundingRequest);
