@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
@@ -16,6 +17,8 @@ import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.detail.KakaoFriendListDto;
 import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
@@ -85,8 +88,10 @@ public class FundingService {
         );
     }
 
-    public List<FundingResponse> getFriendsActiveFundingItems(String accessToken) {
-        List<String> providerIds = getFriendsProviderIds(accessToken);
+    public List<FundingResponse> getFriendsActiveFundingItems(String providerId,
+                                                              FriendFundingItemRequest friendFundingItemRequest) {
+        List<String> providerIds = getFriendsProviderIds(friendFundingItemRequest);
+        validateIsFriend(providerIds, friendFundingItemRequest);
         List<Member> members = memberRepository.findByProviderIds(providerIds);
         List<Long> memberIds = members.stream().map(Member::getMemberId).toList();
 
@@ -122,10 +127,21 @@ public class FundingService {
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
     }
 
-    private List<String> getFriendsProviderIds(String accessToken) {
-        List<KakaoFriendListDto> friendsList = oAuthWebClientService.getFriendsList(accessToken);
+    private List<String> getFriendsProviderIds(FriendFundingItemRequest friendFundingItemRequest) {
+        List<KakaoFriendListDto> friendsList = oAuthWebClientService.getFriendsList(
+                friendFundingItemRequest.getAccessToken());
         return friendsList.stream()
                 .map(KakaoFriendListDto::getId)
                 .toList();
+    }
+
+    private void validateIsFriend(List<String> providerIds, FriendFundingItemRequest friendFundingItemRequest) {
+        List<KakaoFriendListDto> friends = oAuthWebClientService.getFriendsList(
+                friendFundingItemRequest.getAccessToken());
+        boolean isFriend = providerIds.stream().anyMatch(providerId ->
+                friends.stream().anyMatch(friend -> friend.getId().equals(providerId)));
+        if (!isFriend) {
+            throw new MemberException(MemberErrorCode.NO_SUCH_RELATIONSHIP);
+        }
     }
 }
