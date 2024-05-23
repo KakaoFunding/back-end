@@ -27,25 +27,6 @@ public class OAuthWebClientService {
                 .block();
     }
 
-    public List<KakaoFriendListDto> getFriendsList(String accessToken) {
-        return webClient.get()
-                .uri(FRIENDS_LIST_SERVICE_URL)
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .map(response -> (List<Map<String, Object>>) response.get("elements"))
-                .map(elements -> elements.stream()
-                        .map(element -> KakaoFriendListDto.builder()
-                                .id(element.get("id").toString())
-                                .uuid(element.get("uuid").toString())
-                                .favorite((Boolean) element.get("favorite"))
-                                .profileNickname(element.get("profile_nickname").toString())
-                                .profileThumbnailImage(element.get("profile_thumbnail_image").toString())
-                                .build())
-                        .collect(Collectors.toList()))
-                .block();
-    }
-
     private String getProfileRequestUri(final ClientRegistration registration) {
         return registration.getProviderDetails()
                 .getUserInfoEndpoint()

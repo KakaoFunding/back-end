@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.friend.service.KakaoFriendService;
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
@@ -41,8 +42,7 @@ public class FundingService {
     private final FundingRepository fundingRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
-    private final OAuthWebClientService oAuthWebClientService;
-
+    private final KakaoFriendService kakaoFriendService;
 
     @Transactional
     public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
@@ -128,7 +128,7 @@ public class FundingService {
     }
 
     private List<String> getFriendsProviderIds(FriendFundingItemRequest friendFundingItemRequest) {
-        List<KakaoFriendListDto> friendsList = oAuthWebClientService.getFriendsList(
+        List<KakaoFriendListDto> friendsList = kakaoFriendService.getFriendsList(
                 friendFundingItemRequest.getAccessToken());
         return friendsList.stream()
                 .map(KakaoFriendListDto::getId)
@@ -136,7 +136,7 @@ public class FundingService {
     }
 
     private void validateIsFriend(List<String> providerIds, FriendFundingItemRequest friendFundingItemRequest) {
-        List<KakaoFriendListDto> friends = oAuthWebClientService.getFriendsList(
+        List<KakaoFriendListDto> friends = kakaoFriendService.getFriendsList(
                 friendFundingItemRequest.getAccessToken());
         boolean isFriend = providerIds.stream().anyMatch(providerId ->
                 friends.stream().anyMatch(friend -> friend.getId().equals(providerId)));
