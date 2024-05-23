@@ -1,6 +1,9 @@
 package org.kakaoshare.backend.domain.funding.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
+import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
@@ -40,6 +43,13 @@ public class FundingController {
     public ResponseEntity<?> getFundingProgress(@PathVariable Long fundingId, @LoggedInMember String providerId) {
         ProgressResponse response = fundingService.getFundingProgress(fundingId, providerId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/friends/active")
+    public ResponseEntity<?> getFriendsActiveFundingItems(@LoggedInMember String providerId,
+                                                          @RequestBody FriendFundingItemRequest fundingRequest) {
+        List<FundingResponse> activeFundings = fundingService.getFriendsActiveFundingItems(providerId, fundingRequest);
+        return ResponseEntity.ok(activeFundings);
     }
 
     @GetMapping("/members/funding/products")
