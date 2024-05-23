@@ -95,7 +95,8 @@ public class FundingService {
         List<Member> members = memberRepository.findByProviderIds(providerIds);
         List<Long> memberIds = members.stream().map(Member::getMemberId).toList();
 
-        List<Funding> fundingItems = fundingRepository.findActiveFundingItemsByMemberIds(memberIds);
+        List<Funding> fundingItems = fundingRepository.findActiveFundingItemsByMemberIds(memberIds,
+                friendFundingItemRequest.getFundingStatus().getDescription());
         return fundingItems.stream().map(FundingResponse::from).toList();
     }
 

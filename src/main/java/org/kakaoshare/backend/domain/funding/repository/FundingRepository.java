@@ -17,6 +17,7 @@ public interface FundingRepository extends JpaRepository<Funding, Long>, Funding
             "WHERE f.fundingId =:fundingId")
     Optional<FundingProductDto> findAccumulateAmountAndProductIdById(@Param("fundingId") final Long fundingId);
 
-    @Query("SELECT f FROM Funding f WHERE f.member.memberId IN :memberIds AND f.status = 'PROGRESS'")
-    List<Funding> findActiveFundingItemsByMemberIds(List<Long> memberIds);
+    @Query("SELECT f FROM Funding f WHERE f.member.memberId IN :memberIds AND f.status = :status")
+    List<Funding> findActiveFundingItemsByMemberIds(List<Long> memberIds, String status);
+
 }
