@@ -1,8 +1,6 @@
 package org.kakaoshare.backend.domain.cart.dto;
 
 import lombok.Getter;
-import org.kakaoshare.backend.domain.cart.dto.delete.CartDeleteResponse;
-import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
 
 @Getter
@@ -13,12 +11,11 @@ public abstract class CartIdResponse {
         this.cartId = cartId;
     }
 
-    public static CartIdResponse from(Cart cart, Class<? extends CartIdResponse> clazz) {
-        if (clazz.equals(CartDeleteResponse.class)) {
-            return new CartDeleteResponse(cart.getCartId());
-        } else if (clazz.equals(CartRegisterResponse.class)) {
-            return new CartRegisterResponse(cart.getCartId());
+    public static <T extends CartIdResponse> T from(Cart cart, Class<T> clazz) {
+        try {
+            return clazz.getDeclaredConstructor(Long.class).newInstance(cart.getCartId());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid class for cart response", e);
         }
-        throw new IllegalArgumentException("Invalid class for cart response");
     }
 }
