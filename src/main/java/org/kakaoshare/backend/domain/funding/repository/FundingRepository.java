@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.funding.repository;
 
+import java.util.List;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.repository.query.FundingRepositoryCustom;
@@ -15,4 +16,7 @@ public interface FundingRepository extends JpaRepository<Funding, Long>, Funding
             "FROM Funding f " +
             "WHERE f.fundingId =:fundingId")
     Optional<FundingProductDto> findAccumulateAmountAndProductIdById(@Param("fundingId") final Long fundingId);
+
+    @Query("SELECT f FROM Funding f WHERE f.member.memberId IN :memberIds AND f.status = 'PROGRESS'")
+    List<Funding> findActiveFundingItemsByMemberIds(List<Long> memberIds);
 }
