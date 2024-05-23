@@ -39,7 +39,7 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/members/funding/{fundingId}")
+    @GetMapping("/funding/{fundingId}")
     public ResponseEntity<?> getFundingProgress(@PathVariable Long fundingId, @LoggedInMember String providerId) {
         ProgressResponse response = fundingService.getFundingProgress(fundingId, providerId);
         return ResponseEntity.ok(response);
