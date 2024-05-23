@@ -14,8 +14,10 @@ import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
+import org.kakaoshare.backend.domain.member.dto.oauth.profile.detail.KakaoFriendListDto;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
+import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
@@ -36,6 +38,8 @@ public class FundingService {
     private final FundingRepository fundingRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
+    private final OAuthWebClientService oAuthWebClientService;
+
 
     @Transactional
     public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
@@ -81,6 +85,14 @@ public class FundingService {
         );
     }
 
+    public List<FundingResponse> getFriendsActiveFundingItems(String accessToken) {
+        List<String> providerIds = getFriendsProviderIds(accessToken);
+        List<Member> members = memberRepository.findByProviderIds(providerIds);
+        List<Long> memberIds = members.stream().map(Member::getMemberId).toList();
+
+        List<Funding> fundingItems = fundingRepository.findActiveFundingItemsByMemberIds(memberIds);
+        return fundingItems.stream().map(FundingResponse::from).toList();
+    }
 
     public FundingPreviewResponse preview(final FundingPreviewRequest fundingPreviewRequest) {
         final Long fundingId = fundingPreviewRequest.fundingId();
@@ -108,5 +120,12 @@ public class FundingService {
     private ProductDto findProductDtoByProductId(final Long productId) {
         return productRepository.findProductDtoById(productId)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
+    }
+
+    private List<String> getFriendsProviderIds(String accessToken) {
+        List<KakaoFriendListDto> friendsList = oAuthWebClientService.getFriendsList(accessToken);
+        return friendsList.stream()
+                .map(KakaoFriendListDto::getId)
+                .toList();
     }
 }
