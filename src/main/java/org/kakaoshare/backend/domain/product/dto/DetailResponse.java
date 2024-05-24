@@ -26,12 +26,18 @@ public class DetailResponse {
     private final String billingNotice;
     private final String caution;
     private final List<String> productThumbnails;
-    public static DetailResponse of(final Product product,List<OptionResponse> optionsResponses) {
+    private final int wishCount;
+    private final boolean isWish;
+
+    public static DetailResponse of(final Product product, List<OptionResponse> optionsResponses, Boolean isWished) {
         String origin = product.getProductDetail() != null ? product.getProductDetail().getOrigin() : "정보 없음";
-        String manufacturer = product.getProductDetail() != null ? product.getProductDetail().getManufacturer() : "정보 없음";
+        String manufacturer =
+                product.getProductDetail() != null ? product.getProductDetail().getManufacturer() : "정보 없음";
         String tel = product.getProductDetail() != null ? product.getProductDetail().getTel() : "정보 없음";
-        String deliverDescription = product.getProductDetail() != null ? product.getProductDetail().getDeliverDescription() : "정보 없음";
-        String billingNotice = product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : "정보 없음";
+        String deliverDescription =
+                product.getProductDetail() != null ? product.getProductDetail().getDeliverDescription() : "정보 없음";
+        String billingNotice =
+                product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : "정보 없음";
         String caution = product.getProductDetail() != null ? product.getProductDetail().getCaution() : "정보 없음";
 
         return DetailResponse.builder()
@@ -51,6 +57,8 @@ public class DetailResponse {
                 .brandName(product.getBrandName())
                 .brandId(product.getBrand().getBrandId())
                 .brandThumbnail(product.getBrand().getIconPhoto())
+                .wishCount(product.getWishCount())
+                .isWish(isWished)
                 .build();
     }
 }
