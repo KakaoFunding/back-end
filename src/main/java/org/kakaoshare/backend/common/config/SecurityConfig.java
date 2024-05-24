@@ -22,7 +22,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final List<String> ORIGIN_PATTERN = List.of("https://kakao-funding-git-refactor-241-teamfunding.vercel.app");
+    private static final List<String> ORIGIN_PATTERN = List.of("https://www.kakaofunding.kro.kr/");
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
     public static final String API_V_1 = "/api/v1/";
     private static final List<String> ALLOWED_HEADERS = Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With");
@@ -52,13 +52,14 @@ public class SecurityConfig {
                 .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable).disable())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(httpSecurityCorsConfigurer -> corsConfigurationSource())
                 .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedOriginPatterns(ORIGIN_PATTERN);
         configuration.setAllowedHeaders(ALLOWED_HEADERS);
         configuration.setAllowedMethods(ALLOWED_METHODS);
         configuration.setAllowCredentials(true);
