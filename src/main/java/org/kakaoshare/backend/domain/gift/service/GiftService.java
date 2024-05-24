@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.gift.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +40,12 @@ public class GiftService {
         }
         return giftDescriptionResponse;
     }
-    public Page<GiftResponse> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
+
+    public PageResponse<?> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
         Member member = findMemberByProviderId(providerId);
-        return giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), status,
+        Page<GiftResponse> gifts = giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), status,
                 pageable);
+        return PageResponse.from(gifts);
     }
 
     private Member findMemberByProviderId(String providerId) {
