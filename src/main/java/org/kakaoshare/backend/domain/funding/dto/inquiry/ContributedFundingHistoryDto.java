@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 public record ContributedFundingHistoryDto(Long fundingId,
                                            Long fundingDetailId,
-                                           Long attributeAmount,
-                                           LocalDateTime attributedAt,
+                                           Long contributedAmount,
+                                           LocalDateTime contributedAt,
                                            String creatorName,
                                            String status) {
     @QueryProjection

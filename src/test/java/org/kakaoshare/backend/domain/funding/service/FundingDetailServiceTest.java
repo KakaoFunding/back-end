@@ -130,8 +130,8 @@ public class FundingDetailServiceTest {
 
     private ContributedFundingHistoryDto getFundingHistoryDto(final Long fundingId,
                                                              final Long fundingDetailId,
-                                                             final LocalDateTime attributedAt,
+                                                             final LocalDateTime contributedAt,
                                                              final String creatorName, final String status) {
-        return new ContributedFundingHistoryDto(fundingId, fundingDetailId, 1000L, attributedAt, creatorName, status);
+        return new ContributedFundingHistoryDto(fundingId, fundingDetailId, 1000L, contributedAt, creatorName, status);
     }
 }
