@@ -43,9 +43,7 @@ import java.util.stream.Stream;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.jpa.JPAExpressions.select;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
-import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
+import static org.kakaoshare.backend.common.util.RepositoryUtils.*;
 import static org.kakaoshare.backend.domain.brand.entity.QBrand.brand;
 import static org.kakaoshare.backend.domain.category.entity.QCategory.category;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
@@ -76,18 +74,17 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     @Override
     public Page<ProductDto> findAllByBrandId(final Long brandId,
                                              final Pageable pageable) {
-        List<ProductDto> fetch = queryFactory
+        JPAQuery<ProductDto> contentQuery = queryFactory
                 .select(getProductDto())
                 .from(product)
                 .join(product.brand, brand)
                 .where(brand.brandId.eq(brandId))
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .limit(pageable.getPageSize());
         
         JPAQuery<Long> countQuery = countBrand(brandId);
-        return toPage(pageable, fetch, countQuery);
+        return toPage(pageable, contentQuery, countQuery);
     }
     
     @Override

@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.gift.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,7 @@ public class GiftController {
     public ResponseEntity<?> getGiftBox(@LoggedInMember final String providerId,
                                         @PageableDefault(size = 20) Pageable pageable,
                                         @RequestParam(name = "status", required = false, defaultValue = "NOT_USED") GiftStatus status) {
-        Page<GiftResponse> giftSliceResponse = giftService.getMyGiftBox(providerId, pageable, status);
+        PageResponse<?> giftSliceResponse = giftService.getMyGiftBox(providerId, pageable, status);
         return ResponseEntity.ok(giftSliceResponse);
     }
 
