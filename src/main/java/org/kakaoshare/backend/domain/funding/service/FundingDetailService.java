@@ -43,7 +43,7 @@ public class FundingDetailService {
         return fundingDetailRepository.findHistoryByCondition(providerId, date, status, pageable);
     }
 
-    public Page<FundingContributorResponse> getTopContributors(Long fundingId, Pageable pageable, String accessToken) {
+    public PageResponse<?> getTopContributors(Long fundingId, Pageable pageable, String accessToken) {
         Page<FundingDetail> fundingDetails = fundingDetailRepository.findTopContributorsByFundingId(fundingId, pageable);
 
         List<KakaoFriendListDto> friendsList = kakaoFriendService.getFriendsList(accessToken);
@@ -59,7 +59,8 @@ public class FundingDetailService {
                     );
                 }).toList();
 
-        return new PageImpl<>(responses, pageable, fundingDetails.getTotalElements());
+        Page<FundingContributorResponse> contributorResponses = new PageImpl<>(responses, pageable, fundingDetails.getTotalElements());
+        return PageResponse.from(contributorResponses);
     }
 
     private KakaoFriendListDto findFriendProfile(String providerId, List<KakaoFriendListDto> friendsList) {

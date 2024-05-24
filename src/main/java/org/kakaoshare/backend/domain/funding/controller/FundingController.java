@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.funding.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
@@ -76,8 +77,8 @@ public class FundingController {
                                                 @PageableDefault(size = 5) Pageable pageable,
                                                 @RequestHeader("Authorization") String accessToken) {
 
-        accessToken = accessToken.substring("Bearer ".length()); // Assuming the token is sent as "Bearer [token]"
-        Page<FundingContributorResponse> contributors = fundingDetailService.getTopContributors(fundingId, pageable,
+        accessToken = accessToken.substring("Bearer ".length());
+        PageResponse<?> contributors = fundingDetailService.getTopContributors(fundingId, pageable,
                 accessToken);
         return ResponseEntity.ok(contributors);
     }
