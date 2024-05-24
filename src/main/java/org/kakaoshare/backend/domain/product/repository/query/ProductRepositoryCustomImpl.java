@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.micrometer.common.lang.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.error.GlobalErrorCode;
 import org.kakaoshare.backend.common.error.exception.BusinessException;
@@ -201,7 +202,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     @Override
-    public DescriptionResponse findProductWithDetailsAndPhotos(Long productId, Member member) {
+    public DescriptionResponse findProductWithDetailsAndPhotos(Long productId, @Nullable Member member) {
         // 제품 기본 정보 조회
         Product product = Optional.ofNullable(queryFactory
                         .selectFrom(QProduct.product)
@@ -221,12 +222,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .from(QProductThumbnail.productThumbnail)
                 .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
                 .fetch();
-        Boolean isWished = queryFactory
-                .select(QWish.wish.count().gt(0L))
-                .from(QWish.wish)
-                .where(QWish.wish.product.productId.eq(productId)
-                        .and(QWish.wish.member.memberId.eq(member.getMemberId())))
-                .fetchOne();
+        Boolean isWished = false;
+        if (member != null) {
+            isWished = queryFactory
+                    .select(QWish.wish.count().gt(0L))
+                    .from(QWish.wish)
+                    .where(QWish.wish.product.productId.eq(productId)
+                            .and(QWish.wish.member.memberId.eq(member.getMemberId())))
+                    .fetchOne();
+        }
         return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls,
                 isWished);
     }
@@ -244,12 +248,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         }
 
         List<OptionResponse> optionsResponses = findOptions(productId);
-        Boolean isWished = queryFactory
-                .select(QWish.wish.count().gt(0L))
-                .from(QWish.wish)
-                .where(QWish.wish.product.productId.eq(productId)
-                        .and(QWish.wish.member.memberId.eq(member.getMemberId())))
-                .fetchOne();
+        Boolean isWished = false;
+        if (member != null) {
+            isWished = queryFactory
+                    .select(QWish.wish.count().gt(0L))
+                    .from(QWish.wish)
+                    .where(QWish.wish.product.productId.eq(productId)
+                            .and(QWish.wish.member.memberId.eq(member.getMemberId())))
+                    .fetchOne();
+        }
         return DetailResponse.of(product, optionsResponses, isWished);
     }
 

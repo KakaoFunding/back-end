@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.product.service;
 
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
@@ -36,8 +37,8 @@ public class ProductService {
     private final ApplicationEventPublisher eventPublisher;
 
 
-    public DescriptionResponse getProductDescription(Long productId, String providerId) {
-        Member member = findMemberById(providerId);
+    public DescriptionResponse getProductDescription(Long productId, @Nullable String providerId) {
+        Member member = (providerId != null) ? findMemberById(providerId) : null;
         DescriptionResponse descriptionResponse = productRepository.findProductWithDetailsAndPhotos(productId, member);
         if (descriptionResponse == null) {
             throw new ProductException(ProductErrorCode.NOT_FOUND);
