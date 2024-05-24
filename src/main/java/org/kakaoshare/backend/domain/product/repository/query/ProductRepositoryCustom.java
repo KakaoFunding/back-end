@@ -17,7 +17,7 @@ public interface ProductRepositoryCustom {
     Page<ProductDto> findAllByBrandId(final Long brandId, final Pageable pageable);
     Page<ProductDto> findAllByProductIds(final List<Long> productIds, final Pageable pageable);
     DescriptionResponse findProductWithDetailsAndPhotos(Long productId, Member member);
-    DetailResponse findProductDetail(Long productId);
+    DetailResponse findProductDetail(Long productId, Member member);
     Page<Product4DisplayDto> findBySearchConditions(final String keyword, final Integer minPrice, final Integer maxPrice, final List<String> categories, final Pageable pageable,final String providerId);
     
     Page<SimpleBrandProductDto> findBySearchConditionsGroupByBrand(String keyword,
