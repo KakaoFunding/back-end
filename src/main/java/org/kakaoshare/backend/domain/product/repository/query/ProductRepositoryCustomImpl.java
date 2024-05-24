@@ -237,7 +237,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
 
     @Override
-    public DetailResponse findProductDetail(Long productId, Member member) {
+    public DetailResponse findProductDetail(Long productId, @Nullable Member member) {
         Product product = queryFactory
                 .selectFrom(QProduct.product)
                 .where(QProduct.product.productId.eq(productId))

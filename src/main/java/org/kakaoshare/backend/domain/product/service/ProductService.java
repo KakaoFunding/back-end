@@ -46,8 +46,8 @@ public class ProductService {
         return descriptionResponse;
     }
 
-    public DetailResponse getProductDetail(Long productId, String providerId) {
-        Member member = findMemberById(providerId);
+    public DetailResponse getProductDetail(Long productId, @Nullable String providerId) {
+        Member member = (providerId != null) ? findMemberById(providerId) : null;
         DetailResponse detailResponse = productRepository.findProductDetail(productId, member);
         if (detailResponse == null) {
             throw new ProductException(ProductErrorCode.NOT_FOUND);
