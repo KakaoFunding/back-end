@@ -29,9 +29,8 @@ public class FundingController {
     private static final int FUNDING_DEFAULT_SIZE = 20;
 
     @PostMapping("/funding/{productId}")
-    public ResponseEntity<?> registerFunding(@PathVariable Long productId, @LoggedInMember String providerId,
-                                             @RequestBody
-                                             RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerFunding(@PathVariable("productId") Long productId, @LoggedInMember String providerId,
+                                             @RequestBody RegisterRequest registerRequest) {
         RegisterResponse response = fundingService.registerFundingItem(productId, providerId, registerRequest);
         return ResponseEntity.ok(response);
     }
