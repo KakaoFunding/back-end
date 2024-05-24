@@ -3,15 +3,13 @@ package org.kakaoshare.backend.domain.product.controller;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
 import org.kakaoshare.backend.domain.product.dto.DetailResponse;
-import org.kakaoshare.backend.domain.product.dto.Product4DisplayDto;
-import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.dto.WishResponse;
 import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.service.ProductService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -51,14 +49,14 @@ public class ProductController {
             @Nullable @LoggedInMember String providerId,
             @RequestParam("categoryId") Long categoryId,
             @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
-        Page<Product4DisplayDto> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable, providerId);
+        PageResponse<?> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable, providerId);
         return ResponseEntity.ok(simpleProductsPage);
     }
     
     @GetMapping("/brands/{brandId}")
     public ResponseEntity<?> getBrandsProducts(@PathVariable("brandId") Long brandId,
                                                @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
-        Page<ProductDto> simpleProductPage = productService.getSimpleProductsByBrandId(brandId, pageable);
+        PageResponse<?> simpleProductPage = productService.getSimpleProductsByBrandId(brandId, pageable);
         return ResponseEntity.ok(simpleProductPage);
     }
     
