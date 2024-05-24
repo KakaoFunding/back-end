@@ -132,6 +132,6 @@ public class FundingDetailServiceTest {
                                                              final Long fundingDetailId,
                                                              final LocalDateTime attributedAt,
                                                              final String creatorName, final String status) {
-        return new ContributedFundingHistoryDto(fundingId, fundingDetailId, attributedAt, creatorName, status);
+        return new ContributedFundingHistoryDto(fundingId, fundingDetailId, 1000L, attributedAt, creatorName, status);
     }
 }

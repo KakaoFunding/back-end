@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public record ContributedFundingHistoryDto(Long fundingId,
                                            Long fundingDetailId,
+                                           Long attributeAmount,
                                            LocalDateTime attributedAt,
                                            String creatorName,
                                            String status) {
