@@ -15,6 +15,7 @@ import org.kakaoshare.backend.common.util.sort.SortUtil;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
+import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.option.dto.OptionResponse;
 import org.kakaoshare.backend.domain.option.dto.ProductOptionDetailResponse;
 import org.kakaoshare.backend.domain.option.entity.QOption;
@@ -31,6 +32,8 @@ import org.kakaoshare.backend.domain.product.entity.QProductDescriptionPhoto;
 import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
 import org.kakaoshare.backend.domain.search.dto.QSimpleBrandProductDto;
 import org.kakaoshare.backend.domain.search.dto.SimpleBrandProductDto;
+import org.kakaoshare.backend.domain.wish.entity.QWish;
+import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -198,7 +201,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
     
     @Override
-    public DescriptionResponse findProductWithDetailsAndPhotos(Long productId) {
+    public DescriptionResponse findProductWithDetailsAndPhotos(Long productId, Member member) {
         // 제품 기본 정보 조회
         Product product = Optional.ofNullable(queryFactory
                         .selectFrom(QProduct.product)
@@ -218,8 +221,13 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .from(QProductThumbnail.productThumbnail)
                 .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
                 .fetch();
-        
-        return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls);
+        Boolean isWished = queryFactory
+                .select(QWish.wish.count().gt(0L))
+                .from(QWish.wish)
+                .where(QWish.wish.product.productId.eq(productId)
+                        .and(QWish.wish.member.memberId.eq(member.getMemberId())))
+                .fetchOne();
+        return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls , isWished);
     }
     
     
