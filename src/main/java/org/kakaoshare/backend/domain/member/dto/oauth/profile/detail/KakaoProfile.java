@@ -35,6 +35,13 @@ public class KakaoProfile extends OAuthProfile {
     }
 
     @Override
+    public String getBirthDate() {
+        final String birthYear = String.valueOf(getAccount().get("birthyear"));
+        final String birthday = String.valueOf(getAccount().get("birthday"));
+        return birthYear + "-" + birthday.substring(0, 2) + "-" + birthday.substring(2);
+    }
+
+    @Override
     public String getProviderId() {
         return String.valueOf(attributes.get("id"));
     }

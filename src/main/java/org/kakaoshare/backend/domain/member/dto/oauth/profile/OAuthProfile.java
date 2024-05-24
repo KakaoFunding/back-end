@@ -19,6 +19,7 @@ public abstract class OAuthProfile {
     public abstract String getPhoneNumber();
     public abstract String getProfileImageUrl();
     public abstract String getProvider();
+    public abstract String getBirthDate();
     public abstract String getProviderId();
 
     public Member toEntity() {

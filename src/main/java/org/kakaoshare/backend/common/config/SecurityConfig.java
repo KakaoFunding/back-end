@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -30,34 +31,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-        http.httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeHttpRequests()
-                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .requestMatchers(API_V_1 + "oauth/login").permitAll()
-                .requestMatchers(API_V_1 + "oauth/logout").authenticated()
-                .requestMatchers(API_V_1 + "oauth/reissue").permitAll()
-                .requestMatchers(API_V_1 + "categories/**").permitAll()
-                .requestMatchers(API_V_1 + "products/**").permitAll()
-                .requestMatchers(API_V_1 + "products/*/wishes").authenticated()
-                .requestMatchers(API_V_1 + "brands/**").permitAll()
-                .requestMatchers(API_V_1 + "search/**").permitAll()
-                .requestMatchers(API_V_1 + "wishes/**").authenticated()
-                .anyRequest().authenticated()
-                .and()
+        return http.authorizeHttpRequests(
+                        authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
+                                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                                .requestMatchers(API_V_1 + "oauth/login").permitAll()
+                                .requestMatchers(API_V_1 + "oauth/logout").authenticated()
+                                .requestMatchers(API_V_1 + "oauth/reissue").permitAll()
+                                .requestMatchers(API_V_1 + "categories/**").permitAll()
+                                .requestMatchers(API_V_1 + "products/**").permitAll()
+                                .requestMatchers(API_V_1 + "products/*/wishes").authenticated()
+                                .requestMatchers(API_V_1 + "brands/**").permitAll()
+                                .requestMatchers(API_V_1 + "search/**").permitAll()
+                                .requestMatchers(API_V_1 + "wishes/**").authenticated()
+                                .anyRequest().authenticated()
+                )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-                .headers().frameOptions().disable()
-                .and()
-                .cors();
-        
-        return http.build();
+                .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable).disable())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .build();
     }
-    
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();

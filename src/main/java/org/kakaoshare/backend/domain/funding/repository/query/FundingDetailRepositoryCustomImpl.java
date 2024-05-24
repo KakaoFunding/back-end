@@ -108,6 +108,7 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
         return new QContributedFundingHistoryDto(
                 funding.fundingId,
                 fundingDetail.fundingDetailId,
+                fundingDetail.amount,
                 fundingDetail.createdAt,
                 member.name,
                 fundingDetail.status.stringValue()
