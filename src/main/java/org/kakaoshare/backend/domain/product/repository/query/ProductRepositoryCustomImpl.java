@@ -327,8 +327,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     private List<OptionResponse> findOptions(Long productId) {
-
-        // 옵션과 옵션 상세 정보를 조회합니다.
         return queryFactory
                 .select(Projections.constructor(
                         OptionResponse.class,
@@ -345,8 +343,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                         )
                 ))
                 .from(QOption.option)
-                .innerJoin(QOptionDetail.optionDetail)
-                .on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
+                .leftJoin(QOptionDetail.optionDetail).on(QOptionDetail.optionDetail.option.optionsId.eq(QOption.option.optionsId))
                 .where(QOption.option.product.productId.eq(productId))
                 .transform(
                         GroupBy.groupBy(QOption.option.optionsId).list(
