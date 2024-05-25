@@ -47,7 +47,7 @@ public class PaymentWebClientService {
                                        final List<PaymentReadyProductDto> paymentReadyProductDtos,
                                        final String orderNumber) {
         final KakaoPayReadyRequest kakaoPayReadyRequest = requestProvider.createReadyRequest(providerId, paymentReadyProductDtos, orderNumber);
-        log.info("request = {}", kakaoPayReadyRequest);
+        log.info("requests = {}", kakaoPayReadyRequest);
         return webClient.post()
                 .uri(readyUrl)
                 .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + secretKey)
