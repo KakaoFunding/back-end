@@ -1,6 +1,5 @@
 package org.kakaoshare.backend.domain.payment.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.kakaoshare.backend.domain.payment.dto.approve.request.KakaoPayApproveRequest;
 import org.kakaoshare.backend.domain.payment.dto.approve.response.KakaoPayApproveResponse;
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelDto;
@@ -19,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 
 @Service
-@Slf4j
 public class PaymentWebClientService {
     private static final String SECRET_KEY_PREFIX = "DEV_SECRET_KEY ";
     private final String readyUrl;
@@ -47,7 +45,6 @@ public class PaymentWebClientService {
                                        final List<PaymentReadyProductDto> paymentReadyProductDtos,
                                        final String orderNumber) {
         final KakaoPayReadyRequest kakaoPayReadyRequest = requestProvider.createReadyRequest(providerId, paymentReadyProductDtos, orderNumber);
-        log.info("requests = {}", kakaoPayReadyRequest);
         return webClient.post()
                 .uri(readyUrl)
                 .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + secretKey)

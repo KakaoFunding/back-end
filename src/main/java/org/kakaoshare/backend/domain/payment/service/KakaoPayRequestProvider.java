@@ -38,7 +38,6 @@ public class KakaoPayRequestProvider {
     public KakaoPayReadyRequest createReadyRequest(final String providerId,
                                                    final List<PaymentReadyProductDto> paymentReadyProductDtos,
                                                    final String orderNumber) {
-        log.info("approvalUrl = {}", approvalUrl);
         final int totalAmount = getTotalAmount(paymentReadyProductDtos);
         final int quantity = getQuantity(paymentReadyProductDtos);
         final String productName = getProductName(paymentReadyProductDtos);
