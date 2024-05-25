@@ -17,13 +17,11 @@ public class FundingResponse {
     private final String brandName;
     private final String productName;
     private final String productImage;
+    private final Long accumulateAmount;
+    private final Long productId;
 
     public static FundingResponse from(Funding funding) {
         Product product = funding.getProduct();
-        String productImage = null;
-        if (product.getProductThumbnails() != null && !product.getProductThumbnails().isEmpty()) {
-            productImage = product.getProductThumbnails().get(0).getThumbnailUrl();
-        }
 
         return FundingResponse.builder()
                 .fundingId(funding.getFundingId())
@@ -32,7 +30,9 @@ public class FundingResponse {
                 .goalAmount(funding.getGoalAmount())
                 .brandName(product.getBrand().getName())
                 .productName(product.getName())
-                .productImage(productImage)
+                .productImage(product.getPhoto())
+                .accumulateAmount(funding.getAccumulateAmount())
+                .productId(product.getProductId())
                 .build();
     }
 }
