@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.funding.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
@@ -46,7 +47,7 @@ public class FundingController {
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                      @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") FundingStatus status,
                                                      @PageableDefault(size = FUNDING_DEFAULT_SIZE) final Pageable pageable) {
-        FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
+        PageResponse<?> response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
         return ResponseEntity.ok(response);
     }
 
