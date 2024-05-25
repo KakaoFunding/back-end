@@ -101,4 +101,13 @@ public class Product extends BaseTimeEntity {
                 ", brandName='" + brandName + '\'' +
                 '}';
     }
+    public List<String> getThumbnailUrls() {
+        if (productThumbnails.isEmpty()) {
+            return List.of(photo);
+        }
+
+        return productThumbnails.stream()
+                .map(ProductThumbnail::getThumbnailUrl)
+                .toList();
+    }
 }

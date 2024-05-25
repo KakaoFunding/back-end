@@ -74,18 +74,17 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     @Override
     public Page<ProductDto> findAllByBrandId(final Long brandId,
                                              final Pageable pageable) {
-        List<ProductDto> fetch = queryFactory
+        JPAQuery<ProductDto> contentQuery = queryFactory
                 .select(getProductDto())
                 .from(product)
                 .join(product.brand, brand)
                 .where(brand.brandId.eq(brandId))
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .limit(pageable.getPageSize());
         
         JPAQuery<Long> countQuery = countBrand(brandId);
-        return toPage(pageable, fetch, countQuery);
+        return toPage(pageable, contentQuery, countQuery);
     }
     
     @Override
@@ -275,7 +274,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 product.productId,
                 product.name,
                 product.photo,
-                product.price);
+                product.price,
+                product.brandName);
     }
     
     private BooleanExpression categoryIdEqualTo(final Long categoryId) {
@@ -336,9 +336,9 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                                             Projections.constructor(
                                                     ProductOptionDetailResponse.class,
                                                     QOptionDetail.optionDetail.optionDetailId,
-                                                    QOptionDetail.optionDetail.name,
+                                                    QOptionDetail.optionDetail.photo,
                                                     QOptionDetail.optionDetail.additionalPrice,
-                                                    QOptionDetail.optionDetail.photo
+                                                    QOptionDetail.optionDetail.name
                                             )
                                     )
                             )

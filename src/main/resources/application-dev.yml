@@ -55,6 +55,8 @@ security:
       expire-time: 3600000
     refresh:
       expire-time: 86400000
+friend:
+  request-url: https://kapi.kakao.com/v1/api/talk/friends
 pay:
   client:
     id: TC0ONETIME
@@ -65,7 +67,7 @@ pay:
     approve: https://open-api.kakaopay.com/online/v1/payment/approve
     cancel: https://open-api.kakaopay.com/online/v1/payment/cancel
   redirect-url:
-    approval: http://localhost:8080/payments/success
-    cancel: http://localhost:8080/payments/cancel
-    fail: http://localhost:8080/payments/fail
+    approval: http://localhost:5173/payments/success
+    cancel: http://localhost:5173/payments/cancel
+    fail: http://localhost:5173/payments/fail
 

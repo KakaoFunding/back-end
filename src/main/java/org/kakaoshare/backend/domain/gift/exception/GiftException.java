@@ -1,10 +1,11 @@
 package org.kakaoshare.backend.domain.gift.exception;
 
 
-public class GiftException extends RuntimeException {
-    private final GiftErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public GiftException(GiftErrorCode errorCode) {
-        this.errorCode = errorCode;
+public class GiftException extends BusinessException {
+    public GiftException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }

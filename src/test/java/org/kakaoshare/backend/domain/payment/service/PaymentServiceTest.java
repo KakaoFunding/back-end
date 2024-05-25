@@ -7,6 +7,7 @@ import org.kakaoshare.backend.common.util.RedisUtils;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
+import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
@@ -29,14 +30,12 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDe
 import org.kakaoshare.backend.domain.payment.dto.kakaopay.Amount;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.*;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
-import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessResponse;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentGiftSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
@@ -50,18 +49,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.kakaoshare.backend.fixture.BrandFixture.STARBUCKS;
 import static org.kakaoshare.backend.fixture.FundingFixture.SAMPLE_FUNDING;
-import static org.kakaoshare.backend.fixture.MemberFixture.HAN;
-import static org.kakaoshare.backend.fixture.MemberFixture.KAKAO;
-import static org.kakaoshare.backend.fixture.MemberFixture.KIM;
+import static org.kakaoshare.backend.fixture.MemberFixture.*;
 import static org.kakaoshare.backend.fixture.ProductFixture.CAKE;
 import static org.kakaoshare.backend.fixture.ProductFixture.COFFEE;
 import static org.mockito.ArgumentMatchers.any;
@@ -137,6 +131,7 @@ class PaymentServiceTest {
     public void ready() throws Exception {
         final String providerId = "1234";
         final String orderDetailsKey = "12345678";
+        final String socialAccessToken = "socialAccessToken";
 
         final Product cake = CAKE.생성(1L);
         final int cakeQuantity = 1;
@@ -148,7 +143,8 @@ class PaymentServiceTest {
                 createPaymentReadyRequest(cake, cakeQuantity),
                 createPaymentReadyRequest(coffee, coffeeQuantity)
         );
-        final PaymentGiftReadyRequest paymentGiftReadyRequest = new PaymentGiftReadyRequest(providerId, items);
+        final PaymentGiftReadyReceiver paymentGiftReadyReceiver = new PaymentGiftReadyReceiver(providerId, socialAccessToken);
+        final PaymentGiftReadyRequest paymentGiftReadyRequest = new PaymentGiftReadyRequest(paymentGiftReadyReceiver, items);
 
         final List<PaymentReadyProductDto> paymentReadyProductDtos = List.of(
                 new PaymentReadyProductDto(cake.getName(), cakeQuantity, cake.getPrice().intValue()),
@@ -212,8 +208,8 @@ class PaymentServiceTest {
         doReturn(null).when(giftRepository).saveAll(any());
         doReturn(null).when(orderRepository).saveAll(any());  // TODO: 3/16/24 saveAll() 에서 new로 다른 객체가 생성되므로 any()로 대체
 
-        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPrice() * cakeStockQuantity);
-        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPrice() * coffeeStockQuantity);
+        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPhoto(), cake.getPrice());
+        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto(), coffee.getPrice());
         doReturn(cakeSummaryResponse).when(productRepository).findAllProductSummaryById(cake.getProductId());
         doReturn(coffeeSummaryResponse).when(productRepository).findAllProductSummaryById(coffee.getProductId());
 
@@ -222,8 +218,8 @@ class PaymentServiceTest {
                 new OrderSummaryResponse(coffeeSummaryResponse, coffeeStockQuantity, Collections.emptyList())
         );
         final Receiver receiver = Receiver.from(member);
-        final PaymentSuccessResponse expect = new PaymentSuccessResponse(receiver, orderSummaries);
-        final PaymentSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
+        final PaymentGiftSuccessResponse expect = new PaymentGiftSuccessResponse(receiver, orderSummaries);
+        final PaymentGiftSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
         assertThat(actual).isEqualTo(expect);   // TODO: 3/16/24 equals() 및 hashCode()가 재정의되있으므로 isEqualTo() 사용
     }
 
@@ -274,8 +270,8 @@ class PaymentServiceTest {
         doReturn(null).when(giftRepository).saveAll(any());
         doReturn(null).when(orderRepository).saveAll(any());  // TODO: 3/16/24 saveAll() 에서 new로 다른 객체가 생성되므로 any()로 대체
 
-        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPrice() * cakeStockQuantity);
-        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPrice() * coffeeStockQuantity);
+        final ProductSummaryResponse cakeSummaryResponse = new ProductSummaryResponse(brand.getName(), cake.getName(), cake.getPhoto(), cake.getPrice());
+        final ProductSummaryResponse coffeeSummaryResponse = new ProductSummaryResponse(brand.getName(), coffee.getName(), coffee.getPhoto(), coffee.getPrice());
         doReturn(cakeSummaryResponse).when(productRepository).findAllProductSummaryById(cake.getProductId());
         doReturn(coffeeSummaryResponse).when(productRepository).findAllProductSummaryById(coffee.getProductId());
 
@@ -284,8 +280,8 @@ class PaymentServiceTest {
                 new OrderSummaryResponse(coffeeSummaryResponse, coffeeStockQuantity, Collections.emptyList())
         );
         final Receiver receiver = Receiver.from(receiverMember);
-        final PaymentSuccessResponse expect = new PaymentSuccessResponse(receiver, orderSummaries);
-        final PaymentSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
+        final PaymentGiftSuccessResponse expect = new PaymentGiftSuccessResponse(receiver, orderSummaries);
+        final PaymentGiftSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
         assertThat(actual).isEqualTo(expect);   // TODO: 3/16/24 equals() 및 hashCode()가 재정의되있으므로 isEqualTo() 사용
     }
 
@@ -315,6 +311,36 @@ class PaymentServiceTest {
     }
 
     @Test
+    @DisplayName("펀딩 결제 준비시 결제 금액이 남은 금액보다 작으면 예외 발생")
+    public void readyFundingWhenInvalidAttributeAmount() throws Exception {
+        final Member contributor = KIM.생성();
+        final Member creator = KAKAO.생성();
+        final String providerId = contributor.getProviderId();
+        final Product cake = CAKE.가격_설정_생성(10_000L);
+        final Funding funding = SAMPLE_FUNDING.생성(creator, cake, 10_000L, 0L);
+
+        final PaymentFundingReadyRequest paymentFundingReadyRequest = new PaymentFundingReadyRequest(funding.getFundingId(), 12_000);
+
+        assertThatThrownBy(() -> paymentService.readyFunding(providerId, paymentFundingReadyRequest))
+                .isInstanceOf(FundingException.class);
+    }
+
+    @Test
+    @DisplayName("펀딩 목표 금액 달성 후 잔여 금액 결제 준비시 결제 금액이 잔여 금액보다 작으면 예외 발생")
+    public void readyFundingWhenInvalidRemainingPayAmount() throws Exception {
+        final Member contributor = KIM.생성();
+        final Member creator = KAKAO.생성();
+        final String providerId = contributor.getProviderId();
+        final Product cake = CAKE.가격_설정_생성(10_000L);
+        final Funding funding = SAMPLE_FUNDING.생성(creator, cake, 9_000L, 9_000L);
+
+        final PaymentFundingReadyRequest paymentFundingReadyRequest = new PaymentFundingReadyRequest(funding.getFundingId(), 12_000);
+
+        assertThatThrownBy(() -> paymentService.readyFunding(providerId, paymentFundingReadyRequest))
+                .isInstanceOf(FundingException.class);
+    }
+
+    @Test
     @DisplayName("펀딩 결제 승인")
     public void approveFunding() throws Exception {
         final String pgToken = "pgToken";
@@ -325,9 +351,10 @@ class PaymentServiceTest {
         final Member creator = KAKAO.생성();
         final String providerId = contributor.getProviderId();
         final Product cake = CAKE.생성(1L);
+        final int attributeAmount = 200;
 
         final PaymentSuccessRequest paymentSuccessRequest = createPaymentSuccessRequest(pgToken, tid, orderDetailsKey);
-        final KakaoPayApproveResponse approveResponse = createApproveResponse(tid, orderDetailsKey, providerId, 200, cake.getName(), 1);
+        final KakaoPayApproveResponse approveResponse = createApproveResponse(tid, orderDetailsKey, providerId, attributeAmount, cake.getName(), 1);
         doReturn(approveResponse).when(webClientService).approve(providerId, paymentSuccessRequest);
 
         final FundingOrderDetail fundingOrderDetail = new FundingOrderDetail(1L);
@@ -337,8 +364,9 @@ class PaymentServiceTest {
         doReturn(Optional.empty()).when(fundingDetailRepository).findByFundingAndMember(funding, contributor);
         doReturn(Optional.of(contributor)).when(memberRepository).findMemberByProviderId(providerId);
 
-        final PaymentSuccessResponse expect = new PaymentSuccessResponse(Receiver.from(creator), Collections.emptyList());
-        final PaymentSuccessResponse actual = paymentService.approveFunding(providerId, paymentSuccessRequest);
+        final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(cake);
+        final PaymentFundingSuccessResponse expect = new PaymentFundingSuccessResponse(Receiver.from(creator), productSummaryResponse, (long) attributeAmount);
+        final PaymentFundingSuccessResponse actual = paymentService.approveFunding(providerId, paymentSuccessRequest);
 
         assertThat(actual).isEqualTo(expect);
     }

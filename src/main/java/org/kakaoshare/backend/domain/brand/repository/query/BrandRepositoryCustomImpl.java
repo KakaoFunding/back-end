@@ -2,14 +2,11 @@ package org.kakaoshare.backend.domain.brand.repository.query;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.common.util.sort.SortableRepository;
 import org.kakaoshare.backend.domain.brand.dto.QSimpleBrandDto;
 import org.kakaoshare.backend.domain.brand.dto.SimpleBrandDto;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -33,12 +30,11 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
     }
     
     @Override
-    public Page<SimpleBrandDto> findAllSimpleBrandByCategoryId(final Long categoryId, final Pageable pageable) {
+    public List<SimpleBrandDto> findAllSimpleBrandByCategoryId(final Long categoryId) {
         BooleanExpression isParent = isEqCategoryId(categoryId).and(category.parent.isNull());
-        
         BooleanExpression condition = conditionByCategoryType(categoryId, isParent);
         
-        List<SimpleBrandDto> fetch = queryFactory
+        return queryFactory
                 .select(new QSimpleBrandDto(
                         brand.brandId,
                         brand.name,
@@ -47,14 +43,8 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
                 .join(brand.products, product)
                 .where(condition)
                 .distinct()
-                .orderBy(getOrderSpecifiers(pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .orderBy(getOrderSpecifiers(Pageable.unpaged()))    // TODO: 5/20/24 Pageable 을 전달받지 않아 unpaged()를 넘김 (추후 정렬 관련하여 논의할 때 수정)
                 .fetch();
-        
-        JPAQuery<Long> countQuery = countCategory(categoryId);
-        
-        return RepositoryUtils.toPage(pageable, fetch, countQuery);
     }
 
     @Override
@@ -86,12 +76,6 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
             return product.category.parent.categoryId.eq(categoryId);
         }
         return product.category.categoryId.eq(categoryId);
-    }
-    
-    private JPAQuery<Long> countCategory(final Long categoryId) {
-        return queryFactory.select(category.countDistinct())
-                .from(category)
-                .where(isEqCategoryId(categoryId));
     }
     
     @Override

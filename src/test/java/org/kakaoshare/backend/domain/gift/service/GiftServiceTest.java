@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
@@ -116,7 +117,8 @@ public class GiftServiceTest {
         when(giftRepository.findGiftDescriptionById(giftId)).thenReturn(null);
 
         assertThrows(EntityNotFoundException.class, () -> giftService.getGiftDescription(giftId));
-    }@Test
+    }
+    @Test
     @DisplayName("선물함 조회 테스트")
     void getMyGiftBoxTest() {
         String providerId = "providerId";
@@ -127,7 +129,7 @@ public class GiftServiceTest {
         GiftResponse mockGiftResponse = GiftResponse.builder()
                 .giftId(1L)
                 .expiredAt(LocalDateTime.now().plusDays(30))
-                .recipientName("수령인 이름")
+                .senderName("수령인 이름")
                 .productName("상품 이름")
                 .productThumbnail("상품 썸네일 URL")
                 .brandName("브랜드 이름")
@@ -138,9 +140,9 @@ public class GiftServiceTest {
         when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(mockMember));
         when(giftRepository.findGiftsByMemberIdAndStatus(eq(mockMember.getMemberId()), eq(GiftStatus.NOT_USED), eq(pageable))).thenReturn(mockGiftResponses);
 
-        Page<GiftResponse> result = giftService.getMyGiftBox(providerId, pageable, status);
+        PageResponse<?> result = giftService.getMyGiftBox(providerId, pageable, status);
 
         assertNotNull(result);
-        assertEquals(1, result.getContent().size()); // 예상되는 결과 크기를 확인
+        assertEquals(1, result.getItems().size());
     }
 }
