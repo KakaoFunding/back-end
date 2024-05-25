@@ -28,7 +28,6 @@ public class KakaoPayRequestProvider {
                                    @Value("${pay.redirect-url.approval}") final String approvalUrl,
                                    @Value("${pay.redirect-url.cancel}") final String cancelUrl,
                                    @Value("${pay.redirect-url.fail}") final String failUrl) {
-        log.info("approvalUrl = {}", approvalUrl);
         this.cid = cid;
         this.cidSecret = cidSecret;
         this.approvalUrl = approvalUrl;
@@ -39,6 +38,7 @@ public class KakaoPayRequestProvider {
     public KakaoPayReadyRequest createReadyRequest(final String providerId,
                                                    final List<PaymentReadyProductDto> paymentReadyProductDtos,
                                                    final String orderNumber) {
+        log.info("approvalUrl = {}", approvalUrl);
         final int totalAmount = getTotalAmount(paymentReadyProductDtos);
         final int quantity = getQuantity(paymentReadyProductDtos);
         final String productName = getProductName(paymentReadyProductDtos);
