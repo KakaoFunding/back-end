@@ -30,25 +30,16 @@ public class ProgressResponse {
     private final String productName;
 
 
-
     public static ProgressResponse from(Funding funding) {
-        Long goalAmount = funding.getGoalAmount();
-        Long accumulateAmount = funding.getAccumulateAmount();
-        double progressRate = Optional.of(goalAmount)
-                .filter(goalAmountValue -> goalAmountValue.compareTo(ZERO) != 0)
-                .map(goalAmountValue -> divide(accumulateAmount, goalAmountValue, SCALE) * PERCENT_MULTIPLIER)
-                .orElse(DEFAULT_PROGRESS_RATE);
-        Long remainAmount = goalAmount - accumulateAmount;
-
         Product product = funding.getProduct();
         Brand brand = product.getBrand();
 
         return ProgressResponse.builder()
                 .fundingId(funding.getFundingId())
-                .progressRate(progressRate)
-                .remainAmount(remainAmount)
-                .goalAmount(goalAmount)
-                .accumulateAmount(accumulateAmount)
+                .progressRate(funding.calculateProgressRate())
+                .remainAmount(funding.calculateRemainAmount())
+                .goalAmount(funding.getGoalAmount())
+                .accumulateAmount(funding.getAccumulateAmount())
                 .productId(product.getProductId())
                 .brandId(brand.getBrandId())
                 .brandPhoto(brand.getIconPhoto())
@@ -56,16 +47,5 @@ public class ProgressResponse {
                 .brandName(brand.getName())
                 .productName(product.getName())
                 .build();
-    }
-    
-    private static Double divide(long numerator, long denominator, int scale) {
-        long scaledNumerator = numerator * (long) Math.pow(10, scale + 1);
-        long rawResult = scaledNumerator / denominator;
-        long remainder = rawResult % 10;
-        rawResult /= 10;
-        if (remainder >= 5) {
-            rawResult += 1;
-        }
-        return rawResult / Math.pow(10, scale);
     }
 }
