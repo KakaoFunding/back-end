@@ -6,6 +6,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRes
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
@@ -54,6 +55,12 @@ public class OAuthService {
         final String refreshTokenValue = oAuthLogoutRequest.refreshToken();
         final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
         refreshTokenRepository.delete(refreshToken);
+    }
+
+    public void socialLogout(final OAuthSocialLogoutRequest oAuthSocialLogoutRequest) {
+        final String provider = oAuthSocialLogoutRequest.provider();
+        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(provider);
+        webClientService.expireToken(registration, oAuthSocialLogoutRequest);
     }
 
     @Transactional
