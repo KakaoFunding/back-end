@@ -30,15 +30,15 @@ public class DetailResponse {
     private final boolean isWish;
 
     public static DetailResponse of(final Product product, List<OptionResponse> optionsResponses, Boolean isWished) {
-        String origin = product.getProductDetail() != null ? product.getProductDetail().getOrigin() : "정보 없음";
+        String origin = product.getProductDetail() != null ? product.getProductDetail().getOrigin() : null;
         String manufacturer =
-                product.getProductDetail() != null ? product.getProductDetail().getManufacturer() : "정보 없음";
-        String tel = product.getProductDetail() != null ? product.getProductDetail().getTel() : "정보 없음";
+                product.getProductDetail() != null ? product.getProductDetail().getManufacturer() : null;
+        String tel = product.getProductDetail() != null ? product.getProductDetail().getTel() : null;
         String deliverDescription =
-                product.getProductDetail() != null ? product.getProductDetail().getDeliverDescription() : "정보 없음";
+                product.getProductDetail() != null ? product.getProductDetail().getDeliverDescription() : null;
         String billingNotice =
-                product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : "정보 없음";
-        String caution = product.getProductDetail() != null ? product.getProductDetail().getCaution() : "정보 없음";
+                product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : null;
+        String caution = product.getProductDetail() != null ? product.getProductDetail().getCaution() : null;
 
         return DetailResponse.builder()
                 .productId(product.getProductId())
