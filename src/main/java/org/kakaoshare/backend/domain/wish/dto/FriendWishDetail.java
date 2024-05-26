@@ -2,12 +2,13 @@ package org.kakaoshare.backend.domain.wish.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 
-public final class FriendWishDetail extends AbstractWishDetail {
+public final class FriendWishDetail{
     private final boolean isWished;
+    private final WishDetail wishDetail;
     
     @QueryProjection
-    public FriendWishDetail(Long wishId, Long productId, String productName, Long productPrice, String productPhoto, boolean isWished) {
-        super(wishId, productId, productName, productPrice, productPhoto);
+    public FriendWishDetail(WishDetail wishDetail, boolean isWished) {
+        this.wishDetail=wishDetail;
         this.isWished = isWished;
     }
     

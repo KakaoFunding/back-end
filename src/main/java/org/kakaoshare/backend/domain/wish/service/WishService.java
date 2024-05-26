@@ -133,7 +133,7 @@ public class WishService {
     
     public void changeWishType(final String providerId, final Long wishId) {
         boolean exists = getMembersWishList(providerId).stream()
-                .anyMatch(wishDetail -> wishDetail.getWishId().equals(wishId));
+                .anyMatch(myWishDetail -> myWishDetail.isSameWishId(wishId));
         if (!exists) {
             throw new WishException(WishErrorCode.NOT_FOUND);
         }

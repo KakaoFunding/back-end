@@ -9,6 +9,7 @@ import org.kakaoshare.backend.domain.wish.dto.FriendWishDetail;
 import org.kakaoshare.backend.domain.wish.dto.MyWishDetail;
 import org.kakaoshare.backend.domain.wish.dto.QFriendWishDetail;
 import org.kakaoshare.backend.domain.wish.dto.QMyWishDetail;
+import org.kakaoshare.backend.domain.wish.dto.QWishDetail;
 import org.kakaoshare.backend.domain.wish.entity.QWish;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.springframework.stereotype.Repository;
@@ -28,13 +29,13 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
     public List<MyWishDetail> findWishDetailsByProviderId(final String providerId) {
         return queryFactory
                 .select(
-                        new QMyWishDetail(
-                                wish.wishId,
-                                product.productId,
-                                product.name,
-                                product.price,
-                                product.photo,
-                                wish.isPublic))
+                        new QMyWishDetail(wish.isPublic,
+                                new QWishDetail(
+                                        wish.wishId,
+                                        product.productId,
+                                        product.name,
+                                        product.price,
+                                        product.photo)))
                 .from(wish)
                 .join(wish.member, member)
                 .on(wish.member.providerId.eq(providerId))
@@ -51,11 +52,12 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
         return queryFactory
                 .select(
                         new QFriendWishDetail(
-                                friendWish.wishId,
-                                product.productId,
-                                product.name,
-                                product.price,
-                                product.photo,
+                                new QWishDetail(
+                                        friendWish.wishId,
+                                        product.productId,
+                                        product.name,
+                                        product.price,
+                                        product.photo),
                                 JPAExpressions.select(myWish.count())
                                         .from(myWish)
                                         .where(myWish.member.providerId.eq(providerId)
