@@ -38,12 +38,12 @@ public class ProductService {
 
 
     public DescriptionResponse getProductDescription(Long productId, @Nullable String providerId) {
-        Member member = (providerId != null) ? findMemberById(providerId) : null;
-        DescriptionResponse descriptionResponse = productRepository.findProductWithDetailsAndPhotos(productId, member);
-        if (descriptionResponse == null) {
-            throw new ProductException(ProductErrorCode.NOT_FOUND);
+        if (providerId != null) {
+            Member member = findMemberById(providerId);
+            return productRepository.findProductWithDetailsAndPhotosForMember(productId, member);
+        } else {
+            return productRepository.findProductWithDetailsAndPhotosForNonMember(productId);
         }
-        return descriptionResponse;
     }
 
     public DetailResponse getProductDetail(Long productId, @Nullable String providerId) {
