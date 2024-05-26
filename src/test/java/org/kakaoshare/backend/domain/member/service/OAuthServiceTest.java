@@ -8,6 +8,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -26,16 +27,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.kakaoshare.backend.fixture.MemberFixture.KAKAO;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OAuthServiceTest {
@@ -137,6 +139,32 @@ class OAuthServiceTest {
         final OAuthReissueResponse expect = OAuthReissueResponse.of(accessToken, newRefreshToken);
 
         assertThat(actual).isEqualTo(expect);
+    }
+
+    @Test
+    @DisplayName("카카오 소셜 로그아웃")
+    public void socialLogout() throws Exception {
+        final String provider = "kakao";
+        final ClientRegistration registration = getClientRegistration(provider);
+        final OAuthSocialLogoutRequest oAuthSocialLogoutRequest = new OAuthSocialLogoutRequest(provider, providerId, socialAccessToken);
+
+        doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(provider);
+        doNothing().when(webClientService).expireToken(registration, oAuthSocialLogoutRequest);
+        assertThatCode(() -> oAuthService.socialLogout(oAuthSocialLogoutRequest))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("카카오 소셜 로그아웃에서 providerId가 잘못되면 예외가 발생")
+    public void socialLogoutWhenIvalidProviderId() throws Exception {
+        final String provider = "kakao";
+        final ClientRegistration registration = getClientRegistration(provider);
+        final OAuthSocialLogoutRequest oAuthSocialLogoutRequest = new OAuthSocialLogoutRequest(provider, providerId, socialAccessToken);
+
+        doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(provider);
+        doThrow(WebClientResponseException.class).when(webClientService).expireToken(registration, oAuthSocialLogoutRequest);
+        assertThatThrownBy(() -> oAuthService.socialLogout(oAuthSocialLogoutRequest))
+                .isInstanceOf(WebClientResponseException.class);
     }
 
     private ClientRegistration getClientRegistration(final String registrationId) {
