@@ -47,12 +47,11 @@ public class ProductService {
     }
 
     public DetailResponse getProductDetail(Long productId, @Nullable String providerId) {
-        Member member = (providerId != null) ? findMemberById(providerId) : null;
-        DetailResponse detailResponse = productRepository.findProductDetail(productId, member);
-        if (detailResponse == null) {
-            throw new ProductException(ProductErrorCode.NOT_FOUND);
+        if (providerId != null) {
+            Member member = findMemberById(providerId);
+            return productRepository.findProductDetailForMember(productId, member);
         }
-        return detailResponse;
+        return productRepository.findProductDetailForNonMember(productId);
     }
 
     public PageResponse<?> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {
