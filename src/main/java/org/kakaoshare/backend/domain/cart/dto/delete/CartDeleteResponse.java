@@ -6,8 +6,8 @@ import org.kakaoshare.backend.domain.cart.dto.CartIdResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
 
 @Getter
-@Builder
 public class CartDeleteResponse extends CartIdResponse {
+    @Builder
     public CartDeleteResponse(Long cartId) {
         super(cartId);
     }
