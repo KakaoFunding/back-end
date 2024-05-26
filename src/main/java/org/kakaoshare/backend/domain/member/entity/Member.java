@@ -23,46 +23,50 @@ import static org.kakaoshare.backend.domain.member.entity.Role.USER;
 @Entity
 @Getter
 public class Member extends BaseTimeEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
-    
+
     @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    
+
     @Column(nullable = false)
     private String name;
-    
+
     @Column(nullable = false, length = 20)
     private String phoneNumber;
-    
+
     @Column(nullable = false)
     private String providerId;
-    
+
+    @Column(nullable = false)
+    private String profileImageUrl;
+
     @Builder.Default
     @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
     private Role role = USER;
-    
+
     @Builder.Default
     @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)
     private List<Wish> wishes=new ArrayList<>();
-    
+
     protected Member() {
-    
+
     }
-    
+
     @Builder
-    public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId) {
+    public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId, final String profileImageUrl) {
         this.memberId = memberId;
         this.gender = gender;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.providerId = providerId;
+        this.profileImageUrl = profileImageUrl;
     }
-    
+
     @Override
     public String toString() {
         return "Member{" +
@@ -71,10 +75,11 @@ public class Member extends BaseTimeEntity {
                 ", username='" + name + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", providerId='" + providerId + '\'' +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
                 ", role=" + role +
                 '}';
     }
-    
+
     public boolean isWishEmpty() {
         return wishes == null || wishes.isEmpty();
     }
