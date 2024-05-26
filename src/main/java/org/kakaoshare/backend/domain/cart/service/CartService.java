@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.cart.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.domain.cart.dto.CartIdResponse;
 import org.kakaoshare.backend.domain.cart.dto.delete.CartClearResponse;
 import org.kakaoshare.backend.domain.cart.dto.delete.CartDeleteResponse;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterRequest;
@@ -42,7 +43,7 @@ public class CartService {
         if (existingCart != null) {
             existingCart.updateItemCount(existingCart.getItemCount() + 1);
             cartRepository.save(existingCart);
-            return CartRegisterResponse.from(existingCart);
+            return CartIdResponse.from(existingCart, CartRegisterResponse.class);
         } else {
             Cart newCart = Cart.builder()
                     .member(member)
@@ -52,7 +53,7 @@ public class CartService {
                     .itemCount(request.getItemCount())
                     .build();
             cartRepository.save(newCart);
-            return CartRegisterResponse.from(newCart);
+            return CartIdResponse.from(newCart, CartRegisterResponse.class);
         }
     }
 
@@ -67,7 +68,7 @@ public class CartService {
         cart.updateItemCount(newQuantity - cart.getItemCount());
         cartRepository.save(cart);
 
-        return CartRegisterResponse.from(cart);
+        return CartIdResponse.from(cart, CartRegisterResponse.class);
     }
 
     @Transactional
@@ -79,7 +80,7 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("No cart item"));
 
         cartRepository.delete(cart);
-        return CartDeleteResponse.from(cart);
+        return CartIdResponse.from(cart, CartDeleteResponse.class);
     }
 
     public List<CartResponse> getCartItems(String providerId) {
