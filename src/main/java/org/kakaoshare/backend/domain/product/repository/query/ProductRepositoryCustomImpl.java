@@ -202,13 +202,11 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     @Override
-    public DescriptionResponse findProductWithDetailsAndPhotos(Long productId, @Nullable Member member) {
-        // 제품 기본 정보 조회
-        Product product = Optional.ofNullable(queryFactory
-                        .selectFrom(QProduct.product)
-                        .where(QProduct.product.productId.eq(productId))
-                        .fetchOne())
-                .orElseThrow(() -> new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+    public DescriptionResponse findProductWithDetailsAndPhotosForNonMember(Long productId) {
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
+                .fetchOne();
 
         List<String> descriptionPhotosUrls = queryFactory
                 .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
@@ -222,18 +220,40 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .from(QProductThumbnail.productThumbnail)
                 .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
                 .fetch();
-        Boolean isWished = false;
-        if (member != null) {
-            isWished = queryFactory
-                    .select(QWish.wish.count().gt(0L))
-                    .from(QWish.wish)
-                    .where(QWish.wish.product.productId.eq(productId)
-                            .and(QWish.wish.member.memberId.eq(member.getMemberId())))
-                    .fetchOne();
-        }
-        return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls,
-                isWished);
+
+        return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls, false);
     }
+
+    @Override
+    public DescriptionResponse findProductWithDetailsAndPhotosForMember(Long productId, Member member) {
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
+                .fetchOne();
+
+        List<String> descriptionPhotosUrls = queryFactory
+                .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
+                .from(QProductDescriptionPhoto.productDescriptionPhoto)
+                .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(productId))
+                .fetch();
+
+        List<OptionResponse> optionsResponses = findOptions(productId);
+        List<String> productThumbnailsUrls = queryFactory
+                .select(QProductThumbnail.productThumbnail.thumbnailUrl)
+                .from(QProductThumbnail.productThumbnail)
+                .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
+                .fetch();
+
+        Boolean isWished = queryFactory
+                .select(QWish.wish.count().gt(0L))
+                .from(QWish.wish)
+                .where(QWish.wish.product.productId.eq(productId)
+                        .and(QWish.wish.member.memberId.eq(member.getMemberId())))
+                .fetchOne();
+
+        return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls, isWished);
+    }
+
 
 
     public DetailResponse findProductDetailForNonMember(Long productId) {
