@@ -236,8 +236,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
 
-    @Override
-    public DetailResponse findProductDetail(Long productId, @Nullable Member member) {
+    public DetailResponse findProductDetailForNonMember(Long productId) {
         Product product = queryFactory
                 .selectFrom(QProduct.product)
                 .where(QProduct.product.productId.eq(productId))
@@ -248,15 +247,29 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         }
 
         List<OptionResponse> optionsResponses = findOptions(productId);
-        Boolean isWished = false;
-        if (member != null) {
-            isWished = queryFactory
-                    .select(QWish.wish.count().gt(0L))
-                    .from(QWish.wish)
-                    .where(QWish.wish.product.productId.eq(productId)
-                            .and(QWish.wish.member.memberId.eq(member.getMemberId())))
-                    .fetchOne();
+
+        return DetailResponse.of(product, optionsResponses, false);
+    }
+    @Override
+    public DetailResponse findProductDetailForMember(Long productId, Member member) {
+        Product product = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.productId.eq(productId))
+                .fetchOne();
+
+        if (product == null) {
+            throw new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND);
         }
+
+        List<OptionResponse> optionsResponses = findOptions(productId);
+
+        Boolean isWished = queryFactory
+                .select(QWish.wish.count().gt(0L))
+                .from(QWish.wish)
+                .where(QWish.wish.product.productId.eq(productId)
+                        .and(QWish.wish.member.memberId.eq(member.getMemberId())))
+                .fetchOne();
+
         return DetailResponse.of(product, optionsResponses, isWished);
     }
 
