@@ -244,12 +244,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
                 .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
                 .fetch();
 
-        Boolean isWished = queryFactory
-                .select(QWish.wish.count().gt(0L))
-                .from(QWish.wish)
-                .where(QWish.wish.product.productId.eq(productId)
-                        .and(QWish.wish.member.memberId.eq(member.getMemberId())))
-                .fetchOne();
+        Boolean isWished = isProductWishedByMember(productId, member.getMemberId());
 
         return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls, isWished);
     }
@@ -283,17 +278,21 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
         List<OptionResponse> optionsResponses = findOptions(productId);
 
-        Boolean isWished = queryFactory
-                .select(QWish.wish.count().gt(0L))
-                .from(QWish.wish)
-                .where(QWish.wish.product.productId.eq(productId)
-                        .and(QWish.wish.member.memberId.eq(member.getMemberId())))
-                .fetchOne();
+        Boolean isWished = isProductWishedByMember(productId, member.getMemberId());
 
         return DetailResponse.of(product, optionsResponses, isWished);
     }
 
+    private boolean isProductWishedByMember(Long productId, Long memberId) {
+        Long wishId = queryFactory
+                .select(QWish.wish.wishId)
+                .from(QWish.wish)
+                .where(QWish.wish.product.productId.eq(productId)
+                        .and(QWish.wish.member.memberId.eq(memberId)))
+                .fetchFirst();
 
+        return wishId != null;
+    }
     private QSimpleBrandDto getSimpleBrandDto() {
         return new QSimpleBrandDto(
                 brand.brandId,
