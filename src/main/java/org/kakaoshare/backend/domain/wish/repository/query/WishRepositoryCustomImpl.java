@@ -45,6 +45,14 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                 .fetch();
     }
     
+    private static BooleanExpression isInMyWishList(final String providerId, final QWish myWish, final QWish friendWish) {
+        return JPAExpressions.selectOne()
+                .from(myWish)
+                .where(myWish.member.providerId.eq(providerId)
+                        .and(myWish.product.eq(friendWish.product)))
+                .exists();
+    }
+    
     @Override
     public List<FriendWishDetail> findWishDetailsByFriendProviderId(final String providerId,
                                                                     final String friendsProviderId) {
@@ -61,12 +69,9 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                                         product.price,
                                         product.photo,
                                         product.brandName,
-                                        product.wishCount),
-                                JPAExpressions.select(myWish.count())
-                                        .from(myWish)
-                                        .where(myWish.member.providerId.eq(providerId)
-                                                .and(myWish.product.eq(friendWish.product)))
-                                        .gt(0L).as("isWished")
+                                        product.wishCount
+                                ),
+                                isInMyWishList(providerId, myWish, friendWish)
                         ))
                 .from(friendWish)
                 .join(friendWish.member, member)
