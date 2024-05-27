@@ -70,7 +70,7 @@ public class FundingServiceTest {
         Long fundingId = 1L;
         Brand brand = BrandFixture.EDIYA.생성(1L);
         Member member = MemberFixture.KAKAO.생성();
-        Product product = ProductFixture.TEST_PRODUCT.생성(1L,brand);
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L, brand);
         Funding funding = FundingFixture.SAMPLE_FUNDING.생성(member, product);
 
         given(memberRepository.findMemberByProviderId(member.getProviderId())).willReturn(Optional.of(member));
