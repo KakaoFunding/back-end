@@ -40,18 +40,18 @@ public class ProductService {
     public DescriptionResponse getProductDescription(Long productId, @Nullable String providerId) {
         if (providerId != null) {
             Member member = findMemberById(providerId);
-            return productRepository.findProductWithDetailsAndPhotosForMember(productId, member);
+            return productRepository.findProductWithDetailsAndPhotosWithMember(productId, member);
         } else {
-            return productRepository.findProductWithDetailsAndPhotosForNonMember(productId);
+            return productRepository.findProductWithDetailsAndPhotosWithoutMember(productId);
         }
     }
 
     public DetailResponse getProductDetail(Long productId, @Nullable String providerId) {
         if (providerId != null) {
             Member member = findMemberById(providerId);
-            return productRepository.findProductDetailForMember(productId, member);
+            return productRepository.findProductDetailWithMember(productId, member);
         }
-        return productRepository.findProductDetailForNonMember(productId);
+        return productRepository.findProductDetailWithoutMember(productId);
     }
 
     public PageResponse<?> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {

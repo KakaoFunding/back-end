@@ -47,7 +47,7 @@ public class ProductServiceTest {
                 .thenReturn(Optional.of(member));
         doReturn(expectedDetailResponse)
                 .when(productRepository)
-                .findProductDetailForMember(productId, member);
+                .findProductDetailWithMember(productId, member);
 
         final DetailResponse actual = productService.getProductDetail(productId, member.getProviderId());
 
@@ -67,19 +67,19 @@ public class ProductServiceTest {
                 .thenReturn(Optional.of(member));
         doReturn(expectedDescriptionResponse)
                 .when(productRepository)
-                .findProductWithDetailsAndPhotosForMember(productId,member);
+                .findProductWithDetailsAndPhotosWithMember(productId,member);
 
         DescriptionResponse actualDescriptionResponse = productService.getProductDescription(productId,member.getProviderId());
 
         assertEquals(expectedDescriptionResponse, actualDescriptionResponse);
-        verify(productRepository).findProductWithDetailsAndPhotosForMember(productId,member);
+        verify(productRepository).findProductWithDetailsAndPhotosWithMember(productId,member);
     }
 
     @Test
     @DisplayName("존재하지 않는 상품 ID로 조회 시 예외 발생")
     void getProductDetail_WhenProductNotFound_ThenThrowException() {
         final Long nonExistingProductId = 999L;
-        when(productRepository.findProductWithDetailsAndPhotosForNonMember(nonExistingProductId))
+        when(productRepository.findProductWithDetailsAndPhotosWithoutMember(nonExistingProductId))
                 .thenReturn(null);
 
         assertThatThrownBy(() -> productService.getProductDescription(nonExistingProductId, null))
