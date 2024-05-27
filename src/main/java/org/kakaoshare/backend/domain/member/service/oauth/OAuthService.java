@@ -5,6 +5,8 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
@@ -64,8 +66,8 @@ public class OAuthService {
     }
 
     @Transactional
-    public OAuthReissueResponse reissue(final OAuthReissueRequest oAuthReissueRequest) {
-        final String refreshTokenValue = oAuthReissueRequest.refreshToken();
+    public ReissueResponse reissue(final ReissueRequest reissueRequest) {
+        final String refreshTokenValue = reissueRequest.refreshToken();
         final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
         final String providerId = refreshToken.getProviderId();
         final UserDetails userDetails = findUserDetailsByProviderId(providerId);
@@ -74,7 +76,7 @@ public class OAuthService {
         refreshTokenRepository.delete(refreshToken);
         refreshTokenRepository.save(newRefreshToken);
 
-        return OAuthReissueResponse.of(accessToken, newRefreshToken);
+        return ReissueResponse.of(accessToken, newRefreshToken);
     }
 
     private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {

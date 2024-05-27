@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
@@ -134,9 +134,9 @@ class OAuthServiceTest {
         doReturn(newRefreshToken).when(refreshTokenProvider).createToken(providerId);
         doReturn(newRefreshToken).when(refreshTokenRepository).save(newRefreshToken);
 
-        final OAuthReissueRequest oAuthReissueRequest = new OAuthReissueRequest(refreshTokenValue);
-        final OAuthReissueResponse actual = oAuthService.reissue(oAuthReissueRequest);
-        final OAuthReissueResponse expect = OAuthReissueResponse.of(accessToken, newRefreshToken);
+        final ReissueRequest reissueRequest = new ReissueRequest(refreshTokenValue);
+        final ReissueResponse actual = oAuthService.reissue(reissueRequest);
+        final ReissueResponse expect = ReissueResponse.of(accessToken, newRefreshToken);
 
         assertThat(actual).isEqualTo(expect);
     }
