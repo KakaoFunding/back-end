@@ -23,6 +23,7 @@ import static org.kakaoshare.backend.domain.wish.entity.QWish.wish;
 @Repository
 @RequiredArgsConstructor
 public class WishRepositoryCustomImpl implements WishRepositoryCustom {
+    private static final int FRIEND_WISH_LIMIT = 10;
     private final JPAQueryFactory queryFactory;
     
     @Override
@@ -78,6 +79,9 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                 .on(member.providerId.eq(friendsProviderId)
                         .and(friendWish.isPublic.isTrue()))
                 .join(friendWish.product, product)
+                //TODO 2024 05 27 20:04:17 : 친구 위시리스트 조회시 정렬 조건 구체화 후 논의
+                .orderBy(friendWish.product.wishCount.desc())
+                .limit(FRIEND_WISH_LIMIT)
                 .fetch();
     }
     

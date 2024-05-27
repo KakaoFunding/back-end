@@ -1,7 +1,9 @@
 package org.kakaoshare.backend.domain.wish.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.Getter;
 
+@Getter
 public final class FriendWishDetail{
     private final boolean isWished;
     private final WishDetail wishDetail;
