@@ -1,12 +1,19 @@
 package org.kakaoshare.backend.domain.member.service.oauth.detail.kakao;
 
+import org.kakaoshare.backend.common.util.MultiValueMapConverter;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.detail.kakao.request.KakaoLogoutRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
@@ -37,6 +44,21 @@ public class KakaoOAuthService implements OAuthWebClientService {
     }
 
     @Override
+    public OAuthTokenResponse issueToken(final ClientRegistration registration,
+                                         final OAuthReissueRequest oAuthReissueRequest) {
+        final String socialRefreshToken = oAuthReissueRequest.refreshToken();
+        final OAuthTokenRequest oAuthTokenRequest = OAuthTokenRequest.of(registration, socialRefreshToken);
+        final MultiValueMap<String, String> params = MultiValueMapConverter.convert(oAuthTokenRequest);
+        return webClient.post()
+                .uri(getTokenRequestUri(registration))
+                .headers(header -> header.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .body(BodyInserters.fromFormData(params))
+                .retrieve()
+                .bodyToMono(OAuthTokenResponse.class)
+                .block();
+    }
+
+    @Override
     public void expireToken(final ClientRegistration registration,
                             final OAuthSocialLogoutRequest oAuthSocialLogoutRequest) {
         final String socialAccessTokenToken = oAuthSocialLogoutRequest.socialAccessToken();
@@ -55,5 +77,10 @@ public class KakaoOAuthService implements OAuthWebClientService {
         return registration.getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUri();
+    }
+
+    private String getTokenRequestUri(final ClientRegistration registration) {
+        return registration.getProviderDetails()
+                .getTokenUri();
     }
 }
