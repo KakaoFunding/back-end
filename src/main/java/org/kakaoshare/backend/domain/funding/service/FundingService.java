@@ -1,6 +1,11 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.dto.PageResponse;
+
+import org.kakaoshare.backend.domain.friend.service.KakaoFriendService;
+import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
+
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
@@ -14,13 +19,18 @@ import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
+import org.kakaoshare.backend.domain.member.dto.oauth.profile.detail.KakaoFriendListDto;
 import org.kakaoshare.backend.domain.member.entity.Member;
+import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
+import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
+import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
 import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -36,6 +46,7 @@ public class FundingService {
     private final FundingRepository fundingRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
+    private final KakaoFriendService kakaoFriendService;
 
     @Transactional
     public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
@@ -62,25 +73,27 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
-    public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status,
-                                                             Pageable pageable) {
+    public PageResponse<?> getMyFilteredFundingProducts(String providerId, FundingStatus status,
+                                                     Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithPage(
+        Page<FundingResponse> fundingResponses = fundingRepository.findFundingByMemberIdAndStatusWithPage(
                 member.getMemberId(), status, pageable);
-        List<FundingResponse> fundingResponses = allFundingSlices
-                .getContent()
-                .stream()
-                .map(FundingResponse::from)
-                .toList();
 
-        return FundingSliceResponse.of(
-                fundingResponses,
-                allFundingSlices.getNumberOfElements(),
-                allFundingSlices.getPageable().getPageNumber(),
-                allFundingSlices.isLast()
-        );
+
+        return PageResponse.from(fundingResponses);
     }
 
+    public List<FundingResponse> getFriendsActiveFundingItems(String providerId,
+                                                              FriendFundingItemRequest friendFundingItemRequest) {
+        List<String> providerIds = getFriendsProviderIds(friendFundingItemRequest);
+        validateIsFriend(providerIds, friendFundingItemRequest);
+        List<Member> members = memberRepository.findByProviderIds(providerIds);
+        List<Long> memberIds = members.stream().map(Member::getMemberId).toList();
+
+        List<Funding> fundingItems = fundingRepository.findActiveFundingItemsByMemberIds(memberIds,
+                friendFundingItemRequest.getFundingStatus().getDescription());
+        return fundingItems.stream().map(FundingResponse::from).toList();
+    }
 
     public FundingPreviewResponse preview(final FundingPreviewRequest fundingPreviewRequest) {
         final Long fundingId = fundingPreviewRequest.fundingId();
@@ -108,5 +121,23 @@ public class FundingService {
     private ProductDto findProductDtoByProductId(final Long productId) {
         return productRepository.findProductDtoById(productId)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
+    }
+
+    private List<String> getFriendsProviderIds(FriendFundingItemRequest friendFundingItemRequest) {
+        List<KakaoFriendListDto> friendsList = kakaoFriendService.getFriendsList(
+                friendFundingItemRequest.getAccessToken());
+        return friendsList.stream()
+                .map(KakaoFriendListDto::getId)
+                .toList();
+    }
+
+    private void validateIsFriend(List<String> providerIds, FriendFundingItemRequest friendFundingItemRequest) {
+        List<KakaoFriendListDto> friends = kakaoFriendService.getFriendsList(
+                friendFundingItemRequest.getAccessToken());
+        boolean isFriend = providerIds.stream().anyMatch(providerId ->
+                friends.stream().anyMatch(friend -> friend.getId().equals(providerId)));
+        if (!isFriend) {
+            throw new MemberException(MemberErrorCode.NO_SUCH_RELATIONSHIP);
+        }
     }
 }

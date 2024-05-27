@@ -16,5 +16,5 @@ public interface FundingRepositoryCustom {
 
     List<Funding> findAllByMemberId(Long memberId);
 
-    Page<Funding> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status, Pageable pageable);
+    Page<FundingResponse> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status, Pageable pageable);
 }
