@@ -5,6 +5,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.service.oauth.OAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,13 @@ public class OAuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody final OAuthLogoutRequest oAuthLogoutRequest) {
         oAuthService.logout(oAuthLogoutRequest);
+        return ResponseEntity.noContent()
+                .build();
+    }
+
+    @PostMapping("/social/logout")
+    public ResponseEntity<Void> socialLogout(@RequestBody final OAuthSocialLogoutRequest oAuthSocialLogoutRequest) {
+        oAuthService.socialLogout(oAuthSocialLogoutRequest);
         return ResponseEntity.noContent()
                 .build();
     }
