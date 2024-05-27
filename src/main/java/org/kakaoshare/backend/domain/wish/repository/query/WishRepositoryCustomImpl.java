@@ -35,7 +35,9 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                                         product.productId,
                                         product.name,
                                         product.price,
-                                        product.photo)))
+                                        product.photo,
+                                        product.brandName,
+                                        product.wishCount)))
                 .from(wish)
                 .join(wish.member, member)
                 .on(wish.member.providerId.eq(providerId))
@@ -57,7 +59,9 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                                         product.productId,
                                         product.name,
                                         product.price,
-                                        product.photo),
+                                        product.photo,
+                                        product.brandName,
+                                        product.wishCount),
                                 JPAExpressions.select(myWish.count())
                                         .from(myWish)
                                         .where(myWish.member.providerId.eq(providerId)

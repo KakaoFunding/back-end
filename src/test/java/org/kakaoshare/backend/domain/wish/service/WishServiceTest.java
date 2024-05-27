@@ -162,10 +162,12 @@ class WishServiceTest {
         Boolean isPublic = wish.getIsPublic();
         MyWishDetail myWishDetail = new MyWishDetail(wish.getIsPublic(),
                 new WishDetail(wish.getWishId(),
-                product.getProductId(),
-                product.getName(),
-                product.getPrice(),
-                product.getPhoto()));
+                        product.getProductId(),
+                        product.getName(),
+                        product.getPrice(),
+                        product.getPhoto(),
+                        product.getBrandName(),
+                        product.getWishCount()));
         when(wishRepository.findById(any()))
                 .thenReturn(Optional.of(wish));
         when(wishRepository.findWishDetailsByProviderId(any()))
