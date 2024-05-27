@@ -11,6 +11,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
+import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.entity.token.RefreshToken;
 import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
@@ -77,6 +78,13 @@ public class OAuthService {
         refreshTokenRepository.save(newRefreshToken);
 
         return ReissueResponse.of(accessToken, newRefreshToken);
+    }
+
+    public OAuthReissueResponse socialReissue(final OAuthReissueRequest oAuthReissueRequest) {
+        final String provider = oAuthReissueRequest.provider();
+        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(provider);
+        final OAuthTokenResponse oAuthTokenResponse = webClientService.issueToken(registration, oAuthReissueRequest);
+        return OAuthReissueResponse.from(oAuthTokenResponse);   // TODO: 5/27/24 응답 중 refresh_token 값은 요청 시 사용된 리프레시 토큰의 만료 시간이 1개월 미만으로 남았을 때만 갱신되어 전달
     }
 
     private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {
