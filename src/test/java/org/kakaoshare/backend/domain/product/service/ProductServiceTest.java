@@ -47,7 +47,7 @@ public class ProductServiceTest {
                 .thenReturn(Optional.of(member));
         doReturn(expectedDetailResponse)
                 .when(productRepository)
-                .findProductDetailWithMember(productId, member);
+                .findProductDetailWithMember(product, member);
 
         final DetailResponse actual = productService.getProductDetail(productId, member.getProviderId());
 

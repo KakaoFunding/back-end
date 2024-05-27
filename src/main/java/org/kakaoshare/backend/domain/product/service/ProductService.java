@@ -4,6 +4,8 @@ import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.common.error.GlobalErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
 import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -47,11 +49,17 @@ public class ProductService {
     }
 
     public DetailResponse getProductDetail(Long productId, @Nullable String providerId) {
+        Product product = productRepository.findProductById(productId);
+
+        if (product == null) {
+            throw new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND);
+        }
+
         if (providerId != null) {
             Member member = findMemberById(providerId);
-            return productRepository.findProductDetailWithMember(productId, member);
+            return productRepository.findProductDetailWithMember(product, member);
         }
-        return productRepository.findProductDetailWithoutMember(productId);
+        return productRepository.findProductDetailWithoutMember(product);
     }
 
     public PageResponse<?> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {

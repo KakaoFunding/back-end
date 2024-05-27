@@ -203,10 +203,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
     @Override
     public DescriptionResponse findProductWithDetailsAndPhotosWithoutMember(Long productId) {
-        Product product = queryFactory
-                .selectFrom(QProduct.product)
-                .where(QProduct.product.productId.eq(productId))
-                .fetchOne();
+        Product product = findProductById(productId);
 
         List<String> descriptionPhotosUrls = queryFactory
                 .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
@@ -226,10 +223,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
     @Override
     public DescriptionResponse findProductWithDetailsAndPhotosWithMember(Long productId, Member member) {
-        Product product = queryFactory
-                .selectFrom(QProduct.product)
-                .where(QProduct.product.productId.eq(productId))
-                .fetchOne();
+        Product product = findProductById(productId);
 
         List<String> descriptionPhotosUrls = queryFactory
                 .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
@@ -249,36 +243,23 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls, isWished);
     }
 
-
-
-    public DetailResponse findProductDetailWithoutMember(Long productId) {
-        Product product = queryFactory
+    public Product findProductById(Long productId) {
+        return queryFactory
                 .selectFrom(QProduct.product)
                 .where(QProduct.product.productId.eq(productId))
                 .fetchOne();
+    }
 
-        if (product == null) {
-            throw new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND);
-        }
-
-        List<OptionResponse> optionsResponses = findOptions(productId);
+    public DetailResponse findProductDetailWithoutMember(Product product) {
+        List<OptionResponse> optionsResponses = findOptions(product.getProductId());
 
         return DetailResponse.of(product, optionsResponses, false);
     }
     @Override
-    public DetailResponse findProductDetailWithMember(Long productId, Member member) {
-        Product product = queryFactory
-                .selectFrom(QProduct.product)
-                .where(QProduct.product.productId.eq(productId))
-                .fetchOne();
+    public DetailResponse findProductDetailWithMember(Product product, Member member) {
+        List<OptionResponse> optionsResponses = findOptions(product.getProductId());
 
-        if (product == null) {
-            throw new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND);
-        }
-
-        List<OptionResponse> optionsResponses = findOptions(productId);
-
-        Boolean isWished = isProductWishedByMember(productId, member.getMemberId());
+        Boolean isWished = isProductWishedByMember(product.getProductId(), member.getMemberId());
 
         return DetailResponse.of(product, optionsResponses, isWished);
     }
