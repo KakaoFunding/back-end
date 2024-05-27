@@ -75,6 +75,10 @@ public final class RepositoryUtils {
         return stringExpression.eq(target);
     }
 
+    public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
+                                                     final Date date) {
+        return dateExpression.between(date.getStartDateTime(), date.getEndDateTime());
+    }
     public static <T extends Comparable<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final SimpleExpression<T> target) {
 
         return simpleExpression.eq(target);
