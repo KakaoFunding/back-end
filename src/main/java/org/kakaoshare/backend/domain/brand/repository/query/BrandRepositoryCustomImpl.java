@@ -51,8 +51,9 @@ public class BrandRepositoryCustomImpl implements BrandRepositoryCustom, Sortabl
     public List<SimpleBrandDto> findBySearchConditions(final String keyword, final Pageable pageable) {
         return queryFactory.select(getSimpleBrandDto())
                 .from(brand)
-                .leftJoin(product).on(product.brand.eq(brand))
+                .innerJoin(product).on(product.brand.eq(brand))
                 .where(containsExpression(product.name, keyword))
+                .groupBy(brand.brandId)
                 .orderBy(createOrderSpecifiers(brand, pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
