@@ -1,9 +1,10 @@
 package org.kakaoshare.backend.domain.product.exception;
 
-public class ProductException extends RuntimeException {
-    private final ProductErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public ProductException(ProductErrorCode errorCode) {
-        this.errorCode = errorCode;
+public class ProductException extends BusinessException {
+    public ProductException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }

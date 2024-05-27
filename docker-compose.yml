@@ -1,31 +1,61 @@
 version: '3.8'
 services:
+  nginx:
+    container_name: nginx
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt/live/fundina.shop/fullchain.pem:/etc/ssl/certs/fullchain.pem
+      - /etc/letsencrypt/live/fundina.shop/privkey.pem:/etc/ssl/private/privkey.pem
+      - /etc/letsencrypt/options-ssl-nginx.conf:/etc/nginx/snippets/options-ssl-nginx.conf
+      - /etc/letsencrypt/ssl-dhparams.pem:/etc/ssl/certs/ssl-dhparams.pem
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - TZ=Asia/Seoul
+    depends_on:
+      - app1
+      - app2
+      - app3
+
   app1:
-    image: "${IMAGE_NAME}:${IMAGE_TAG}"
+    image: "yeachan05/application:latest"
+    restart: always
+    container_name: "app1"
     ports:
       - "8081:8080"
-    environment:
-      MYSQL_URL: "${MYSQL_URL}"
-      MYSQL_USERNAME: "${MYSQL_USERNAME}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-    restart: always
+    depends_on:
+      - redis
+    volumes:
+      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
 
   app2:
-    image: "${IMAGE_NAME}:${IMAGE_TAG}"
+    image: "yeachan05/application:latest"
+    restart: always
+    container_name: "app2"
     ports:
       - "8082:8080"
-    environment:
-      MYSQL_URL: "${MYSQL_URL}"
-      MYSQL_USERNAME: "${MYSQL_USERNAME}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-    restart: always
+    depends_on:
+      - redis
+    volumes:
+      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
 
   app3:
-    image: "${IMAGE_NAME}:${IMAGE_TAG}"
+    image: "yeachan05/application:latest"
+    restart: always
+    container_name: "app3"
     ports:
       - "8083:8080"
-    environment:
-      MYSQL_URL: "${MYSQL_URL}"
-      MYSQL_USERNAME: "${MYSQL_USERNAME}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    depends_on:
+      - redis
+    volumes:
+      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
+
+  redis:
+    container_name: redis
+    image: redis
     restart: always
+    ports:
+      - "6379:6379"

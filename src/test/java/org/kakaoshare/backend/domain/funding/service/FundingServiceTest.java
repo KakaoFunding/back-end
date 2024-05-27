@@ -1,42 +1,12 @@
 //package org.kakaoshare.backend.domain.funding.service;
 //
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.mockito.ArgumentMatchers.any;
-//
-//import java.math.BigDecimal;
-//import java.time.LocalDate;
-//import java.util.Arrays;
-//import java.util.List;
-//import java.util.Optional;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;
-//import org.kakaoshare.backend.domain.brand.entity.Brand;
-//import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
-//import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
-//import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
-//import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
-//import org.kakaoshare.backend.domain.funding.entity.Funding;
 //import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
-//import org.kakaoshare.backend.domain.member.entity.Member;
 //import org.kakaoshare.backend.domain.member.repository.MemberRepository;
-//import org.kakaoshare.backend.domain.product.entity.Product;
 //import org.kakaoshare.backend.domain.product.repository.ProductRepository;
-//import org.kakaoshare.backend.fixture.BrandFixture;
-//import org.kakaoshare.backend.fixture.FundingFixture;
-//import org.kakaoshare.backend.fixture.MemberFixture;
-//import org.kakaoshare.backend.fixture.ProductFixture;
 //import org.mockito.InjectMocks;
 //import org.mockito.Mock;
 //import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.data.domain.Slice;
-//import org.springframework.data.domain.SliceImpl;
-//
-//import static org.mockito.Mockito.*;
-//import static org.mockito.BDDMockito.given;
-//import static org.assertj.core.api.Assertions.assertThat;
 //
 //@ExtendWith(MockitoExtension.class)
 //public class FundingServiceTest {

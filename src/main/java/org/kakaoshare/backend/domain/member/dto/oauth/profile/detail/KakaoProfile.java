@@ -25,8 +25,20 @@ public class KakaoProfile extends OAuthProfile {
     }
 
     @Override
+    public String getProfileImageUrl() {
+        return String.valueOf(getProfile().get("profile_image_url"));
+    }
+
+    @Override
     public String getProvider() {
         return "KAKAO";
+    }
+
+    @Override
+    public String getBirthDate() {
+        final String birthYear = String.valueOf(getAccount().get("birthyear"));
+        final String birthday = String.valueOf(getAccount().get("birthday"));
+        return birthYear + "-" + birthday.substring(0, 2) + "-" + birthday.substring(2);
     }
 
     @Override

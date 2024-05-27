@@ -1,36 +1,34 @@
 package org.kakaoshare.backend.domain.gift.repository.query;
 
-import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
-import static org.kakaoshare.backend.domain.gift.entity.QGift.gift;
-import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
-import static org.kakaoshare.backend.domain.product.entity.QProductThumbnail.productThumbnail;
-import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
-import org.kakaoshare.backend.domain.gift.entity.QGift;
 import org.kakaoshare.backend.domain.gift.exception.GiftErrorCode;
 import org.kakaoshare.backend.domain.gift.exception.GiftException;
-import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 import org.kakaoshare.backend.domain.product.entity.QProduct;
 import org.kakaoshare.backend.domain.product.entity.QProductThumbnail;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
 import org.kakaoshare.backend.domain.product.exception.ProductException;
-import org.kakaoshare.backend.domain.receipt.entity.QReceipt;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
+import static org.kakaoshare.backend.domain.gift.entity.QGift.gift;
+import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
+import static org.kakaoshare.backend.domain.product.entity.QProductThumbnail.productThumbnail;
+import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
 
 
 @Repository
@@ -46,7 +44,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         .selectFrom(QProduct.product)
                         .where(QProduct.product.productId.eq(gift.getReceipt().getProduct().getProductId()))
                         .fetchOne())
-                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
 
         return GiftDetailResponse.of(gift, product);
     }
@@ -59,7 +57,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         .selectFrom(QProduct.product)
                         .where(QProduct.product.productId.eq(gift.getReceipt().getProduct().getProductId()))
                         .fetchOne())
-                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_ERROR));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND));
 
         ProductThumbnail productThumbnail = Optional.ofNullable(queryFactory
                         .selectFrom(QProductThumbnail.productThumbnail)
@@ -74,7 +72,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
         return Optional.ofNullable(queryFactory
                         .selectFrom(gift)
                         .where(gift.giftId.eq(giftId)).fetchOne())
-                .orElseThrow(() -> new GiftException(GiftErrorCode.NOT_FOUND_GIFT));
+                .orElseThrow(() -> new GiftException(GiftErrorCode.NOT_FOUND));
     }
 
     @Override

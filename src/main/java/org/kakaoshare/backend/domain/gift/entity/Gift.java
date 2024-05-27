@@ -53,6 +53,7 @@ public class Gift extends BaseTimeEntity {
 
     @Builder
     public Gift(final LocalDateTime expiredAt, final Receipt receipt) {
+        validateExpiredAt(expiredAt);
         this.expiredAt = expiredAt;
         this.receipt = receipt;
     }
@@ -75,5 +76,11 @@ public class Gift extends BaseTimeEntity {
                 ", expiredAt=" + expiredAt +
                 ", receipt=" + receipt +
                 '}';
+    }
+
+    private void validateExpiredAt(final LocalDateTime expiredAt) {
+        if (!expiredAt.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException();
+        }
     }
 }
