@@ -67,7 +67,7 @@ public class FundingService {
     public PageResponse<?> getMyFilteredFundingProducts(String providerId, FundingStatus status,
                                                      Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        Page<Funding> fundingResponses = fundingRepository.findFundingByMemberIdAndStatusWithPage(
+        Page<FundingResponse> fundingResponses = fundingRepository.findFundingByMemberIdAndStatusWithPage(
                 member.getMemberId(), status, pageable);
 
 
