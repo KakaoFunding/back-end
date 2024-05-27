@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 public interface CartRepository extends JpaRepository<Cart,Long>, CartRepositoryCustom {
     @Query("SELECT c FROM Cart c WHERE c.member.memberId = :memberId AND c.product.productId = :productId")
     Optional<Cart> findByMemberIdAndProductId(@Param("memberId") Long memberId, @Param("productId") Long productId);
-    List<Cart> findByMemberId(Long memberId);
-    void deleteByMemberId(Long memberId);
+    @Query("SELECT c FROM Cart c WHERE c.member.memberId = :memberId")
+    List<Cart> findByMemberId(@Param("memberId") Long memberId);
+    @Query("DELETE FROM Cart c WHERE c.member.memberId = :memberId")
+    void deleteByMemberId(@Param("memberId") Long memberId);
 }
