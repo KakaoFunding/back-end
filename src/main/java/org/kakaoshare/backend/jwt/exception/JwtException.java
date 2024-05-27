@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.jwt.exception;
 
-public class JwtException extends RuntimeException {
-    private final JwtErrorCode errorCode;
+import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 
-    public JwtException(final JwtErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+public class JwtException extends BusinessException {
+    public JwtException(final ErrorCode errorCode) {
+        super(errorCode);
     }
 }
