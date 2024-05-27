@@ -10,6 +10,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.product.entity.Product;
@@ -17,6 +18,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @Table(name = "options",
         indexes = @Index(name = "idx_options_product_id",columnList = "product_id",unique = true)
 )
