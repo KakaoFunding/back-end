@@ -2,6 +2,9 @@ package org.kakaoshare.backend.domain.wish.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
+import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.detail.KakaoFriendListDto;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
@@ -18,6 +21,8 @@ import org.kakaoshare.backend.domain.wish.entity.Wish;
 import org.kakaoshare.backend.domain.wish.error.WishErrorCode;
 import org.kakaoshare.backend.domain.wish.error.exception.WishException;
 import org.kakaoshare.backend.domain.wish.repository.WishRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -103,8 +108,13 @@ public class WishService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
     }
     
-    public List<MyWishDetail> getMembersWishList(final String providerId) {
-        return wishRepository.findWishDetailsByProviderId(providerId);
+    public PageResponse<?> getMembersWishList(final Pageable pageable,
+                                              final String providerId) {
+        Page<MyWishDetail> myWishDetails = wishRepository.findWishDetailsByProviderId(pageable, providerId);
+        if(myWishDetails.isEmpty()){
+            throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
+        }
+        return PageResponse.from(myWishDetails);
     }
     
     
@@ -119,7 +129,7 @@ public class WishService {
                 .anyMatch(kakaoFriendListDto -> kakaoFriendListDto
                         .getId()
                         .equals(friendsWishRequest.friendsProviderId()));
-        if(!isFriend){
+        if (!isFriend) {
             throw new MemberException(MemberErrorCode.NO_SUCH_RELATIONSHIP);
         }
     }
@@ -130,14 +140,14 @@ public class WishService {
                 .product(event.getProduct())
                 .build();
     }
-    
+    @Transactional
     public void changeWishType(final String providerId, final Long wishId) {
-        boolean exists = getMembersWishList(providerId).stream()
-                .anyMatch(myWishDetail -> myWishDetail.isSameWishId(wishId));
+        boolean exists = wishRepository.existsByMember_ProviderIdAndWishId(providerId,wishId);
         if (!exists) {
             throw new WishException(WishErrorCode.NOT_FOUND);
         }
         Wish wish = wishRepository.findById(wishId).orElseThrow(() -> new WishException(WishErrorCode.NOT_FOUND));
         wish.changeScopeOfDisclosure();
     }
+    
 }

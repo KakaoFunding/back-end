@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.wish.repository.query;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -12,10 +13,13 @@ import org.kakaoshare.backend.domain.wish.dto.QMyWishDetail;
 import org.kakaoshare.backend.domain.wish.dto.QWishDetail;
 import org.kakaoshare.backend.domain.wish.entity.QWish;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
 import static org.kakaoshare.backend.domain.member.entity.QMember.member;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.kakaoshare.backend.domain.wish.entity.QWish.wish;
@@ -27,8 +31,15 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     
     @Override
-    public List<MyWishDetail> findWishDetailsByProviderId(final String providerId) {
-        return queryFactory
+    public Page<MyWishDetail> findWishDetailsByProviderId(final Pageable pageable,
+                                                          final String providerId) {
+        JPAQuery<Long> countQuery = queryFactory.select(wish.count())
+                .from(wish)
+                .join(wish.member, member)
+                .on(wish.member.providerId.eq(providerId))
+                .join(wish.product, product);
+        
+        JPAQuery<MyWishDetail> contentQuery = queryFactory
                 .select(
                         new QMyWishDetail(wish.isPublic,
                                 new QWishDetail(
@@ -43,7 +54,9 @@ public class WishRepositoryCustomImpl implements WishRepositoryCustom {
                 .join(wish.member, member)
                 .on(wish.member.providerId.eq(providerId))
                 .join(wish.product, product)
-                .fetch();
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+        return toPage(pageable, contentQuery, countQuery);
     }
     
     private static BooleanExpression isInMyWishList(final String providerId, final QWish myWish, final QWish friendWish) {
