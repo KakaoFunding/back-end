@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.order.repository.OrderRepository;
 import org.kakaoshare.backend.common.vo.PriceRange;
+import org.kakaoshare.backend.domain.rank.dto.RankPriceRange;
 import org.kakaoshare.backend.domain.rank.dto.RankResponse;
 import org.kakaoshare.backend.domain.rank.util.RankType;
 import org.kakaoshare.backend.domain.rank.util.TargetType;
@@ -58,10 +59,7 @@ public class RankServiceTest {
     @DisplayName("위시많은순 랭킹 조회")
     public void testFindProductsByFiltersWithWishRankType() {
         List<RankResponse> mockResponses = Arrays.asList(new RankResponse(1L, "Product1", 1000.0, "url1"));
-        PriceRange priceRange = PriceRange.builder()
-                .maxPrice(9999)
-                .minPrice(0)
-                .build();
+        PriceRange priceRange = new RankPriceRange(0,9999);
         when(orderRepository.findProductsByWish(any(TargetType.class), eq(priceRange.getMinPrice()), eq(priceRange.getMaxPrice()), eq(20)))
                 .thenReturn(mockResponses);
 
@@ -78,10 +76,7 @@ public class RankServiceTest {
     public void testFindProductsByFiltersWithReceiveRankType() {
         // Setup
         List<RankResponse> mockResponses = Arrays.asList(new RankResponse(2L, "Product2", 2000.0, "url2"));
-        PriceRange priceRange = PriceRange.builder()
-                .maxPrice(9999)
-                .minPrice(0)
-                .build();
+        PriceRange priceRange = new RankPriceRange(0,9999);
         when(orderRepository.findProductsByReceived(any(TargetType.class), eq(priceRange.getMinPrice()), eq(priceRange.getMaxPrice()), eq(20)))
                 .thenReturn(mockResponses);
 
