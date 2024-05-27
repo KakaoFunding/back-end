@@ -3,11 +3,9 @@ package org.kakaoshare.backend.domain.funding.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
-<<<<<<< refactor/myFunding
-=======
+
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
->>>>>>> develop
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
