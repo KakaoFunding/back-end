@@ -1,9 +1,11 @@
 package org.kakaoshare.backend.domain.product.dto;
 
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.option.dto.OptionResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.entity.ProductDetail;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 import java.util.List;
 
@@ -30,15 +32,14 @@ public class DetailResponse {
     private final boolean isWish;
 
     public static DetailResponse of(final Product product, List<OptionResponse> optionsResponses, Boolean isWished) {
-        String origin = product.getProductDetail() != null ? product.getProductDetail().getOrigin() : null;
-        String manufacturer =
-                product.getProductDetail() != null ? product.getProductDetail().getManufacturer() : null;
-        String tel = product.getProductDetail() != null ? product.getProductDetail().getTel() : null;
-        String deliverDescription =
-                product.getProductDetail() != null ? product.getProductDetail().getDeliverDescription() : null;
-        String billingNotice =
-                product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : null;
-        String caution = product.getProductDetail() != null ? product.getProductDetail().getCaution() : null;
+        ProductDetail detail = product.getProductDetail();
+
+        String origin = Optional.ofNullable(detail).map(ProductDetail::getOrigin).orElse(null);
+        String manufacturer = Optional.ofNullable(detail).map(ProductDetail::getManufacturer).orElse(null);
+        String tel = Optional.ofNullable(detail).map(ProductDetail::getTel).orElse(null);
+        String deliverDescription = Optional.ofNullable(detail).map(ProductDetail::getDeliverDescription).orElse(null);
+        String billingNotice = Optional.ofNullable(detail).map(ProductDetail::getBillingNotice).orElse(null);
+        String caution = Optional.ofNullable(detail).map(ProductDetail::getCaution).orElse(null);
 
         return DetailResponse.builder()
                 .productId(product.getProductId())
