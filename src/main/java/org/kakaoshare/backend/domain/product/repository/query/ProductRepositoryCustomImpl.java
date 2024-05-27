@@ -202,7 +202,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     @Override
-    public DescriptionResponse findProductWithDetailsAndPhotosForNonMember(Long productId) {
+    public DescriptionResponse findProductWithDetailsAndPhotosWithoutMember(Long productId) {
         Product product = queryFactory
                 .selectFrom(QProduct.product)
                 .where(QProduct.product.productId.eq(productId))
@@ -225,7 +225,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     @Override
-    public DescriptionResponse findProductWithDetailsAndPhotosForMember(Long productId, Member member) {
+    public DescriptionResponse findProductWithDetailsAndPhotosWithMember(Long productId, Member member) {
         Product product = queryFactory
                 .selectFrom(QProduct.product)
                 .where(QProduct.product.productId.eq(productId))
@@ -251,7 +251,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
 
 
 
-    public DetailResponse findProductDetailForNonMember(Long productId) {
+    public DetailResponse findProductDetailWithoutMember(Long productId) {
         Product product = queryFactory
                 .selectFrom(QProduct.product)
                 .where(QProduct.product.productId.eq(productId))
@@ -266,7 +266,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
         return DetailResponse.of(product, optionsResponses, false);
     }
     @Override
-    public DetailResponse findProductDetailForMember(Long productId, Member member) {
+    public DetailResponse findProductDetailWithMember(Long productId, Member member) {
         Product product = queryFactory
                 .selectFrom(QProduct.product)
                 .where(QProduct.product.productId.eq(productId))
