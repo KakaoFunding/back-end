@@ -130,6 +130,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
             return member.gender.eq(Gender.FEMALE);
         }
         return null;
+    }
       
     @Override
     public Page<OrderProductDto> findAllOrderProductDtoByCondition(final String providerId, final OrderHistoryDate date, final Pageable pageable) {
