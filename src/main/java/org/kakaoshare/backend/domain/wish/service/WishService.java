@@ -111,7 +111,7 @@ public class WishService {
     public PageResponse<?> getMembersWishList(final Pageable pageable,
                                               final String providerId) {
         Page<MyWishDetail> myWishDetails = wishRepository.findWishDetailsByProviderId(pageable, providerId);
-        if(myWishDetails.isEmpty()){
+        if (myWishDetails.isEmpty()) {
             throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }
         return PageResponse.from(myWishDetails);
@@ -140,14 +140,11 @@ public class WishService {
                 .product(event.getProduct())
                 .build();
     }
+    
     @Transactional
     public void changeWishType(final String providerId, final Long wishId) {
-        boolean exists = wishRepository.existsByMember_ProviderIdAndWishId(providerId,wishId);
-        if (!exists) {
-            throw new WishException(WishErrorCode.NOT_FOUND);
-        }
-        Wish wish = wishRepository.findById(wishId).orElseThrow(() -> new WishException(WishErrorCode.NOT_FOUND));
+        Wish wish = wishRepository.findByMember_ProviderIdAndWishId(providerId, wishId)
+                .orElseThrow(() -> new WishException(WishErrorCode.NOT_FOUND));
         wish.changeScopeOfDisclosure();
     }
-    
 }
