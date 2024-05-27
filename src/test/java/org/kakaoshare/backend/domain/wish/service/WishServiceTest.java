@@ -23,11 +23,12 @@ import org.kakaoshare.backend.fixture.WishFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -170,9 +171,10 @@ class WishServiceTest {
                         product.getWishCount()));
         when(wishRepository.findById(any()))
                 .thenReturn(Optional.of(wish));
-        when(wishRepository.findWishDetailsByProviderId(any()))
-                .thenReturn(List.of(myWishDetail));
-        
+        when(wishRepository.findWishDetailsByProviderId(any(),any()))
+                .thenReturn(new PageImpl<>(Collections.singletonList(myWishDetail)));
+        when(wishRepository.findByMember_ProviderIdAndWishId(any(), any()))
+                .thenReturn(Optional.of(wish));
         // when
         wishService.changeWishType(member.getProviderId(), wish.getWishId());
         
