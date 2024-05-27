@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.product.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.common.util.sort.error.SortErrorCode;
 import org.kakaoshare.backend.common.util.sort.error.exception.NoMorePageException;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
@@ -47,20 +48,20 @@ public class ProductService {
         return detailResponse;
     }
     
-    public Page<Product4DisplayDto> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {
+    public PageResponse<?> getSimpleProductsPage(Long categoryId, Pageable pageable, final String providerId) {
         Page<Product4DisplayDto> productDtos = productRepository.findAllByCategoryId(categoryId, pageable,providerId);
         if (productDtos.isEmpty()) {
             throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }
-        return productDtos;
+        return PageResponse.from(productDtos);
     }
     
-    public Page<ProductDto> getSimpleProductsByBrandId(Long brandId, Pageable pageable) {
+    public PageResponse<?> getSimpleProductsByBrandId(Long brandId, Pageable pageable) {
         Page<ProductDto> productDtos = productRepository.findAllByBrandId(brandId, pageable);
         if (productDtos.isEmpty()) {
             throw new NoMorePageException(SortErrorCode.NO_MORE_PAGE);
         }
-        return productDtos;
+        return PageResponse.from(productDtos);
     }
     
     /**
