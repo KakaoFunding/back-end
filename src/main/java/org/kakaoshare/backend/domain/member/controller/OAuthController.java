@@ -3,6 +3,7 @@ package org.kakaoshare.backend.domain.member.controller;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
@@ -41,5 +42,11 @@ public class OAuthController {
     public ResponseEntity<?> reissue(@RequestBody final ReissueRequest reissueRequest) {
         return ResponseEntity.ok()
                 .body(oAuthService.reissue(reissueRequest));
+    }
+
+    @PostMapping("/social/reissue")
+    public ResponseEntity<?> socialReissue(@RequestBody final OAuthReissueRequest oAuthReissueRequest) {
+        return ResponseEntity.ok()
+                .body(oAuthService.socialReissue(oAuthReissueRequest));
     }
 }
