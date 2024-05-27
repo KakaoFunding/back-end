@@ -1,12 +1,9 @@
 package org.kakaoshare.backend.domain.funding.service;
 
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.brand.entity.Brand;
-import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
@@ -23,11 +20,12 @@ import org.kakaoshare.backend.fixture.ProductFixture;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.mockito.BDDMockito.*;
-import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -50,10 +48,7 @@ public class FundingServiceTest {
     void registerFundingItem_Success() {
         Long productId = 1L;
         String providerId = "provider123";
-        RegisterRequest request = RegisterRequest.builder()
-                .goalAmount(1000L)
-                .expiredAt(LocalDate.now().plusDays(30))
-                .build();
+        RegisterRequest request = new RegisterRequest(1000L, LocalDate.now().plusDays(30));
 
         Product product = ProductFixture.TEST_PRODUCT.생성();
         Member member = MemberFixture.KAKAO.생성();
@@ -75,7 +70,7 @@ public class FundingServiceTest {
         Long fundingId = 1L;
         Brand brand = BrandFixture.EDIYA.생성(1L);
         Member member = MemberFixture.KAKAO.생성();
-        Product product = ProductFixture.TEST_PRODUCT.생성(1L,brand);
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L, brand);
         Funding funding = FundingFixture.SAMPLE_FUNDING.생성(member, product);
 
         given(memberRepository.findMemberByProviderId(member.getProviderId())).willReturn(Optional.of(member));
