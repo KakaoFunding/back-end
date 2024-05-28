@@ -12,11 +12,13 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
+import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
@@ -32,12 +34,16 @@ import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.PROGRES
 @AllArgsConstructor
 @Table(
         indexes = {
-                @Index(name = "idx_funding_member_id",columnList = "member_id",unique = true),
-                @Index(name = "idx_funding_product_id",columnList = "product_id",unique = true),
+                @Index(name = "idx_funding_member_id", columnList = "member_id", unique = true),
+                @Index(name = "idx_funding_product_id", columnList = "product_id", unique = true),
         }
 )
 public class Funding extends BaseTimeEntity {
-    
+    private static final Long ZERO = 0L;
+    private static final int SCALE = 4;
+    private static final double DEFAULT_PROGRESS_RATE = 0.0;
+    private static final double PERCENT_MULTIPLIER = 100.0;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fundingId;
@@ -46,21 +52,21 @@ public class Funding extends BaseTimeEntity {
     @Column(columnDefinition = "varchar(255)", nullable = false)
     @Enumerated(EnumType.STRING)
     private FundingStatus status = PROGRESS;
-    
+
     @Column(nullable = false)
     private LocalDate expiredAt;
-    
+
     @Column(nullable = false, precision = 12, scale = 2)
     private Long goalAmount;
-    
+
     @ColumnDefault("0")
     @Column(nullable = false, precision = 12, scale = 2)
     private Long accumulateAmount = 0L;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -137,7 +143,26 @@ public class Funding extends BaseTimeEntity {
     public boolean satisfiedAccumulateAmount() {
         return goalAmount.equals(accumulateAmount);
     }
+    public Long calculateRemainAmount(){
+        return goalAmount - accumulateAmount;
+    }
+    public Double calculateProgressRate() {
+        return Optional.of(goalAmount)
+                .filter(goalAmountValue -> goalAmountValue.compareTo(ZERO) != 0)
+                .map(goalAmountValue -> divide(accumulateAmount, goalAmountValue) * PERCENT_MULTIPLIER)
+                .orElse(DEFAULT_PROGRESS_RATE);
+    }
 
+    private static Double divide(long numerator, long denominator) {
+        long scaledNumerator = numerator * (long) Math.pow(10, Funding.SCALE + 1);
+        long rawResult = scaledNumerator / denominator;
+        long remainder = rawResult % 10;
+        rawResult /= 10;
+        if (remainder >= 5) {
+            rawResult += 1;
+        }
+        return rawResult / Math.pow(10, Funding.SCALE);
+    }
     private long getRemainAmount() {
         if (satisfiedAccumulateAmount()) {
             return product.getPrice() - goalAmount;
