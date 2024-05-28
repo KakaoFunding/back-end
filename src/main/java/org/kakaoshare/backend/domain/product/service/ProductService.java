@@ -40,16 +40,18 @@ public class ProductService {
 
 
     public DescriptionResponse getProductDescription(Long productId, @Nullable String providerId) {
+        Product product = findProductById(productId);
+
         if (providerId != null) {
             Member member = findMemberById(providerId);
-            return productRepository.findProductWithDetailsAndPhotosWithMember(productId, member);
+            return productRepository.findProductWithDetailsAndPhotosWithMember(product, member);
         } else {
-            return productRepository.findProductWithDetailsAndPhotosWithoutMember(productId);
+            return productRepository.findProductWithDetailsAndPhotosWithoutMember(product);
         }
     }
 
     public DetailResponse getProductDetail(Long productId, @Nullable String providerId) {
-        Product product = productRepository.findProductById(productId);
+        Product product = findProductById(productId);
 
         if (product == null) {
             throw new BusinessException(GlobalErrorCode.RESOURCE_NOT_FOUND);

@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.kakaoshare.backend.domain.product.dto.DescriptionResponse;
@@ -36,20 +37,23 @@ public class ProductServiceTest {
     @Test
     @DisplayName("상품 상세정보 조회 성공")
     void getProductDetail_Success() {
+        // Arrange
         Member member = MemberFixture.KAKAO.생성();
-        final Product product = ProductFixture.TEST_PRODUCT.생성();
-        final Long productId = product.getProductId();
+        Product product = ProductFixture.TEST_PRODUCT.생성();
+        Long productId = product.getProductId();
 
         DetailResponse expectedDetailResponse = DetailResponse.builder()
                 .deliverDescription("배송 설명")
                 .build();
+
         when(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .thenReturn(Optional.of(member));
-        doReturn(expectedDetailResponse)
-                .when(productRepository)
-                .findProductDetailWithMember(product, member);
+        when(productRepository.findProductById(productId))
+                .thenReturn(product);
+        when(productRepository.findProductDetailWithMember(product, member))
+                .thenReturn(expectedDetailResponse);
 
-        final DetailResponse actual = productService.getProductDetail(productId, member.getProviderId());
+        DetailResponse actual = productService.getProductDetail(productId, member.getProviderId());
 
         assertEquals(expectedDetailResponse.getDeliverDescription(), actual.getDeliverDescription());
     }
@@ -58,29 +62,31 @@ public class ProductServiceTest {
     @DisplayName("상품 상세설명 조회 성공")
     void getProductDescription_Success() {
         Member member = MemberFixture.KAKAO.생성();
-        final Long productId = 1L;
+        Product product = ProductFixture.TEST_PRODUCT.생성();
+        Long productId = product.getProductId();
+
         DescriptionResponse expectedDescriptionResponse = DescriptionResponse.builder()
                 .description("설명")
                 .build();
 
         when(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .thenReturn(Optional.of(member));
+        when(productRepository.findProductById(productId))
+                .thenReturn(product);
         doReturn(expectedDescriptionResponse)
                 .when(productRepository)
-                .findProductWithDetailsAndPhotosWithMember(productId,member);
+                .findProductWithDetailsAndPhotosWithMember(product,member);
 
         DescriptionResponse actualDescriptionResponse = productService.getProductDescription(productId,member.getProviderId());
 
         assertEquals(expectedDescriptionResponse, actualDescriptionResponse);
-        verify(productRepository).findProductWithDetailsAndPhotosWithMember(productId,member);
+        verify(productRepository).findProductWithDetailsAndPhotosWithMember(product,member);
     }
 
     @Test
     @DisplayName("존재하지 않는 상품 ID로 조회 시 예외 발생")
     void getProductDetail_WhenProductNotFound_ThenThrowException() {
-        final Long nonExistingProductId = 999L;
-        when(productRepository.findProductWithDetailsAndPhotosWithoutMember(nonExistingProductId))
-                .thenReturn(null);
+        Long nonExistingProductId = 999L;
 
         assertThatThrownBy(() -> productService.getProductDescription(nonExistingProductId, null))
                 .isInstanceOf(ProductException.class);

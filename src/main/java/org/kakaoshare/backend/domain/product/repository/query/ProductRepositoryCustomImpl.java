@@ -202,43 +202,40 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom, Sor
     }
 
     @Override
-    public DescriptionResponse findProductWithDetailsAndPhotosWithoutMember(Long productId) {
-        Product product = findProductById(productId);
+    public DescriptionResponse findProductWithDetailsAndPhotosWithoutMember(Product product) {
 
         List<String> descriptionPhotosUrls = queryFactory
                 .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
                 .from(QProductDescriptionPhoto.productDescriptionPhoto)
-                .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(productId))
+                .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(product.getProductId()))
                 .fetch();
 
-        List<OptionResponse> optionsResponses = findOptions(productId);
+        List<OptionResponse> optionsResponses = findOptions(product.getProductId());
         List<String> productThumbnailsUrls = queryFactory
                 .select(QProductThumbnail.productThumbnail.thumbnailUrl)
                 .from(QProductThumbnail.productThumbnail)
-                .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
+                .where(QProductThumbnail.productThumbnail.product.productId.eq(product.getProductId()))
                 .fetch();
 
         return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls, false);
     }
 
     @Override
-    public DescriptionResponse findProductWithDetailsAndPhotosWithMember(Long productId, Member member) {
-        Product product = findProductById(productId);
-
+    public DescriptionResponse findProductWithDetailsAndPhotosWithMember(Product product, Member member) {
         List<String> descriptionPhotosUrls = queryFactory
                 .select(QProductDescriptionPhoto.productDescriptionPhoto.photoUrl)
                 .from(QProductDescriptionPhoto.productDescriptionPhoto)
-                .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(productId))
+                .where(QProductDescriptionPhoto.productDescriptionPhoto.product.productId.eq(product.getProductId()))
                 .fetch();
 
-        List<OptionResponse> optionsResponses = findOptions(productId);
+        List<OptionResponse> optionsResponses = findOptions(product.getProductId());
         List<String> productThumbnailsUrls = queryFactory
                 .select(QProductThumbnail.productThumbnail.thumbnailUrl)
                 .from(QProductThumbnail.productThumbnail)
-                .where(QProductThumbnail.productThumbnail.product.productId.eq(productId))
+                .where(QProductThumbnail.productThumbnail.product.productId.eq(product.getProductId()))
                 .fetch();
 
-        Boolean isWished = isProductWishedByMember(productId, member.getMemberId());
+        Boolean isWished = isProductWishedByMember(product.getProductId(), member.getMemberId());
 
         return DescriptionResponse.of(product, descriptionPhotosUrls, optionsResponses, productThumbnailsUrls, isWished);
     }
