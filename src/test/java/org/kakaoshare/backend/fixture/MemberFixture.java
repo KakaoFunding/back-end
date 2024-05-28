@@ -36,6 +36,7 @@ public enum MemberFixture {
                 .gender(gender)
                 .phoneNumber(phoneNumber)
                 .providerId(providerId)
+                .profileImageUrl("defaultProfileImageUrl")
                 .build();
     }
 }
