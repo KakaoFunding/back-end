@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.member.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
+import org.kakaoshare.backend.domain.cart.entity.Cart;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
 
 import java.util.ArrayList;
@@ -53,12 +55,15 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)
     private List<Wish> wishes=new ArrayList<>();
 
+    @OneToMany(mappedBy = "member",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Cart> carts = new ArrayList<>();
+
     protected Member() {
 
     }
 
     @Builder
-    public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId, final String profileImageUrl) {
+    public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId) {
         this.memberId = memberId;
         this.gender = gender;
         this.name = name;
