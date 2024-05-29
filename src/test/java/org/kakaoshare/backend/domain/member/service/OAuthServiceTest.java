@@ -90,7 +90,6 @@ class OAuthServiceTest {
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
         doReturn(attributes).when(webClientService).getSocialProfile(registration, socialAccessToken);
-        doReturn(Optional.empty()).when(memberRepository).findDetailsByProviderId(providerId);
         doReturn(member).when(memberRepository).save(any());
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
@@ -112,7 +111,7 @@ class OAuthServiceTest {
 
         doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
         doReturn(attributes).when(webClientService).getSocialProfile(registration, socialAccessToken);
-        doReturn(Optional.of(userDetails)).when(memberRepository).findDetailsByProviderId(providerId);
+        doReturn(member).when(memberRepository).save(any());
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
         doReturn(refreshToken).when(refreshTokenRepository).save(any());

@@ -1,11 +1,13 @@
 package org.kakaoshare.backend.domain.gift.dto;
 
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 
 @Getter
+@AllArgsConstructor
 @Builder
 public class GiftResponse {
     private final Long giftId;
