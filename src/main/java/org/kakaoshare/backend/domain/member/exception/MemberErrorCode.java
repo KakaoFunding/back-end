@@ -16,4 +16,9 @@ public enum MemberErrorCode implements ErrorCode {
         this.httpStatus = httpStatus;
         this.message = message;
     }
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }

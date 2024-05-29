@@ -15,4 +15,9 @@ public enum GiftErrorCode implements ErrorCode {
         this.httpStatus = httpStatus;
         this.message = message;
     }
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }

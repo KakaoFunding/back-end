@@ -12,4 +12,9 @@ public enum FriendErrorCode implements ErrorCode {
 
     private final HttpStatus httpStatus;
     private final String message;
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }
