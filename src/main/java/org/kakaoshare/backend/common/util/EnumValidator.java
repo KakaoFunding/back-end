@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class EnumValidator implements ConstraintValidator<EnumValue, String> {
     private EnumValue enumValue;
@@ -16,8 +17,7 @@ public class EnumValidator implements ConstraintValidator<EnumValue, String> {
 
     @Override
     public boolean isValid(final String value, final ConstraintValidatorContext context) {
-        final Enum<?>[] enumConstants = enumValue.enumClass().getEnumConstants();
-        if (enumConstants == null) {
+        if (context == null) {
             return false;
         }
 
@@ -25,16 +25,23 @@ public class EnumValidator implements ConstraintValidator<EnumValue, String> {
             return true;
         }
 
-        return Arrays.stream(enumConstants)
+        final List<ParamEnum> paramEnums = getParamEnums();
+        return paramEnums.stream()
                 .anyMatch(enumConstant -> convertible(value, enumConstant));
     }
 
-    private boolean convertible(final String value, final Enum<?> enumConstant) {
+    private List<ParamEnum> getParamEnums() {
+        return Arrays.stream(enumValue.enumClass().getEnumConstants())
+                .map(enumConstant -> (ParamEnum) enumConstant)
+                .toList();
+    }
+
+    private boolean convertible(final String value, final ParamEnum paramEnum) {
         final String trimValue = value.trim();
         if (enumValue.ignoreCase()) {
-            return trimValue.equalsIgnoreCase(enumConstant.name());
+            return trimValue.equalsIgnoreCase(paramEnum.getParamName());
         }
 
-        return trimValue.equals(enumConstant.name());
+        return trimValue.equals(paramEnum.getParamName());
     }
 }
