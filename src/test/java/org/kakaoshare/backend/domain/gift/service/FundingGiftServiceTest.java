@@ -90,7 +90,7 @@ class FundingGiftServiceTest {
     }
 
     private FundingGiftHistoryResponse getFundingGiftHistoryResponse(final Product product) {
-        return new FundingGiftHistoryResponse(getProductDto(product), 1, LocalDateTime.now());
+        return new FundingGiftHistoryResponse(null, getProductDto(product), 1, LocalDateTime.now());
     }
 
     private ProductDto getProductDto(final Product product) {
