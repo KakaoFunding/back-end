@@ -6,10 +6,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.gift.dto.funding.inquiry.response.FundingGiftHistoryResponse;
 import org.kakaoshare.backend.domain.gift.dto.funding.inquiry.response.QFundingGiftHistoryResponse;
+import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
+import static org.kakaoshare.backend.common.util.RepositoryUtils.containsExpression;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpecifiers;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.eqExpression;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
@@ -23,9 +27,9 @@ public class FundingGiftRepositoryCustomImpl implements FundingGiftRepositoryCus
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<FundingGiftHistoryResponse> findHistoryByCondition(final String providerId, final String status, final Pageable pageable) {
-        final JPAQuery<FundingGiftHistoryResponse> contentQuery = createHistoryContentQuery(providerId, status, pageable);
-        final JPAQuery<Long> countQuery = createHistoryCountQuery(providerId, status, pageable);
+    public Page<FundingGiftHistoryResponse> findHistoryByCondition(final String providerId, final List<GiftStatus> statuses, final Pageable pageable) {
+        final JPAQuery<FundingGiftHistoryResponse> contentQuery = createHistoryContentQuery(providerId, statuses, pageable);
+        final JPAQuery<Long> countQuery = createHistoryCountQuery(providerId, statuses, pageable);
         return toPage(pageable, contentQuery, countQuery);
     }
 
@@ -37,24 +41,24 @@ public class FundingGiftRepositoryCustomImpl implements FundingGiftRepositoryCus
         return toPage(pageable, contentQuery, countQuery);
     }
 
-    private JPAQuery<Long> createHistoryCountQuery(final String providerId, final String status, final Pageable pageable) {
-        return createHistoryBaseQuery(providerId, status, pageable)
+    private JPAQuery<Long> createHistoryCountQuery(final String providerId, final List<GiftStatus> statuses, final Pageable pageable) {
+        return createHistoryBaseQuery(providerId, statuses, pageable)
                 .select(fundingGift.count());
     }
 
-    private JPAQuery<FundingGiftHistoryResponse> createHistoryContentQuery(final String providerId, final String status, final Pageable pageable) {
-        return createHistoryBaseQuery(providerId, status, pageable)
+    private JPAQuery<FundingGiftHistoryResponse> createHistoryContentQuery(final String providerId, final List<GiftStatus> statuses, final Pageable pageable) {
+        return createHistoryBaseQuery(providerId, statuses, pageable)
                 .select(getFundingGiftHistoryResponse())
                 .orderBy(createOrderSpecifiers(fundingGift, pageable));
     }
 
-    private JPAQuery<?> createHistoryBaseQuery(final String providerId, final String status, final Pageable pageable) {
+    private JPAQuery<?> createHistoryBaseQuery(final String providerId, final List<GiftStatus> statuses, final Pageable pageable) {
         return queryFactory.from(fundingGift)
                 .innerJoin(fundingGift.funding, funding)
                 .innerJoin(funding.member, member)
                 .where(
                         eqExpression(member.providerId, providerId),
-                        eqExpression(fundingGift.status.stringValue(), status)
+                        containsExpression(fundingGift.status, statuses)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
