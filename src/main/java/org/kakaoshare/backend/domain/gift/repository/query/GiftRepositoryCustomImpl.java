@@ -89,7 +89,8 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                                 .from(productThumbnail)
                                 .where(productThumbnail.product.productId.eq(receipt.product.productId))
                                 .limit(1),
-                        receipt.product.brandName))
+                        receipt.product.brandName,
+                        gift.createdAt))
                 .from(gift)
                 .leftJoin(gift.receipt, receipt)
                 .where(gift.status.eq(status)

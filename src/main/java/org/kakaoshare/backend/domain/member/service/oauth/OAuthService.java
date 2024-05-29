@@ -12,6 +12,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRe
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
 import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
+import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.entity.token.RefreshToken;
 import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
@@ -93,8 +94,8 @@ public class OAuthService {
     }
 
     private UserDetails addOrFindByProfile(final OAuthProfile oAuthProfile) {
-        return memberRepository.findDetailsByProviderId(oAuthProfile.getProviderId())
-                .orElseGet(() -> MemberDetails.from(memberRepository.save(oAuthProfile.toEntity())));
+        final Member member = memberRepository.save(oAuthProfile.toEntity());   // TODO: 5/27/24 dirty checking 을 통해 DB내 Member 테이블 프로필 사진 수정
+        return MemberDetails.from(member);
     }
 
     private UserDetails findUserDetailsByProviderId(final String providerId) {

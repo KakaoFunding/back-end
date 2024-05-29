@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import static org.kakaoshare.backend.common.error.GlobalErrorCode.INTERNAL_SERVER_ERROR;
@@ -38,6 +39,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                           final HttpStatusCode status,
                                                                           final WebRequest request) {
         GlobalErrorCode errorCode = GlobalErrorCode.UNSUPPORTED_PARAMETER_NAME;
+        logException(e, errorCode);
+        return handleExceptionInternal(errorCode);
+    }
+
+
+    @Override
+    protected ResponseEntity<Object> handleNoHandlerFoundException(final NoHandlerFoundException e,
+                                                                   final HttpHeaders headers,
+                                                                   final HttpStatusCode status,
+                                                                   final WebRequest request) {
+        final GlobalErrorCode errorCode = GlobalErrorCode.RESOURCE_NOT_FOUND;
         logException(e, errorCode);
         return handleExceptionInternal(errorCode);
     }

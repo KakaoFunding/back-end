@@ -46,7 +46,7 @@ import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResp
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentGiftSuccessResponse;
-import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessReceiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
 import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
@@ -152,7 +152,7 @@ public class PaymentService {
         saveOrders(payment, receipts);
 
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
-        return new PaymentGiftSuccessResponse(Receiver.from(receiver), orderSummaries);
+        return new PaymentGiftSuccessResponse(PaymentSuccessReceiver.from(receiver), orderSummaries);
     }
 
     @Transactional
@@ -178,8 +178,8 @@ public class PaymentService {
 
         final Product product = funding.getProduct();
         final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(product);
-        final Receiver receiver = Receiver.from(funding.getMember());
-        return new PaymentFundingSuccessResponse(receiver, productSummaryResponse, amount);
+        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.from(funding.getMember());
+        return new PaymentFundingSuccessResponse(paymentSuccessReceiver, productSummaryResponse, amount);
     }
 
     @Transactional
