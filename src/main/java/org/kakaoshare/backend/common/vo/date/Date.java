@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.common.vo;
+package org.kakaoshare.backend.common.vo.date;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
