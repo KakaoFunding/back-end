@@ -3,10 +3,15 @@ package org.kakaoshare.backend.common.vo.date;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.kakaoshare.backend.common.vo.date.exception.DateException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+
+import static org.kakaoshare.backend.common.vo.date.exception.DateErrorCode.INVALID_END_DATE;
+import static org.kakaoshare.backend.common.vo.date.exception.DateErrorCode.INVALID_RANGE;
+import static org.kakaoshare.backend.common.vo.date.exception.DateErrorCode.NOT_FOUND_DATE;
 
 @EqualsAndHashCode
 @Getter
@@ -31,15 +36,15 @@ public abstract class Date {
 
     private void validateDateRange(final LocalDate startDate, final LocalDate endDate) {
         if (startDate == null && endDate == null) {
-            throw new IllegalArgumentException();
+            throw new DateException(NOT_FOUND_DATE);
         }
 
         if (endDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException();
+            throw new DateException(INVALID_END_DATE);
         }
 
         if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException();
+            throw new DateException(INVALID_RANGE);
         }
     }
 }
