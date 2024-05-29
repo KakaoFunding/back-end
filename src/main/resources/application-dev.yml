@@ -49,6 +49,10 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+        other:
+          kakao:
+            logout-url: https://kapi.kakao.com/v1/user/logout
+
 security:
   token:
     access:
