@@ -53,7 +53,7 @@ class FundingGiftServiceTest {
     public void lookUpWithStatus(final String statusParam) throws Exception {
         final FundingGiftHistoryRequest fundingGiftHistoryRequest = new FundingGiftHistoryRequest(statusParam);
         final Product cake = CAKE.생성();
-        final Page<?> page = getPage(cake, statusParam);
+        final Page<?> page = getPage(cake);
         final List<GiftStatus> statuses = GiftStatusConstraint.findByParam(statusParam);
         doReturn(page).when(fundingGiftRepository).findHistoryByCondition(providerId, statuses, pageable);
 
@@ -77,34 +77,20 @@ class FundingGiftServiceTest {
                 .isEqualTo(expect);
     }
 
-    private Page<?> getPage(final Product product, final String status) {
-        return new PageImpl<>(getFundingGiftHistoryResponses(product, status));
-    }
-
     private Page<?> getPage(final Product product) {
-        return new PageImpl<>(getFundingGiftHistoryResponses(product));
+        return new PageImpl<>(getFundingGiftHistoryResponsesSameStatus(product));
     }
-
-    private List<FundingGiftHistoryResponse> getFundingGiftHistoryResponses(final Product product) {
+    private List<FundingGiftHistoryResponse> getFundingGiftHistoryResponsesSameStatus(final Product product) {
         return List.of(
-                getFundingGiftHistoryResponse(product, GiftStatus.USED.name()),
-                getFundingGiftHistoryResponse(product, GiftStatus.USING.name()),
-                getFundingGiftHistoryResponse(product, GiftStatus.CANCEL_REFUND.name()),
-                getFundingGiftHistoryResponse(product, GiftStatus.NOT_USED.name())
+                getFundingGiftHistoryResponse(product),
+                getFundingGiftHistoryResponse(product),
+                getFundingGiftHistoryResponse(product),
+                getFundingGiftHistoryResponse(product)
         );
     }
 
-    private List<FundingGiftHistoryResponse> getFundingGiftHistoryResponses(final Product product, final String status) {
-        return List.of(
-                getFundingGiftHistoryResponse(product, status),
-                getFundingGiftHistoryResponse(product, status),
-                getFundingGiftHistoryResponse(product, status),
-                getFundingGiftHistoryResponse(product, status)
-        );
-    }
-
-    private FundingGiftHistoryResponse getFundingGiftHistoryResponse(final Product product, final String status) {
-        return new FundingGiftHistoryResponse(getProductDto(product), 1, LocalDateTime.now(), status);
+    private FundingGiftHistoryResponse getFundingGiftHistoryResponse(final Product product) {
+        return new FundingGiftHistoryResponse(getProductDto(product), 1, LocalDateTime.now());
     }
 
     private ProductDto getProductDto(final Product product) {

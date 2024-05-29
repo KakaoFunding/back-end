@@ -34,7 +34,11 @@ class FundingGiftRepositoryTest {
     static Stream<Arguments> statusData() {
         return Stream.of(
                 Arguments.of("providerId1", List.of(USING, NOT_USED)),
-                Arguments.of("providerId1", List.of(USED, CANCEL_REFUND))
+                Arguments.of("providerId1", List.of(USED, CANCEL_REFUND)),
+                Arguments.of("providerId2", List.of(USING, NOT_USED)),
+                Arguments.of("providerId2", List.of(USED, CANCEL_REFUND)),
+                Arguments.of("providerId3", List.of(USING, NOT_USED)),
+                Arguments.of("providerId3", List.of(USED, CANCEL_REFUND))
         );
     }
 
@@ -48,10 +52,7 @@ class FundingGiftRepositoryTest {
     @MethodSource("statusData")
     public void findHistoryByStatus(final String providerId, final List<GiftStatus> statuses) throws Exception {
         final Page<FundingGiftHistoryResponse> page = fundingGiftRepository.findHistoryByCondition(providerId, statuses, pageable);
-        final boolean isAllSameStatus = page.getContent()
-                .stream()
-                .allMatch(fundingGiftHistoryResponse -> statuses.contains(GiftStatus.valueOf(fundingGiftHistoryResponse.status())));
-        assertThat(isAllSameStatus).isTrue();
+        assertThat(page.getNumberOfElements()).isEqualTo(1);
     }
 
     @ParameterizedTest
@@ -59,6 +60,6 @@ class FundingGiftRepositoryTest {
     @ValueSource(strings = {"providerId1", "providerId2", "providerId3"})
     public void findAllHistory(final String providerId) throws Exception {
         final Page<FundingGiftHistoryResponse> page = fundingGiftRepository.findHistoryByConditionWithoutStatus(providerId, pageable);
-        assertThat(page.getNumberOfElements()).isEqualTo(3);
+        assertThat(page.getNumberOfElements()).isEqualTo(2);
     }
 }
