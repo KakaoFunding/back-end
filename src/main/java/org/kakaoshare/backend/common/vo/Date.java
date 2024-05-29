@@ -30,7 +30,7 @@ public abstract class Date {
     }
 
     private void validateDateRange(final LocalDate startDate, final LocalDate endDate) {
-        if (startDate == null && endDate == null) {
+        if (startDate == null || endDate == null) {
             throw new IllegalArgumentException();
         }
 
