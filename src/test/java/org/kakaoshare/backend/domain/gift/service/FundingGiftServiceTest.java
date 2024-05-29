@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.domain.gift.controller.GiftStatusConstraint;
 import org.kakaoshare.backend.domain.gift.dto.funding.inquiry.request.FundingGiftHistoryRequest;
 import org.kakaoshare.backend.domain.gift.dto.funding.inquiry.response.FundingGiftHistoryResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
@@ -48,12 +49,13 @@ class FundingGiftServiceTest {
 
     @ParameterizedTest
     @DisplayName("나의 펀딩 선물함 조회 (상태 필터링 O)")
-    @ValueSource(strings = {"USED", "USING"})
-    public void lookUpWithStatus(final String status) throws Exception {
-        final FundingGiftHistoryRequest fundingGiftHistoryRequest = new FundingGiftHistoryRequest(status);
+    @ValueSource(strings = {"USABLE", "USED"})
+    public void lookUpWithStatus(final String statusParam) throws Exception {
+        final FundingGiftHistoryRequest fundingGiftHistoryRequest = new FundingGiftHistoryRequest(statusParam);
         final Product cake = CAKE.생성();
-        final Page<?> page = getPage(cake, status);
-        doReturn(page).when(fundingGiftRepository).findHistoryByCondition(providerId, status, pageable);
+        final Page<?> page = getPage(cake, statusParam);
+        final List<GiftStatus> statuses = GiftStatusConstraint.findByParam(statusParam);
+        doReturn(page).when(fundingGiftRepository).findHistoryByCondition(providerId, statuses, pageable);
 
         final PageResponse<?> actual = fundingGiftService.lookUp(providerId, fundingGiftHistoryRequest, pageable);
         final PageResponse<?> expect = PageResponse.from(page);
