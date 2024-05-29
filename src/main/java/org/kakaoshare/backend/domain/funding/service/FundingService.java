@@ -11,6 +11,7 @@ import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.FriendFundingInquiryRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
@@ -65,14 +66,21 @@ public class FundingService {
         return RegisterResponse.from(funding);
     }
 
-    public ProgressResponse getFundingProgress(Long fundingId, String providerId) {
+    public ProgressResponse getMyFundingProgress(Long fundingId, String providerId) {
         Member member = findMemberByProviderId(providerId);
         Funding funding = fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
 
         return ProgressResponse.from(funding);
     }
+    public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
+        Member self = findMemberByProviderId(providerId);
+        Member friend = findMemberByProviderId(inquiryRequest.getFriendProviderId()); //todo 친구 검증 메소드 추가해야함
+        Funding funding = fundingRepository.findByIdAndMemberId(inquiryRequest.getFundingId(), friend.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
 
+        return ProgressResponse.from(funding);
+    }
     public PageResponse<?> getMyFilteredFundingProducts(String providerId, FundingStatus status,
                                                      Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
