@@ -66,7 +66,7 @@ public class FundingGiftRepositoryCustomImpl implements FundingGiftRepositoryCus
 
     private QFundingGiftHistoryResponse getFundingGiftHistoryResponse() {
         // TODO 5/28 펀딩 등록시 수량이 고려되지 않아 수량을 1로 고정
-        return new QFundingGiftHistoryResponse(getProductDto(), Expressions.ONE, fundingGift.createdAt, fundingGift.status.stringValue());
+        return new QFundingGiftHistoryResponse(getProductDto(), Expressions.ONE, fundingGift.createdAt);
     }
 
     private QProductDto getProductDto() {

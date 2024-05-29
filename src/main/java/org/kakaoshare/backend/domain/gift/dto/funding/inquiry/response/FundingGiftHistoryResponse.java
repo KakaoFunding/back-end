@@ -5,7 +5,7 @@ import org.kakaoshare.backend.domain.product.dto.ProductDto;
 
 import java.time.LocalDateTime;
 
-public record FundingGiftHistoryResponse(ProductDto product, Integer quantity, LocalDateTime receivedDate, String status) {
+public record FundingGiftHistoryResponse(ProductDto product, Integer quantity, LocalDateTime receivedDate) {
     @QueryProjection
     public FundingGiftHistoryResponse {
     }
