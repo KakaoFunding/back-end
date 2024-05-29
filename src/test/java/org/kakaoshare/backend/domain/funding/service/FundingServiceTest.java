@@ -76,7 +76,7 @@ public class FundingServiceTest {
         given(memberRepository.findMemberByProviderId(member.getProviderId())).willReturn(Optional.of(member));
         given(fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())).willReturn(Optional.of(funding));
 
-        ProgressResponse response = fundingService.getFundingProgress(fundingId, member.getProviderId());
+        ProgressResponse response = fundingService.getMyFundingProgress(fundingId, member.getProviderId());
 
         assertThat(response).isNotNull();
 

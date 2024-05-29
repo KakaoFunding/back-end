@@ -4,20 +4,18 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 
+import org.kakaoshare.backend.domain.funding.dto.inquiry.FriendFundingInquiryRequest;
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
-import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
-import org.kakaoshare.backend.domain.funding.dto.inquiry.FundingContributorResponse;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
 import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.service.FundingDetailService;
 import org.kakaoshare.backend.domain.funding.service.FundingService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +37,8 @@ public class FundingController {
     private static final int FUNDING_DEFAULT_SIZE = 20;
 
     @PostMapping("/funding/{productId}")
-    public ResponseEntity<?> registerFunding(@PathVariable("productId") Long productId, @LoggedInMember String providerId,
+    public ResponseEntity<?> registerFunding(@PathVariable("productId") Long productId,
+                                             @LoggedInMember String providerId,
                                              @RequestBody RegisterRequest registerRequest) {
         RegisterResponse response = fundingService.registerFundingItem(productId, providerId, registerRequest);
         return ResponseEntity.ok(response);
@@ -47,7 +46,14 @@ public class FundingController {
 
     @GetMapping("/funding/{fundingId}")
     public ResponseEntity<?> getFundingProgress(@PathVariable Long fundingId, @LoggedInMember String providerId) {
-        ProgressResponse response = fundingService.getFundingProgress(fundingId, providerId);
+        ProgressResponse response = fundingService.getMyFundingProgress(fundingId, providerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/funding/friendItem")
+    public ResponseEntity<?> getFriendFundingProgress(@LoggedInMember String providerId, @RequestBody
+    FriendFundingInquiryRequest inquiryRequest) {
+        ProgressResponse response = fundingService.getFriendFundingProgress(providerId, inquiryRequest);
         return ResponseEntity.ok(response);
     }
 
