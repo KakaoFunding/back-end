@@ -6,6 +6,7 @@ import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.friend.service.KakaoFriendService;
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 
+import org.kakaoshare.backend.domain.funding.dto.FundingCheckRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
@@ -44,6 +45,7 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 public class FundingService {
+    private static final String PROGRESS_STATUS = "PROGRESS";
     private final FundingRepository fundingRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
@@ -73,6 +75,7 @@ public class FundingService {
 
         return ProgressResponse.from(funding);
     }
+
     public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
         Member self = findMemberByProviderId(providerId);
         Member friend = findMemberByProviderId(inquiryRequest.getFriendProviderId()); //todo 친구 검증 메소드 추가해야함
@@ -81,12 +84,12 @@ public class FundingService {
 
         return ProgressResponse.from(funding);
     }
+
     public PageResponse<?> getMyFilteredFundingProducts(String providerId, FundingStatus status,
-                                                     Pageable pageable) {
+                                                        Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
         Page<FundingResponse> fundingResponses = fundingRepository.findFundingByMemberIdAndStatusWithPage(
                 member.getMemberId(), status, pageable);
-
 
         return PageResponse.from(fundingResponses);
     }
@@ -109,6 +112,14 @@ public class FundingService {
         final Long productId = fundingProductDto.productId();
         final ProductDto productDto = findProductDtoByProductId(productId);
         return FundingPreviewResponse.of(productDto, fundingProductDto);
+    }
+
+    public FundingResponse checkFundingItem(FundingCheckRequest fundingCheckRequest) {
+        Member member = findMemberByProviderId(fundingCheckRequest.getProviderId());
+        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
+                .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
+
+        return FundingResponse.from(funding);
     }
 
     private Member findMemberByProviderId(String providerId) {
