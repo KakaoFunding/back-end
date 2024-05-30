@@ -58,7 +58,7 @@ public class FundingService {
 
         Optional<FundingResponse> existingFunding = fundingRepository.findByProductIdAndMemberId(productId,
                 member.getMemberId());
-        if (existingFunding.isPresent() && "Active".equals(existingFunding.get().getStatus())) {
+        if (existingFunding.isPresent() && "PROGRESS".equals(existingFunding.get().getStatus())) {
             throw new IllegalStateException("There is already an active funding for this product and user.");
         }
 
