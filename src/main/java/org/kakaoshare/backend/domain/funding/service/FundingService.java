@@ -74,7 +74,7 @@ public class FundingService {
         Funding funding = fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
 
-        return ProgressResponse.from(funding);
+        return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
 
     public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
@@ -83,7 +83,7 @@ public class FundingService {
         Funding funding = fundingRepository.findByIdAndMemberId(inquiryRequest.getFundingId(), friend.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
 
-        return ProgressResponse.from(funding);
+        return getFundingProgress(funding.getFundingId(), friend.getMemberId());
     }
 
     public PageResponse<?> getMyFilteredFundingProducts(String providerId, FundingStatus status,
@@ -160,4 +160,12 @@ public class FundingService {
             throw new MemberException(MemberErrorCode.NO_SUCH_RELATIONSHIP);
         }
     }
+
+    private ProgressResponse getFundingProgress(final Long fundingId, final Long memberId) {
+        Funding funding = fundingRepository.findByIdAndMemberId(fundingId, memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
+
+        return ProgressResponse.from(funding);
+    }
+
 }
