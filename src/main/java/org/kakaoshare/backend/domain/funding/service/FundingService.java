@@ -71,8 +71,7 @@ public class FundingService {
 
     public ProgressResponse getMyFundingProgress(Long fundingId, String providerId) {
         Member member = findMemberByProviderId(providerId);
-        Funding funding = fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
+        Funding funding = findByIdAndMemberId(fundingId, member.getMemberId());
 
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
@@ -80,8 +79,7 @@ public class FundingService {
     public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
         Member self = findMemberByProviderId(providerId);
         Member friend = findMemberByProviderId(inquiryRequest.getFriendProviderId()); //todo 친구 검증 메소드 추가해야함
-        Funding funding = fundingRepository.findByIdAndMemberId(inquiryRequest.getFundingId(), friend.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
+        Funding funding = findByIdAndMemberId(inquiryRequest.getFundingId(), friend.getMemberId());
 
         return getFundingProgress(funding.getFundingId(), friend.getMemberId());
     }
@@ -168,4 +166,8 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
+    private Funding findByIdAndMemberId(Long fundingId, Long memberId) {
+        return fundingRepository.findByIdAndMemberId(fundingId, memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
+    }
 }
