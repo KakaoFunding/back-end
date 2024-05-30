@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 
+import org.kakaoshare.backend.domain.funding.dto.FundingCheckRequest;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.FriendFundingInquiryRequest;
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
@@ -41,6 +42,12 @@ public class FundingController {
                                              @LoggedInMember String providerId,
                                              @RequestBody RegisterRequest registerRequest) {
         RegisterResponse response = fundingService.registerFundingItem(productId, providerId, registerRequest);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/funding/check")
+    public ResponseEntity<?> checkFunding(@RequestBody FundingCheckRequest checkRequest){
+
+        FundingResponse response = fundingService.checkFundingItem(checkRequest);
         return ResponseEntity.ok(response);
     }
 
