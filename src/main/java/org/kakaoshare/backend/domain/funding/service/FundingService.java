@@ -56,16 +56,17 @@ public class FundingService {
         Product product = findProductById(productId);
         Member member = findMemberByProviderId(providerId);
 
-        Optional<FundingResponse> existingFunding = fundingRepository.findByProductIdAndMemberId(productId,
-                member.getMemberId());
-        if (existingFunding.isPresent() && "PROGRESS".equals(existingFunding.get().getStatus())) {
-            throw new IllegalStateException("There is already an active funding for this product and user.");
+        List<FundingResponse> existingFundings = fundingRepository.findByMemberId(member.getMemberId());
+        for (FundingResponse funding : existingFundings) {
+            if ("PROGRESS".equals(funding.getStatus())) {
+                throw new IllegalStateException("There is already an active funding for this product and user.");
+            }
         }
 
-        Funding funding = request.toEntity(member, product);
-        funding = fundingRepository.save(funding);
+        Funding newFunding = request.toEntity(member, product);
+        newFunding = fundingRepository.save(newFunding);
 
-        return RegisterResponse.from(funding);
+        return RegisterResponse.from(newFunding);
     }
 
     public ProgressResponse getMyFundingProgress(Long fundingId, String providerId) {
