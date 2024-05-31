@@ -2,11 +2,13 @@ package org.kakaoshare.backend.domain.funding.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.common.vo.date.exception.DateException;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryDto;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryResponse;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.kakaoshare.backend.domain.funding.entity.FundingDetailStatus.COMPLETE;
 import static org.kakaoshare.backend.domain.funding.entity.FundingDetailStatus.PROGRESS;
 import static org.kakaoshare.backend.fixture.MemberFixture.KAKAO;
@@ -47,11 +50,13 @@ public class FundingDetailServiceTest {
 
     Member contributor;
     Member creator;
+    Pageable pageable;
 
     @BeforeEach
     public void setUp() {
         contributor = KAKAO.생성();
         creator = KIM.생성();
+        pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
     }
 
     @ParameterizedTest
@@ -61,7 +66,6 @@ public class FundingDetailServiceTest {
         final String providerId = contributor.getProviderId();
         final LocalDate startDate = LocalDate.now().minusMonths(5L);
         final LocalDate endDate = LocalDate.now();
-        final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
 
         final Product cake = CAKE.생성();
         final Product coffee = COFFEE.생성();
@@ -86,14 +90,14 @@ public class FundingDetailServiceTest {
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("내가 기여한 펀딩 내역 조회 (상태 필터링 X)")
-    public void lookUpWithoutStatus() throws Exception {
+    @NullSource
+    @EmptySource
+    public void lookUpWithoutStatus(final String status) throws Exception {
         final String providerId = contributor.getProviderId();
         final LocalDate startDate = LocalDate.now().minusMonths(5L);
         final LocalDate endDate = LocalDate.now();
-        final String status = null;
-        final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
 
         final Product cake = CAKE.생성();
         final Product coffee = COFFEE.생성();
@@ -116,6 +120,48 @@ public class FundingDetailServiceTest {
         final PageResponse<?> actual = fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable);
         final PageResponse<?> expect = PageResponse.from(page);
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
+    }
+
+    @ParameterizedTest
+    @DisplayName("내가 기여한 내역 조회 시 조회 시작, 종료일이 모두 NULL이면 예외 발생")
+    @NullSource
+    @EmptySource
+    @ValueSource(strings = {"PROGRESS", "COMPLETE", "CANCEL_REFUND"})
+    public void lookUpWhenDateIsNull(final String status) throws Exception {
+        final String providerId = contributor.getProviderId();
+        final LocalDate startDate = null;
+        final LocalDate endDate = null;
+        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
+        assertThatThrownBy(() -> fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable))
+                .isInstanceOf(DateException.class);
+    }
+
+    @ParameterizedTest
+    @DisplayName("내가 기여한 내역 조회 시 종료일이 시작일보다 앞서면 예외 발생")
+    @NullSource
+    @EmptySource
+    @ValueSource(strings = {"PROGRESS", "COMPLETE", "CANCEL_REFUND"})
+    public void lookUpWhenInvalidDate(final String status) throws Exception {
+        final String providerId = contributor.getProviderId();
+        final LocalDate startDate = LocalDate.of(2024, 2, 1);
+        final LocalDate endDate = LocalDate.of(2024, 1, 1);
+        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
+        assertThatThrownBy(() -> fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable))
+                .isInstanceOf(DateException.class);
+    }
+
+    @ParameterizedTest
+    @DisplayName("내가 기여한 내역 조회 기간이 1년이 넘으면 예외 발생")
+    @NullSource
+    @EmptySource
+    @ValueSource(strings = {"PROGRESS", "COMPLETE", "CANCEL_REFUND"})
+    public void lookUpWhenInvalidDateRange(final String status) throws Exception {
+        final String providerId = contributor.getProviderId();
+        final LocalDate startDate = LocalDate.of(2025, 9, 1);
+        final LocalDate endDate = LocalDate.of(2024, 9, 1);
+        final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
+        assertThatThrownBy(() -> fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable))
+                .isInstanceOf(DateException.class);
     }
 
     private ProductDto getProductDto(final Product product) {
