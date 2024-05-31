@@ -76,7 +76,9 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
                         QFunding.funding.goalAmount,
                         QFunding.funding.product.brandName,
                         QFunding.funding.product.name,
-                        QFunding.funding.product.photo
+                        QFunding.funding.product.photo,
+                        QFunding.funding.accumulateAmount,
+                        QFunding.funding.product.productId
                 ))
                 .from(QFunding.funding)
                 .leftJoin(QFunding.funding.product).on(QFunding.funding.product.productId.eq(QProduct.product.productId))
