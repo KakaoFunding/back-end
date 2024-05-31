@@ -25,7 +25,7 @@ public class GiftResponse {
                 .senderName(gift.getReceipt().getRecipient().getName())
                 .productName(gift.getReceipt().getProduct().getName())
                 .brandName(gift.getReceipt().getProduct().getBrandName())
-                .productThumbnail(gift.getReceipt().getProduct().getProductThumbnails().get(0).getThumbnailUrl())
+                .productThumbnail(gift.getReceipt().getProduct().getPhoto())
                 .receivedAt(gift.getCreatedAt())
                 .build();
     }
