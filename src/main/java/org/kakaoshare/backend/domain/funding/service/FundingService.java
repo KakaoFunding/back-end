@@ -58,7 +58,7 @@ public class FundingService {
 
         List<FundingResponse> existingFundings = fundingRepository.findByMemberId(member.getMemberId());
         for (FundingResponse funding : existingFundings) {
-            if ("PROGRESS".equals(funding.getStatus())) {
+            if (PROGRESS_STATUS.equals(funding.getStatus())) {
                 throw new IllegalStateException("There is already an active funding for this product and user.");
             }
         }
