@@ -12,17 +12,16 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
-import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.BEFORE_PAYING_REMAINING;
 import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.CANCEL;
@@ -34,8 +33,8 @@ import static org.kakaoshare.backend.domain.funding.entity.FundingStatus.PROGRES
 @AllArgsConstructor
 @Table(
         indexes = {
-                @Index(name = "idx_funding_member_id", columnList = "member_id", unique = true),
-                @Index(name = "idx_funding_product_id", columnList = "product_id", unique = true),
+                @Index(name = "idx_funding_member_id", columnList = "member_id"),
+                @Index(name = "idx_funding_product_id", columnList = "product_id"),
         }
 )
 public class Funding extends BaseTimeEntity {

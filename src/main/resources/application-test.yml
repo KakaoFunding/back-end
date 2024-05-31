@@ -11,7 +11,7 @@ spring:
   sql:
     init:
       mode: always
-      data-locations: classpath:testdata/initial_category_brand_product.sql
+      data-locations: classpath:testdata/initial_*.sql
 
   jpa:
     hibernate:
