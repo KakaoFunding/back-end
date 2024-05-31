@@ -1,6 +1,6 @@
 package org.kakaoshare.backend.domain.funding.vo;
 
-import org.kakaoshare.backend.common.vo.Date;
+import org.kakaoshare.backend.common.vo.date.Date;
 
 import java.time.LocalDate;
 

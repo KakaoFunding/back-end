@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.common.dto.PageResponse;
+import org.kakaoshare.backend.common.vo.date.exception.DateException;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
@@ -24,7 +25,11 @@ import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -135,7 +140,7 @@ class OrderServiceTest {
         final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
         assertThatThrownBy(() -> orderService.lookUp(providerId, orderHistoryRequest, pageable))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DateException.class);
     }
 
     @Test
@@ -146,7 +151,7 @@ class OrderServiceTest {
         final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
         assertThatThrownBy(() -> orderService.lookUp(providerId, orderHistoryRequest, pageable))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DateException.class);
     }
 
     @Test
@@ -157,7 +162,7 @@ class OrderServiceTest {
         final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt"));
         assertThatThrownBy(() -> orderService.lookUp(providerId, orderHistoryRequest, pageable))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DateException.class);
     }
 
     @Test
