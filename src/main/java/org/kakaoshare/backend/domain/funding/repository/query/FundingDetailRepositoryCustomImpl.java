@@ -3,7 +3,7 @@ package org.kakaoshare.backend.domain.funding.repository.query;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.common.vo.Date;
+import org.kakaoshare.backend.common.vo.date.Date;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryResponse;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.QContributedFundingHistoryDto;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.QContributedFundingHistoryResponse;
