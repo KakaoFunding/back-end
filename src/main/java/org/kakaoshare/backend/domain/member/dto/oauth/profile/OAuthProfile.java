@@ -28,6 +28,7 @@ public abstract class OAuthProfile {
                 .gender(Gender.from(getGender()))
                 .phoneNumber(getPhoneNumber())
                 .providerId(getProviderId())
+                .profileImageUrl(getProfileImageUrl())
                 .build();
     }
 }
