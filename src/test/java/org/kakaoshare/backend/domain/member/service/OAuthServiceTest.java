@@ -8,9 +8,12 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
+import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.entity.token.RefreshToken;
@@ -88,7 +91,7 @@ class OAuthServiceTest {
         final OAuthProfile oAuthProfile = OAuthProfileFactory.of(attributes, registrationId);
         final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, socialAccessToken);
 
-        doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
+        mockingRegistration(registrationId, registration);
         doReturn(attributes).when(webClientService).getSocialProfile(registration, socialAccessToken);
         doReturn(member).when(memberRepository).save(any());
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
@@ -109,7 +112,7 @@ class OAuthServiceTest {
         final OAuthProfile oAuthProfile = OAuthProfileFactory.of(attributes, registrationId);
         final OAuthLoginRequest request = new OAuthLoginRequest(registrationId, socialAccessToken);
 
-        doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(registrationId);
+        mockingRegistration(registrationId, registration);
         doReturn(attributes).when(webClientService).getSocialProfile(registration, socialAccessToken);
         doReturn(member).when(memberRepository).save(any());
         doReturn(accessToken).when(jwtProvider).createAccessToken(userDetails);
@@ -133,9 +136,9 @@ class OAuthServiceTest {
         doReturn(newRefreshToken).when(refreshTokenProvider).createToken(providerId);
         doReturn(newRefreshToken).when(refreshTokenRepository).save(newRefreshToken);
 
-        final OAuthReissueRequest oAuthReissueRequest = new OAuthReissueRequest(refreshTokenValue);
-        final OAuthReissueResponse actual = oAuthService.reissue(oAuthReissueRequest);
-        final OAuthReissueResponse expect = OAuthReissueResponse.of(accessToken, newRefreshToken);
+        final ReissueRequest reissueRequest = new ReissueRequest(refreshTokenValue);
+        final ReissueResponse actual = oAuthService.reissue(reissueRequest);
+        final ReissueResponse expect = ReissueResponse.of(accessToken, newRefreshToken);
 
         assertThat(actual).isEqualTo(expect);
     }
@@ -147,7 +150,7 @@ class OAuthServiceTest {
         final ClientRegistration registration = getClientRegistration(provider);
         final OAuthSocialLogoutRequest oAuthSocialLogoutRequest = new OAuthSocialLogoutRequest(provider, providerId, socialAccessToken);
 
-        doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(provider);
+        mockingRegistration(provider, registration);
         doNothing().when(webClientService).expireToken(registration, oAuthSocialLogoutRequest);
         assertThatCode(() -> oAuthService.socialLogout(oAuthSocialLogoutRequest))
                 .doesNotThrowAnyException();
@@ -160,10 +163,27 @@ class OAuthServiceTest {
         final ClientRegistration registration = getClientRegistration(provider);
         final OAuthSocialLogoutRequest oAuthSocialLogoutRequest = new OAuthSocialLogoutRequest(provider, providerId, socialAccessToken);
 
-        doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(provider);
+        mockingRegistration(provider, registration);
         doThrow(WebClientResponseException.class).when(webClientService).expireToken(registration, oAuthSocialLogoutRequest);
         assertThatThrownBy(() -> oAuthService.socialLogout(oAuthSocialLogoutRequest))
                 .isInstanceOf(WebClientResponseException.class);
+    }
+
+    @Test
+    @DisplayName("카카오 소셜 토큰 재발급")
+    public void kakaoTokenReissue() throws Exception {
+        final String provider = "kakao";
+        final ClientRegistration registration = getClientRegistration(provider);
+        final OAuthReissueRequest oAuthReissueRequest = new OAuthReissueRequest(provider, refreshToken.getValue());
+        final OAuthTokenResponse oAuthTokenResponse = getOAuthTokenResponse(accessToken, refreshToken.getValue());
+
+        mockingRegistration(provider, registration);
+        doReturn(oAuthTokenResponse).when(webClientService).issueToken(registration, oAuthReissueRequest);
+
+        final OAuthReissueResponse actual = oAuthService.socialReissue(oAuthReissueRequest);
+        final OAuthReissueResponse expect = OAuthReissueResponse.from(oAuthTokenResponse);
+
+        assertThat(actual).isEqualTo(expect);
     }
 
     private ClientRegistration getClientRegistration(final String registrationId) {
@@ -177,6 +197,10 @@ class OAuthServiceTest {
                 .tokenUri("token-uri")
                 .scope(Set.of("profile", "email"))
                 .build();
+    }
+
+    private void mockingRegistration(final String provider, final ClientRegistration registration) {
+        doReturn(registration).when(clientRegistrationRepository).findByRegistrationId(provider);
     }
 
     private RefreshToken getRefreshToken() {
@@ -196,5 +220,15 @@ class OAuthServiceTest {
         attributes.put("kakao_account", account);
 
         return attributes;
+    }
+
+    private OAuthTokenResponse getOAuthTokenResponse(final String accessToken, final String refreshToken) {
+        return new OAuthTokenResponse(
+                "refresh_token",
+                accessToken,
+                refreshToken,
+                1000L,
+                10000L
+        );
     }
 }

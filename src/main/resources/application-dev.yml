@@ -31,8 +31,7 @@ spring:
             client-secret: QH0n8i9qoDE4TkeVl9p9aFPRQVcIgXHC
             client-authentication-method: POST
             client-name: kakao
-            redirect-uri: http://localhost:3000/oauth/kakao
-            authorization-grant-type: authorization_code
+            authorization-grant-type: refresh_token
             scope:
               - profile_nickname
               - profile_image
