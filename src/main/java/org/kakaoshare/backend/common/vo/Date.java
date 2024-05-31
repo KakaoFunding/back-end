@@ -30,11 +30,11 @@ public abstract class Date {
     }
 
     private void validateDateRange(final LocalDate startDate, final LocalDate endDate) {
-        if (startDate == null && endDate == null) {
+        if (startDate == null || endDate == null) {
             throw new IllegalArgumentException();
         }
 
-        if (endDate.isAfter(LocalDate.now())) {
+        if (!endDate.equals(LocalDate.now()) && endDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException();
         }
 
