@@ -14,7 +14,7 @@ import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.jsonwebtoken.lang.Collections;
 import org.kakaoshare.backend.common.vo.PriceRange;
-import org.kakaoshare.backend.common.vo.Date;
+import org.kakaoshare.backend.common.vo.date.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 public final class RepositoryUtils {
