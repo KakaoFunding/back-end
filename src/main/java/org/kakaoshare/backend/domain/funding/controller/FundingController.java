@@ -44,7 +44,7 @@ public class FundingController {
         RegisterResponse response = fundingService.registerFundingItem(productId, providerId, registerRequest);
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/funding/check")
+    @PostMapping("/funding/check")
     public ResponseEntity<?> checkFunding(@RequestBody FundingCheckRequest checkRequest){
 
         FundingResponse response = fundingService.checkFundingItem(checkRequest);
