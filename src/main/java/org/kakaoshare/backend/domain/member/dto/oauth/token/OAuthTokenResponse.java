@@ -1,12 +1,9 @@
 package org.kakaoshare.backend.domain.member.dto.oauth.token;
 
-import lombok.Builder;
-
-@Builder
-public record OAuthTokenResponse(String access_token, String refresh_token, Long expires_in) {
-    public static OAuthTokenResponse of(final String accessToken) {
-        return OAuthTokenResponse.builder()
-                .access_token(accessToken)
-                .build();
-    }
+/**
+ * @author kim-minwoo
+ * @param refresh_token 요청 시 사용된 리프레시 토큰의 만료 시간이 1개월 미만으로 남았을 때만 갱신되어 전달. 아닌 경우 null
+ * @param refresh_token_expires_in 요청 시 사용된 리프레시 토큰의 만료 시간이 1개월 미만으로 남았을 때만 갱신되어 전달. 아닌 경우 null
+ */
+public record OAuthTokenResponse(String token_type, String access_token, String refresh_token, Long expires_in, Long refresh_token_expires_in) {
 }

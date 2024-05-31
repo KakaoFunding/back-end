@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.funding.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class FundingResponse {
     private final Long fundingId;
     private final String status;

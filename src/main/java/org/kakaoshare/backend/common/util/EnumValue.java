@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnumValue {
-    Class<? extends Enum<?>> enumClass();
+    Class<? extends Enum<? extends ParamEnum>> enumClass();
     String message() default "";
     Class<?> [] groups() default {};
     Class<? extends Payload>[] payload() default {};
