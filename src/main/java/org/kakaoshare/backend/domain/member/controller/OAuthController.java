@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.member.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
@@ -19,7 +20,7 @@ public class OAuthController {
     private final RefreshTokenCookieProvider refreshTokenCookieProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<OAuthLoginResponse> login(@ModelAttribute final OAuthLoginRequest oAuthLoginRequest) {
+    public ResponseEntity<OAuthLoginResponse> login(@RequestBody @Valid final OAuthLoginRequest oAuthLoginRequest) {
         return ResponseEntity.ok()
                 .body(oAuthService.login(oAuthLoginRequest));
     }
