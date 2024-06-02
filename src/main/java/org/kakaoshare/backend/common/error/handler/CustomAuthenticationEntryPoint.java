@@ -36,6 +36,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          final HttpServletResponse response,
                          final AuthenticationException authException) throws IOException {
         final JwtException jwtException = (JwtException) request.getAttribute(jwtExceptionAttributeName); // TODO 6/2 JwtAuthenticationFilter 에서 인증 오류 발생 시 request Attribute에 담긴 JwtException 객체를 꺼낸다.
+        if (jwtException == null) {
+            return;
+        }
         printLog(jwtException, request);
 
         final ErrorCode errorCode = jwtException.getErrorCode();
