@@ -36,10 +36,9 @@ public class JwtProvider {
         this.expireTime = expireTime;
     }
 
-    public boolean validateToken(final String token) {
+    public void validateToken(final String token) {
         try {
             getJwtParser().parseClaimsJws(token);
-            return true;
         } catch (SecurityException | MalformedJwtException e) {
             throw new JwtException(INVALID);
         } catch (ExpiredJwtException e) {
