@@ -3,6 +3,7 @@ package org.kakaoshare.backend.domain.funding.repository.query;
 import static org.kakaoshare.backend.common.util.sort.SortUtil.MOST_RECENT;
 
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,6 +19,7 @@ import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.entity.QFunding;
+import org.kakaoshare.backend.domain.product.entity.QProduct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -64,10 +66,22 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
     }
 
     @Override
-    public Page<Funding> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status, Pageable pageable) {
-
-        JPAQuery<Funding> contentQuery = queryFactory
-                .selectFrom(QFunding.funding)
+    public Page<FundingResponse> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status, Pageable pageable) {
+        JPAQuery<FundingResponse> contentQuery = queryFactory
+                .select(Projections.constructor(
+                        FundingResponse.class,
+                        QFunding.funding.fundingId,
+                        QFunding.funding.status.stringValue(),
+                        QFunding.funding.expiredAt,
+                        QFunding.funding.goalAmount,
+                        QFunding.funding.product.brandName,
+                        QFunding.funding.product.name,
+                        QFunding.funding.product.photo,
+                        QFunding.funding.accumulateAmount,
+                        QFunding.funding.product.productId
+                ))
+                .from(QFunding.funding)
+                .leftJoin(QFunding.funding.product).on(QFunding.funding.product.productId.eq(QProduct.product.productId))
                 .where(QFunding.funding.member.memberId.eq(memberId)
                         .and(QFunding.funding.status.eq(status)))
                 .orderBy(SortUtil.from(pageable))
@@ -82,6 +96,7 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
 
         return RepositoryUtils.toPage(pageable, contentQuery, countQuery);
     }
+
 
     @Override
     public OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {

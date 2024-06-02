@@ -80,11 +80,11 @@ public class WishService {
             notRecoverable = MemberException.class
     )
     public void handleWishCancel(WishCancelEvent event) {
-        Member member = getMember(event.getProviderId());
-        Wish wish = createWish(event, member);
-        
+        final Member member = getMember(event.getProviderId());
+        final Product product = event.getProduct();
+
         try {
-            wishRepository.delete(wish);
+            wishRepository.deleteByMemberAndProduct(member, product);
         } catch (RuntimeException e) {
             throw new WishException(WishErrorCode.REMOVING_FAILED);
         }

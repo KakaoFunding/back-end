@@ -1,11 +1,13 @@
 package org.kakaoshare.backend.domain.gift.dto;
 
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 
 @Getter
+@AllArgsConstructor
 @Builder
 public class GiftResponse {
     private final Long giftId;
@@ -23,7 +25,7 @@ public class GiftResponse {
                 .senderName(gift.getReceipt().getRecipient().getName())
                 .productName(gift.getReceipt().getProduct().getName())
                 .brandName(gift.getReceipt().getProduct().getBrandName())
-                .productThumbnail(gift.getReceipt().getProduct().getProductThumbnails().get(0).getThumbnailUrl())
+                .productThumbnail(gift.getReceipt().getProduct().getPhoto())
                 .receivedAt(gift.getCreatedAt())
                 .build();
     }

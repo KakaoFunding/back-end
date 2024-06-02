@@ -3,9 +3,8 @@ package org.kakaoshare.backend.domain.member.service.oauth;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.detail.KakaoFriendListDto;
 import org.springframework.core.ParameterizedTypeReference;
+
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
@@ -52,3 +51,4 @@ public class OAuthWebClientService {
                 .block();
     }
 }
+

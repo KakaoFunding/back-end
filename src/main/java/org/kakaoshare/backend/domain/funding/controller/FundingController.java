@@ -3,6 +3,7 @@ package org.kakaoshare.backend.domain.funding.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
+
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
@@ -38,9 +39,8 @@ public class FundingController {
     private static final int FUNDING_DEFAULT_SIZE = 20;
 
     @PostMapping("/funding/{productId}")
-    public ResponseEntity<?> registerFunding(@PathVariable Long productId, @LoggedInMember String providerId,
-                                             @RequestBody
-                                             RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerFunding(@PathVariable("productId") Long productId, @LoggedInMember String providerId,
+                                             @RequestBody RegisterRequest registerRequest) {
         RegisterResponse response = fundingService.registerFundingItem(productId, providerId, registerRequest);
         return ResponseEntity.ok(response);
     }
@@ -62,7 +62,7 @@ public class FundingController {
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
                                                      @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") FundingStatus status,
                                                      @PageableDefault(size = FUNDING_DEFAULT_SIZE) final Pageable pageable) {
-        FundingSliceResponse response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
+        PageResponse<?> response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
         return ResponseEntity.ok(response);
     }
 

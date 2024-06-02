@@ -13,16 +13,16 @@ import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.jsonwebtoken.lang.Collections;
-import org.kakaoshare.backend.common.vo.Date;
+import org.kakaoshare.backend.common.vo.PriceRange;
+import org.kakaoshare.backend.common.vo.date.Date;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 public final class RepositoryUtils {
@@ -30,7 +30,8 @@ public final class RepositoryUtils {
 
     }
 
-    public static <T> Page<T> toPage(final Pageable pageable, final JPAQuery<T> contentQuery, final JPAQuery<Long> countQuery) {
+    public static <T> Page<T> toPage(final Pageable pageable, final JPAQuery<T> contentQuery,
+                                     final JPAQuery<Long> countQuery) {
         if (countQuery.fetchFirst() == null) {
             return Page.empty();
         }
@@ -46,13 +47,15 @@ public final class RepositoryUtils {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final T target) {
+    public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(
+            final SimpleExpression<T> simpleExpression, final T target) {
         if (target == null) {
             return null;
         }
 
         return simpleExpression.eq(target);
     }
+
 
     public static <T extends Number & Comparable<?>> BooleanExpression eqExpression(final NumberExpression<T> numberExpression, final T target) {
         if (target == null) {
@@ -70,7 +73,12 @@ public final class RepositoryUtils {
         return stringExpression.eq(target);
     }
 
+    public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
+                                                     final Date date) {
+        return dateExpression.between(date.getStartDateTime(), date.getEndDateTime());
+    }
     public static <T extends Comparable<?>> BooleanExpression eqExpression(final SimpleExpression<T> simpleExpression, final SimpleExpression<T> target) {
+
         return simpleExpression.eq(target);
     }
 
@@ -82,9 +90,10 @@ public final class RepositoryUtils {
         return stringPath.contains(keyword);
     }
 
-    public static <T extends Number & Comparable<?>> BooleanExpression containsExpression(final NumberExpression<T> numberExpression,
-                                                                                          final Integer min,
-                                                                                          final Integer max) {
+    public static <T extends Number & Comparable<?>> BooleanExpression containsExpression(
+            final NumberExpression<T> numberExpression,
+            final Integer min,
+            final Integer max) {
         if (min == null && max == null) {
             return null;
         }
@@ -100,7 +109,8 @@ public final class RepositoryUtils {
         return numberExpression.between(min, max);
     }
 
-    public static <T> BooleanExpression containsExpression(final SimpleExpression<T> simpleExpression, final List<T> items) {
+    public static <T> BooleanExpression containsExpression(final SimpleExpression<T> simpleExpression,
+                                                           final List<T> items) {
         if (Collections.isEmpty(items)) {
             return null;
         }
@@ -108,16 +118,6 @@ public final class RepositoryUtils {
         return simpleExpression.in(items);
     }
 
-    public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
-                                                       final Date date) {
-        return dateExpression.between(date.getStartDateTime(), date.getEndDateTime());
-    }
-
-    public static BooleanExpression periodExpression(final DateTimePath<LocalDateTime> dateExpression,
-                                                     final LocalDate startDate,
-                                                     final LocalDate endDate) {
-        return dateExpression.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
-    }
 
     public static <T> OrderSpecifier<?>[] createOrderSpecifiers(final EntityPathBase<T> qClass, final Pageable pageable) {
         return pageable.getSort()
@@ -138,5 +138,10 @@ public final class RepositoryUtils {
         }
 
         return Order.DESC;
+    }
+
+    public static <T extends Number & Comparable<?>> BooleanExpression priceExpression(
+            final NumberExpression<T> numberExpression, PriceRange priceRange) {
+        return numberExpression.between(priceRange.getMinPrice(), priceRange.getMaxPrice());
     }
 }

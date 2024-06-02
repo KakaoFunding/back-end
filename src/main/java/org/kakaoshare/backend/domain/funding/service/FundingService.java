@@ -1,8 +1,11 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import lombok.RequiredArgsConstructor;
+import org.kakaoshare.backend.common.dto.PageResponse;
+
 import org.kakaoshare.backend.domain.friend.service.KakaoFriendService;
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
+
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
@@ -27,6 +30,7 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
 import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -69,23 +73,14 @@ public class FundingService {
         return ProgressResponse.from(funding);
     }
 
-    public FundingSliceResponse getMyFilteredFundingProducts(String providerId, FundingStatus status,
-                                                             Pageable pageable) {
+    public PageResponse<?> getMyFilteredFundingProducts(String providerId, FundingStatus status,
+                                                     Pageable pageable) {
         Member member = findMemberByProviderId(providerId);
-        Slice<Funding> allFundingSlices = fundingRepository.findFundingByMemberIdAndStatusWithPage(
+        Page<FundingResponse> fundingResponses = fundingRepository.findFundingByMemberIdAndStatusWithPage(
                 member.getMemberId(), status, pageable);
-        List<FundingResponse> fundingResponses = allFundingSlices
-                .getContent()
-                .stream()
-                .map(FundingResponse::from)
-                .toList();
 
-        return FundingSliceResponse.of(
-                fundingResponses,
-                allFundingSlices.getNumberOfElements(),
-                allFundingSlices.getPageable().getPageNumber(),
-                allFundingSlices.isLast()
-        );
+
+        return PageResponse.from(fundingResponses);
     }
 
     public List<FundingResponse> getFriendsActiveFundingItems(String providerId,
