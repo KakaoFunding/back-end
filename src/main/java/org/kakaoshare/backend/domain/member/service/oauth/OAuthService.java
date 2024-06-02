@@ -5,9 +5,14 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
+import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
+import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.entity.MemberDetails;
 import org.kakaoshare.backend.domain.member.entity.token.RefreshToken;
 import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
@@ -56,9 +61,15 @@ public class OAuthService {
         refreshTokenRepository.delete(refreshToken);
     }
 
+    public void socialLogout(final OAuthSocialLogoutRequest oAuthSocialLogoutRequest) {
+        final String provider = oAuthSocialLogoutRequest.provider();
+        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(provider);
+        webClientService.expireToken(registration, oAuthSocialLogoutRequest);
+    }
+
     @Transactional
-    public OAuthReissueResponse reissue(final OAuthReissueRequest oAuthReissueRequest) {
-        final String refreshTokenValue = oAuthReissueRequest.refreshToken();
+    public ReissueResponse reissue(final ReissueRequest reissueRequest) {
+        final String refreshTokenValue = reissueRequest.refreshToken();
         final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
         final String providerId = refreshToken.getProviderId();
         final UserDetails userDetails = findUserDetailsByProviderId(providerId);
@@ -67,7 +78,14 @@ public class OAuthService {
         refreshTokenRepository.delete(refreshToken);
         refreshTokenRepository.save(newRefreshToken);
 
-        return OAuthReissueResponse.of(accessToken, newRefreshToken);
+        return ReissueResponse.of(accessToken, newRefreshToken);
+    }
+
+    public OAuthReissueResponse socialReissue(final OAuthReissueRequest oAuthReissueRequest) {
+        final String provider = oAuthReissueRequest.provider();
+        final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(provider);
+        final OAuthTokenResponse oAuthTokenResponse = webClientService.issueToken(registration, oAuthReissueRequest);
+        return OAuthReissueResponse.from(oAuthTokenResponse);   // TODO: 5/27/24 응답 중 refresh_token 값은 요청 시 사용된 리프레시 토큰의 만료 시간이 1개월 미만으로 남았을 때만 갱신되어 전달
     }
 
     private OAuthProfile getProfile(final OAuthLoginRequest request, final ClientRegistration registration) {
@@ -76,8 +94,8 @@ public class OAuthService {
     }
 
     private UserDetails addOrFindByProfile(final OAuthProfile oAuthProfile) {
-        return memberRepository.findDetailsByProviderId(oAuthProfile.getProviderId())
-                .orElseGet(() -> MemberDetails.from(memberRepository.save(oAuthProfile.toEntity())));
+        final Member member = memberRepository.save(oAuthProfile.toEntity());   // TODO: 5/27/24 dirty checking 을 통해 DB내 Member 테이블 프로필 사진 수정
+        return MemberDetails.from(member);
     }
 
     private UserDetails findUserDetailsByProviderId(final String providerId) {

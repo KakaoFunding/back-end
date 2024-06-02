@@ -43,6 +43,9 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private String providerId;
 
+    @Column(nullable = false)
+    private String profileImageUrl;
+
     @Builder.Default
     @Column(nullable = false, columnDefinition = "varchar(255)")
     @Enumerated(EnumType.STRING)
@@ -60,12 +63,13 @@ public class Member extends BaseTimeEntity {
     }
 
     @Builder
-    public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId) {
+    public Member(final Long memberId, final Gender gender, final String name, final String phoneNumber, final String providerId, final String profileImageUrl) {
         this.memberId = memberId;
         this.gender = gender;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.providerId = providerId;
+        this.profileImageUrl = profileImageUrl;
     }
 
     @Override
@@ -76,6 +80,7 @@ public class Member extends BaseTimeEntity {
                 ", username='" + name + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", providerId='" + providerId + '\'' +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
                 ", role=" + role +
                 '}';
     }

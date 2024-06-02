@@ -11,12 +11,12 @@ import org.kakaoshare.backend.domain.funding.exception.FundingDetailException;
 import org.kakaoshare.backend.domain.funding.exception.FundingErrorCode;
 import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
-import org.kakaoshare.backend.domain.funding.repository.FundingGiftRepository;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.gift.entity.FundingGift;
 import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.exception.GiftErrorCode;
 import org.kakaoshare.backend.domain.gift.exception.GiftException;
+import org.kakaoshare.backend.domain.gift.repository.FundingGiftRepository;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.exception.MemberException;
@@ -40,13 +40,17 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingCa
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDetailCancelRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.*;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyReceiver;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentFundingSuccessResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentGiftSuccessResponse;
-import org.kakaoshare.backend.domain.payment.dto.success.response.Receiver;
+import org.kakaoshare.backend.domain.payment.dto.success.response.PaymentSuccessReceiver;
 import org.kakaoshare.backend.domain.payment.entity.Payment;
 import org.kakaoshare.backend.domain.payment.entity.PaymentMethod;
 import org.kakaoshare.backend.domain.payment.exception.PaymentErrorCode;
@@ -152,7 +156,7 @@ public class PaymentService {
         saveOrders(payment, receipts);
 
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
-        return new PaymentGiftSuccessResponse(Receiver.from(receiver), orderSummaries);
+        return new PaymentGiftSuccessResponse(PaymentSuccessReceiver.from(receiver), orderSummaries);
     }
 
     @Transactional
@@ -178,8 +182,8 @@ public class PaymentService {
 
         final Product product = funding.getProduct();
         final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(product);
-        final Receiver receiver = Receiver.from(funding.getMember());
-        return new PaymentFundingSuccessResponse(receiver, productSummaryResponse, amount);
+        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.from(funding.getMember());
+        return new PaymentFundingSuccessResponse(paymentSuccessReceiver, productSummaryResponse, amount);
     }
 
     @Transactional
