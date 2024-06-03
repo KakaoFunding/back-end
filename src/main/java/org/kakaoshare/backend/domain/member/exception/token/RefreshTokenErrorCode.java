@@ -6,12 +6,16 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum RefreshTokenErrorCode implements ErrorCode {
-    NOT_FOUND(HttpStatus.NOT_FOUND, "리프레시 토큰이 없습니다.");
+    NOT_FOUND(CODE_PREFIX + "004", HttpStatus.NOT_FOUND, "리프레시 토큰을 찾을 수 없습니다."),
+    INVALID(CODE_PREFIX + "005", HttpStatus.NOT_FOUND, "유효하지 않은 리프레시 토큰입니다."),
+    EXPIRED(CODE_PREFIX + "006", HttpStatus.NOT_FOUND, "만료된 리프레시 토큰입니다.");
 
+    private final String code;
     private final HttpStatus httpStatus;
     private final String message;
 
-    RefreshTokenErrorCode(final HttpStatus httpStatus, final String message) {
+    RefreshTokenErrorCode(final String code, final HttpStatus httpStatus, final String message) {
+        this.code = code;
         this.httpStatus = httpStatus;
         this.message = message;
     }

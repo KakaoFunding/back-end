@@ -14,4 +14,9 @@ public enum WishErrorCode implements ErrorCode {
     REMOVING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Removing wish failed");
     private final HttpStatus httpStatus;
     private final String message;
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }

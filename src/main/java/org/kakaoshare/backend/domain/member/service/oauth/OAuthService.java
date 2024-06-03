@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -94,7 +95,15 @@ public class OAuthService {
     }
 
     private UserDetails addOrFindByProfile(final OAuthProfile oAuthProfile) {
-        final Member member = memberRepository.save(oAuthProfile.toEntity());   // TODO: 5/27/24 dirty checking 을 통해 DB내 Member 테이블 프로필 사진 수정
+        final String providerId = oAuthProfile.getProviderId();
+        final Optional<Member> optionalMember = memberRepository.findMemberByProviderId(providerId);
+        if (optionalMember.isEmpty()) {
+            final Member member = memberRepository.save(oAuthProfile.toEntity());
+            return MemberDetails.from(member);
+        }
+
+        final Member member = optionalMember.get();
+        member.updateProfileUrl(oAuthProfile.getProfileImageUrl());
         return MemberDetails.from(member);
     }
 

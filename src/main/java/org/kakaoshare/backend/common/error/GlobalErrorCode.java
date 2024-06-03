@@ -14,4 +14,9 @@ public enum GlobalErrorCode implements ErrorCode {
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "external api error. check server log.");
     private final HttpStatus httpStatus;
     private final String message;
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }
