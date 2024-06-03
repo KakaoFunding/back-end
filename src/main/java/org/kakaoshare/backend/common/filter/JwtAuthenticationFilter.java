@@ -10,7 +10,6 @@ import org.kakaoshare.backend.jwt.exception.JwtException;
 import org.kakaoshare.backend.jwt.util.JwtProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,11 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(final HttpServletRequest request,
                                     final HttpServletResponse response,
                                     final FilterChain filterChain) throws ServletException, IOException {
-        if (request.getMethod().equals(HttpMethod.OPTIONS.name())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         final String accessToken = getAccessToken(request);
         try {
             jwtProvider.validateToken(accessToken);
