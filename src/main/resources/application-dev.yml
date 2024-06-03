@@ -31,8 +31,7 @@ spring:
             client-secret: QH0n8i9qoDE4TkeVl9p9aFPRQVcIgXHC
             client-authentication-method: POST
             client-name: kakao
-            redirect-uri: http://localhost:3000/oauth/kakao
-            authorization-grant-type: authorization_code
+            authorization-grant-type: refresh_token
             scope:
               - profile_nickname
               - profile_image
@@ -49,6 +48,10 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+        other:
+          kakao:
+            logout-url: https://kapi.kakao.com/v1/user/logout
+
 security:
   token:
     access:
