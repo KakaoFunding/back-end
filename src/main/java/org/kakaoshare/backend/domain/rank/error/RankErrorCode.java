@@ -11,4 +11,9 @@ public enum RankErrorCode implements ErrorCode {
     INVALID_PRICE_RANGE(HttpStatus.BAD_REQUEST, "Not in the correct price range");
     private final HttpStatus httpStatus;
     private final String message;
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }
