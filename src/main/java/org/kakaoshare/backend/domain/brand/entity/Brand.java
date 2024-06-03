@@ -30,20 +30,20 @@ import java.util.List;
         indexes = {@Index(name = "idx_brand_name", columnList = "name")}
 )
 public class Brand extends BaseTimeEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long brandId;
-    
+
     @Column(nullable = false)
     private String name;
-    
+
     @Column
     private String iconPhoto;
-    
+
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Product> products;
-    
+
     @Override
     public String toString() {
         return "Brand{" +
