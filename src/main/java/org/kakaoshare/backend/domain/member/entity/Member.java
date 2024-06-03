@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.member.entity;
 
+import com.querydsl.core.util.StringUtils;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -69,6 +70,14 @@ public class Member extends BaseTimeEntity {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.providerId = providerId;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateProfileUrl(final String profileImageUrl) {
+        if (StringUtils.isNullOrEmpty(profileImageUrl) || this.profileImageUrl.equals(profileImageUrl)) {
+            return;
+        }
+
         this.profileImageUrl = profileImageUrl;
     }
 
