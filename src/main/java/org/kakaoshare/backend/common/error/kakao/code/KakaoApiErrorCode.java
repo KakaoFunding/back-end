@@ -2,10 +2,13 @@ package org.kakaoshare.backend.common.error.kakao.code;
 
 import lombok.Getter;
 import org.kakaoshare.backend.common.error.ErrorCode;
+import org.kakaoshare.backend.common.error.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.Objects;
+
+import static org.kakaoshare.backend.common.error.GlobalErrorCode.EXTERNAL_API_ERROR;
 
 @Getter
 public enum KakaoApiErrorCode implements ErrorCode {
@@ -27,6 +30,6 @@ public enum KakaoApiErrorCode implements ErrorCode {
         return Arrays.stream(values())
                 .filter(value -> Objects.equals(value.serverErrorCode, serverErrorCode))
                 .findAny()
-                .orElseThrow(() -> new IllegalStateException());
+                .orElseThrow(() -> new BusinessException(EXTERNAL_API_ERROR));
     }
 }
