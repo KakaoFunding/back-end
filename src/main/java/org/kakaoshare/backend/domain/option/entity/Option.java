@@ -10,8 +10,10 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
@@ -19,8 +21,9 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 @Entity
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "options",
-        indexes = @Index(name = "idx_options_product_id",columnList = "product_id",unique = true)
+        indexes = @Index(name = "idx_options_product_id", columnList = "product_id", unique = true)
 )
 public class Option extends BaseTimeEntity {
 

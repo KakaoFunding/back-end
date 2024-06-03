@@ -17,4 +17,9 @@ public enum FundingErrorCode implements ErrorCode {
         this.httpStatus = httpStatus;
         this.message = message;
     }
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }

@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.member.service.oauth.detail.kakao;
 
+import org.kakaoshare.backend.common.error.kakao.handler.KakaoErrorHandler;
 import org.kakaoshare.backend.common.util.MultiValueMapConverter;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
@@ -9,6 +10,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.token.OAuthTokenResponse;
 import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,16 @@ import java.util.Map;
 
 @Service
 public class KakaoOAuthService implements OAuthWebClientService {
+    private final KakaoErrorHandler kakaoErrorHandler;
     private final KakaoOAuthRequestProvider kakaoOAuthRequestProvider;
     private final String logoutRequestUrl;
     private final WebClient webClient;
 
-    public KakaoOAuthService(final KakaoOAuthRequestProvider kakaoOAuthRequestProvider,
+    public KakaoOAuthService(final KakaoErrorHandler kakaoErrorHandler,
+                             final KakaoOAuthRequestProvider kakaoOAuthRequestProvider,
                              @Value("${spring.security.oauth2.client.other.kakao.logout-url}") final String logoutRequestUrl,
                              final WebClient webClient) {
+        this.kakaoErrorHandler = kakaoErrorHandler;
         this.kakaoOAuthRequestProvider = kakaoOAuthRequestProvider;
         this.logoutRequestUrl = logoutRequestUrl;
         this.webClient = webClient;
@@ -39,6 +44,8 @@ public class KakaoOAuthService implements OAuthWebClientService {
                 .uri(getProfileRequestUri(registration))
                 .headers(header -> header.setBearerAuth(socialToken))
                 .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, kakaoErrorHandler::handle5xxError)
+                .onStatus(HttpStatusCode::is4xxClientError, kakaoErrorHandler::handleApi4xxError)
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .block();
     }
@@ -54,6 +61,8 @@ public class KakaoOAuthService implements OAuthWebClientService {
                 .headers(header -> header.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .body(BodyInserters.fromFormData(params))
                 .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, kakaoErrorHandler::handle5xxError)
+                .onStatus(HttpStatusCode::is4xxClientError, kakaoErrorHandler::handleAuth4xxError)
                 .bodyToMono(OAuthTokenResponse.class)
                 .block();
     }
@@ -69,6 +78,8 @@ public class KakaoOAuthService implements OAuthWebClientService {
                 .headers(header -> header.setBearerAuth(socialAccessTokenToken))
                 .bodyValue(kakaoLogoutRequest)
                 .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, kakaoErrorHandler::handle5xxError)
+                .onStatus(HttpStatusCode::is4xxClientError, kakaoErrorHandler::handleApi4xxError)
                 .bodyToMono(Void.class)
                 .block();
     }

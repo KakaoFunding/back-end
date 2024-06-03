@@ -70,14 +70,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(errorResponseOf(errorCode));
-    }
-    
-    private ErrorResponse errorResponseOf(ErrorCode errorCode) {
-        return ErrorResponse.builder()
-                .code(errorCode.getHttpStatus().value())
-                .message(errorCode.getMessage())
-                .build();
+                .body(ErrorResponse.from(errorCode));
     }
     
     private void logException(final Exception e, final ErrorCode errorCode) {
