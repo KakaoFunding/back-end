@@ -10,6 +10,7 @@ import org.kakaoshare.backend.domain.product.dto.WishType;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.domain.product.service.ProductService;
+import org.kakaoshare.backend.domain.wish.dto.MyWishDetail;
 import org.kakaoshare.backend.domain.wish.dto.WishDetail;
 import org.kakaoshare.backend.domain.wish.dto.WishReservationEvent;
 import org.kakaoshare.backend.domain.wish.entity.Wish;
@@ -22,11 +23,12 @@ import org.kakaoshare.backend.fixture.WishFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -159,18 +161,20 @@ class WishServiceTest {
         // given
         Wish wish = WishFixture.TEST_WISH3.생성();//isPublic=true
         Boolean isPublic = wish.getIsPublic();
-        WishDetail wishDetail = new WishDetail(
-                wish.getWishId(),
-                product.getProductId(),
-                product.getName(),
-                product.getPrice(),
-                product.getPhoto(),
-                wish.getIsPublic());
+        MyWishDetail myWishDetail = new MyWishDetail(wish.getIsPublic(),
+                new WishDetail(wish.getWishId(),
+                        product.getProductId(),
+                        product.getName(),
+                        product.getPrice(),
+                        product.getPhoto(),
+                        product.getBrandName(),
+                        product.getWishCount()));
         when(wishRepository.findById(any()))
                 .thenReturn(Optional.of(wish));
-        when(wishRepository.findWishDetailsByProviderId(any()))
-                .thenReturn(List.of(wishDetail));
-        
+        when(wishRepository.findWishDetailsByProviderId(any(),any()))
+                .thenReturn(new PageImpl<>(Collections.singletonList(myWishDetail)));
+        when(wishRepository.findByMember_ProviderIdAndWishId(any(), any()))
+                .thenReturn(Optional.of(wish));
         // when
         wishService.changeWishType(member.getProviderId(), wish.getWishId());
         
