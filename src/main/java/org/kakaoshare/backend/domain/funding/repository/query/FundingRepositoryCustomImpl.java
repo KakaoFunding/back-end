@@ -74,6 +74,7 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
                         FundingResponse.class,
                         QFunding.funding.fundingId,
                         QFunding.funding.status.stringValue(),
+                        QFunding.funding.createdAt,
                         QFunding.funding.expiredAt,
                         QFunding.funding.goalAmount,
                         QFunding.funding.product.brandName,

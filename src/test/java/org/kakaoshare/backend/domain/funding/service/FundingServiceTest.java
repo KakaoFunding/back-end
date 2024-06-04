@@ -67,21 +67,19 @@ public class FundingServiceTest {
     @Test
     @DisplayName("펀딩 진행 상황 조회 성공")
     void getFundingProgress_Success() {
-        Long fundingId = 1L;
         Brand brand = BrandFixture.EDIYA.생성(1L);
         Member member = MemberFixture.KAKAO.생성();
         Product product = ProductFixture.TEST_PRODUCT.생성(1L, brand);
-        Funding funding = FundingFixture.SAMPLE_FUNDING.생성(member, product);
+        Funding funding = FundingFixture.SAMPLE_FUNDING.생성(1L, member, product);
 
         given(memberRepository.findMemberByProviderId(member.getProviderId())).willReturn(Optional.of(member));
-        given(fundingRepository.findByIdAndMemberId(fundingId, member.getMemberId())).willReturn(Optional.of(funding));
+        given(fundingRepository.findByIdAndMemberId(funding.getFundingId(), member.getMemberId())).willReturn(Optional.of(funding));
 
-        ProgressResponse response = fundingService.getMyFundingProgress(fundingId, member.getProviderId());
+        ProgressResponse response = fundingService.getMyFundingProgress(funding.getFundingId(), member.getProviderId());
 
         assertThat(response).isNotNull();
 
         verify(memberRepository).findMemberByProviderId(member.getProviderId());
-        verify(fundingRepository).findByIdAndMemberId(fundingId, member.getMemberId());
     }
 
 }
