@@ -48,8 +48,8 @@ public class ProductServiceTest {
 
         when(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .thenReturn(Optional.of(member));
-        when(productRepository.findProductById(productId))
-                .thenReturn(product);
+        when(productRepository.findById(productId))
+                .thenReturn(Optional.of(product));
         when(productRepository.findProductDetailWithMember(product, member))
                 .thenReturn(expectedDetailResponse);
 
@@ -71,8 +71,8 @@ public class ProductServiceTest {
 
         when(memberRepository.findMemberByProviderId(member.getProviderId()))
                 .thenReturn(Optional.of(member));
-        when(productRepository.findProductById(productId))
-                .thenReturn(product);
+        when(productRepository.findById(productId))
+                .thenReturn(Optional.of(product));
         doReturn(expectedDescriptionResponse)
                 .when(productRepository)
                 .findProductWithDetailsAndPhotosWithMember(product,member);
