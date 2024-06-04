@@ -76,6 +76,14 @@ public class FundingService {
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
 
+    public ProgressResponse getMyFundingProgress(String providerId) {
+        Member member = findMemberByProviderId(providerId);
+        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
+                .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
+
+        return getFundingProgress(funding.getFundingId(), member.getMemberId());
+    }
+
     public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
         Member self = findMemberByProviderId(providerId);
         Member friend = findMemberByProviderId(inquiryRequest.getFriendProviderId()); //todo 친구 검증 메소드 추가해야함
