@@ -53,7 +53,7 @@ public class FundingController {
 
     @GetMapping("/funding/{fundingId}")
     public ResponseEntity<?> getFundingProgress(@PathVariable Long fundingId, @LoggedInMember String providerId) {
-        ProgressResponse response = fundingService.getMyFundingProgress(fundingId, providerId);
+        ProgressResponse response = fundingService.getFundingItemProgress(fundingId, providerId);
         return ResponseEntity.ok(response);
     }
 
@@ -61,6 +61,12 @@ public class FundingController {
     public ResponseEntity<?> getFriendFundingProgress(@LoggedInMember String providerId, @RequestBody
     FriendFundingInquiryRequest inquiryRequest) {
         ProgressResponse response = fundingService.getFriendFundingProgress(providerId, inquiryRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/funding/myItem")
+    public ResponseEntity<?> getMyFundingProgress(@LoggedInMember String providerId){
+        ProgressResponse response = fundingService.getMyFundingProgress(providerId);
         return ResponseEntity.ok(response);
     }
 

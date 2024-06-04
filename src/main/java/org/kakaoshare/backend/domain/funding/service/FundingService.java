@@ -69,7 +69,7 @@ public class FundingService {
         return RegisterResponse.from(newFunding);
     }
 
-    public ProgressResponse getMyFundingProgress(Long fundingId, String providerId) {
+    public ProgressResponse getFundingItemProgress(Long fundingId, String providerId) {
         Member member = findMemberByProviderId(providerId);
         Funding funding = findByIdAndMemberId(fundingId, member.getMemberId());
 
