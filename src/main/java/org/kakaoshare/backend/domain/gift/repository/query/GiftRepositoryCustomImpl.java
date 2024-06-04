@@ -84,10 +84,11 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         receipt.recipient.name,
                         JPAExpressions.select(product.name)
                                 .from(product)
-                                .where(product.productId.eq(receipt.product.productId)),
-                        JPAExpressions.select(productThumbnail.thumbnailUrl)
-                                .from(productThumbnail)
-                                .where(productThumbnail.product.productId.eq(receipt.product.productId))
+                                .where(product.productId.eq(receipt.product.productId))
+                                .limit(1),
+                        JPAExpressions.select(product.photo)
+                                .from(product)
+                                .where(product.productId.eq(receipt.product.productId))
                                 .limit(1),
                         receipt.product.brandName,
                         gift.createdAt))
