@@ -9,6 +9,7 @@ import org.kakaoshare.backend.domain.product.entity.ProductDescriptionPhoto;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 
 import java.util.List;
+import org.kakaoshare.backend.domain.wish.entity.Wish;
 
 @Getter
 @Builder
@@ -25,9 +26,11 @@ public class DescriptionResponse {
     private final String brandName;
     private final Long brandId;
     private final String brandThumbnail;
+    private final int wishCount;
+    private final boolean isWish;
 
     public static DescriptionResponse of(final Product product, List<String> descriptionPhotosUrls,
-                                           List<OptionResponse> optionsResponses, List<String> productThumbnailsUrls) {
+                                         List<OptionResponse> optionsResponses, List<String> productThumbnailsUrls, Boolean isWished) {
 
         List<String> thumbnails;
         if (product.getProductThumbnails().isEmpty() && product.getPhoto() != null) {
@@ -51,6 +54,8 @@ public class DescriptionResponse {
                 .brandName(product.getBrand().getName())
                 .brandId(product.getBrand().getBrandId())
                 .brandThumbnail(product.getBrand().getIconPhoto())
+                .wishCount(product.getWishCount())
+                .isWish(isWished)
                 .build();
     }
 }
