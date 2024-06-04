@@ -16,7 +16,4 @@ public final class MyWishDetail {
     public boolean isPublic() {
         return isPublic;
     }
-    public boolean isSameWishId(Long wishId){
-        return wishDetail.getWishId().equals(wishId);
-    }
 }
