@@ -47,7 +47,7 @@ public class FundingController {
     @PostMapping("/funding/check")
     public ResponseEntity<?> checkFunding(@RequestBody FundingCheckRequest checkRequest){
 
-        FundingResponse response = fundingService.checkFundingItem(checkRequest);
+        ProgressResponse response = fundingService.checkFundingItem(checkRequest);
         return ResponseEntity.ok(response);
     }
 

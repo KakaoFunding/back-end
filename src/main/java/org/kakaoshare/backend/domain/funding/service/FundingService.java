@@ -113,12 +113,12 @@ public class FundingService {
         return FundingPreviewResponse.of(productDto, fundingProductDto);
     }
 
-    public FundingResponse checkFundingItem(FundingCheckRequest fundingCheckRequest) {
+    public ProgressResponse checkFundingItem(FundingCheckRequest fundingCheckRequest) {
         Member member = findMemberByProviderId(fundingCheckRequest.getProviderId());
         Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
                 .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
 
-        return FundingResponse.from(funding);
+        return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
 
     private Member findMemberByProviderId(String providerId) {
