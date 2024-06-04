@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.util.RepositoryUtils;
 import org.kakaoshare.backend.common.vo.PriceRange;
 import org.kakaoshare.backend.domain.member.entity.Gender;
+import org.kakaoshare.backend.domain.member.entity.QMember;
 import org.kakaoshare.backend.domain.option.dto.QOptionSummaryResponse;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
@@ -43,6 +44,9 @@ import static org.kakaoshare.backend.domain.wish.entity.QWish.wish;
 @Component
 @RequiredArgsConstructor
 public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
+    private static final QMember receiver = new QMember("receiver");
+    private static final QMember recipient = new QMember("recipient");
+
     private final JPAQueryFactory queryFactory;
 
     public Page<RankResponse> findTopRankedProductsByOrders(LocalDateTime term, Pageable pageable) {
@@ -155,10 +159,11 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         return queryFactory.from(order)
                 .innerJoin(order.receipt, receipt)
                 .innerJoin(receipt.product, product)
-                .innerJoin(receipt.recipient, member)
+                .innerJoin(receipt.recipient, recipient)
+                .innerJoin(receipt.receiver, receiver)
                 .where(
                         periodExpression(receipt.createdAt, date),
-                        eqExpression(member.providerId, providerId)
+                        eqExpression(recipient.providerId, providerId)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -179,7 +184,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         return new QOrderProductDto(
                 order.ordersId,
                 receipt.orderNumber,
-                member.name,
+                receiver.name,
                 getProductDto(),
                 receipt.quantity,
                 order.createdAt,
