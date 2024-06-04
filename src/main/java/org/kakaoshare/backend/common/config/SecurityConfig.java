@@ -28,6 +28,7 @@ public class SecurityConfig {
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
     public static final String API_V_1 = "/api/v1/";
     private static final String ACTUATOR = "/actuator/**";
+
     private static final List<String> ALLOWED_HEADERS = Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With");
     private static final List<String> ALLOWED_METHODS = Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS");
     private static final String METRICS = "/metrics";

@@ -12,4 +12,9 @@ public enum CategoryErrorCode implements ErrorCode {
     INVALID_SUB_CATEGORY_ID(HttpStatus.NOT_FOUND,"Miss match between category id and subcategory id");
     private final HttpStatus httpStatus;
     private final String message;
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }

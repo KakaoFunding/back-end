@@ -11,4 +11,9 @@ public enum SortErrorCode implements ErrorCode {
     NO_MORE_PAGE(HttpStatus.NOT_FOUND,"No more page to response");
     private final HttpStatus httpStatus;
     private final String message;
+
+    @Override
+    public String getCode() {
+        return "";
+    }
 }
