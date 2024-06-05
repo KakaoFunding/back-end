@@ -29,21 +29,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
     public static final int PAGE_DEFAULT_SIZE = 20;
     private final ProductService productService;
-    
+
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProductDetail(@PathVariable Long productId,
+                                              @Nullable @LoggedInMember String providerId,
                                               @RequestParam(name = "tab", required = false, defaultValue = "description") String tab) {
         if ("description".equals(tab)) {
-            DescriptionResponse response = productService.getProductDescription(productId);
+            DescriptionResponse response = productService.getProductDescription(productId, providerId);
             return ResponseEntity.ok(response);
         }
         if ("detail".equals(tab)) {
-            DetailResponse response = productService.getProductDetail(productId);
+            DetailResponse response = productService.getProductDetail(productId, providerId);
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.badRequest().body("Invalid tab value");
     }
-    
+
     @GetMapping
     public ResponseEntity<?> getSimpleProductsInPage(
             @Nullable @LoggedInMember String providerId,
@@ -52,15 +53,15 @@ public class ProductController {
         PageResponse<?> simpleProductsPage = productService.getSimpleProductsPage(categoryId, pageable, providerId);
         return ResponseEntity.ok(simpleProductsPage);
     }
-    
+
     @GetMapping("/brands/{brandId}")
     public ResponseEntity<?> getBrandsProducts(@PathVariable("brandId") Long brandId,
                                                @PageableDefault(size = PAGE_DEFAULT_SIZE) Pageable pageable) {
         PageResponse<?> simpleProductPage = productService.getSimpleProductsByBrandId(brandId, pageable);
         return ResponseEntity.ok(simpleProductPage);
     }
-    
-    
+
+
     @PostMapping("/{productId}/wishes")
     public ResponseEntity<?> resistWishingProduct(@LoggedInMember String providerId,
                                                   @PathVariable("productId") Long productId,
@@ -68,8 +69,8 @@ public class ProductController {
         WishResponse response = productService.resisterProductInWishList(providerId, productId, type);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    
-    
+
+
     @DeleteMapping("/{productId}/wishes")
     public ResponseEntity<?> cancelWisingProduct(@LoggedInMember String providerId,
                                                  @PathVariable("productId") Long productId) {
