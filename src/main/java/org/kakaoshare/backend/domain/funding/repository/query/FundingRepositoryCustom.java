@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FundingRepositoryCustom {
-    List<FundingResponse> findByMemberId(Long memberId);
+    List<FundingResponse> findFundingListByMemberId(Long memberId);
     Optional<Funding> findByIdAndMemberId(Long fundingId, Long memberId);
 
     List<Funding> findAllByMemberId(Long memberId);

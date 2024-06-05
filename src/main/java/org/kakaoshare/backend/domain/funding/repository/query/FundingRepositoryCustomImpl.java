@@ -32,7 +32,7 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<FundingResponse> findByMemberId(Long memberId) {
+    public List<FundingResponse> findFundingListByMemberId(Long memberId) {
         List<Funding> fundings = queryFactory
                 .selectFrom(QFunding.funding)
                 .where(QFunding.funding.member.memberId.eq(memberId))
