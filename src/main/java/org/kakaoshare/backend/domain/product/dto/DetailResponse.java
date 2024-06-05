@@ -1,9 +1,11 @@
 package org.kakaoshare.backend.domain.product.dto;
 
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.option.dto.OptionResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
+import org.kakaoshare.backend.domain.product.entity.ProductDetail;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 import java.util.List;
 
@@ -26,13 +28,18 @@ public class DetailResponse {
     private final String billingNotice;
     private final String caution;
     private final List<String> productThumbnails;
-    public static DetailResponse of(final Product product,List<OptionResponse> optionsResponses) {
-        String origin = product.getProductDetail() != null ? product.getProductDetail().getOrigin() : "정보 없음";
-        String manufacturer = product.getProductDetail() != null ? product.getProductDetail().getManufacturer() : "정보 없음";
-        String tel = product.getProductDetail() != null ? product.getProductDetail().getTel() : "정보 없음";
-        String deliverDescription = product.getProductDetail() != null ? product.getProductDetail().getDeliverDescription() : "정보 없음";
-        String billingNotice = product.getProductDetail() != null ? product.getProductDetail().getBillingNotice() : "정보 없음";
-        String caution = product.getProductDetail() != null ? product.getProductDetail().getCaution() : "정보 없음";
+    private final int wishCount;
+    private final boolean isWish;
+
+    public static DetailResponse of(final Product product, List<OptionResponse> optionsResponses, Boolean isWished) {
+        ProductDetail detail = product.getProductDetail();
+
+        String origin = Optional.ofNullable(detail).map(ProductDetail::getOrigin).orElse(null);
+        String manufacturer = Optional.ofNullable(detail).map(ProductDetail::getManufacturer).orElse(null);
+        String tel = Optional.ofNullable(detail).map(ProductDetail::getTel).orElse(null);
+        String deliverDescription = Optional.ofNullable(detail).map(ProductDetail::getDeliverDescription).orElse(null);
+        String billingNotice = Optional.ofNullable(detail).map(ProductDetail::getBillingNotice).orElse(null);
+        String caution = Optional.ofNullable(detail).map(ProductDetail::getCaution).orElse(null);
 
         return DetailResponse.builder()
                 .productId(product.getProductId())
@@ -51,6 +58,8 @@ public class DetailResponse {
                 .brandName(product.getBrandName())
                 .brandId(product.getBrand().getBrandId())
                 .brandThumbnail(product.getBrand().getIconPhoto())
+                .wishCount(product.getWishCount())
+                .isWish(isWished)
                 .build();
     }
 }
