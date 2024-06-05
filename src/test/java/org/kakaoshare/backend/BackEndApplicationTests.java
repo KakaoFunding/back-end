@@ -2,17 +2,14 @@ package org.kakaoshare.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.flyway.enabled=false",
-        "spring.flyway.baseline-on-migrate=false"
-})
+@ActiveProfiles("test")
 class BackEndApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
+    
+    @Test
+    void contextLoads() {
+    }
+    
 }
