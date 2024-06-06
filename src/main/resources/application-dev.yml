@@ -59,8 +59,8 @@ spring:
         other:
           kakao:
             logout-url: https://kapi.kakao.com/v1/user/logout
-#  config:
-#    import: classpath:application-monitor.yml
+  config:
+    import: classpath:application-moni.yml
 
 security:
   token:

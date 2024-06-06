@@ -9,7 +9,8 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: beans, conditions, mappings, info, health, prometheus
+        exclude: heapdump, env
   metrics:
     tags:
       application: ${spring.application.name}
