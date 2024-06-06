@@ -24,12 +24,15 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final List<String> ORIGIN_PATTERN = List.of("*");
+    private static final List<String> ORIGIN_PATTERN = List.of("https://www.kakaofunding.kro.kr/");
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
-    private static final String API_V_1 = "/api/v1/";
+    public static final String API_V_1 = "/api/v1/";
+    private static final String ACTUATOR = "/actuator/**";
+
     private static final List<String> ALLOWED_HEADERS = Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With");
     private static final List<String> ALLOWED_METHODS = Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS");
-
+    private static final String METRICS = "/metrics";
+    
     private final AuthenticationAccessDeniedHandler authenticationAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -39,6 +42,8 @@ public class SecurityConfig {
         return http.authorizeHttpRequests(
                         authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                                .requestMatchers(ACTUATOR).permitAll()
+                                .requestMatchers(METRICS).permitAll()
                                 .requestMatchers(API_V_1 + "oauth/login").permitAll()
                                 .requestMatchers(API_V_1 + "oauth/logout").authenticated()
                                 .requestMatchers(API_V_1 + "oauth/reissue").permitAll()

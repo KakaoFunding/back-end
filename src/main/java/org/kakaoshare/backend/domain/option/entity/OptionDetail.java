@@ -10,20 +10,15 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 
 
-@AllArgsConstructor
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = {
-        @Index(columnList = "option_id")
-})
+@AllArgsConstructor
+@Table(indexes = {@Index(columnList = "option_id")})
 public class OptionDetail extends BaseTimeEntity {
 
     @Id

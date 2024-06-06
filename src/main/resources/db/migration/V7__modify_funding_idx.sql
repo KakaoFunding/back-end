@@ -1,14 +1,14 @@
 ALTER TABLE funding
-    DROP FOREIGN KEY `FK308j7d5ln7xaq590xo8bxwul0`;
+DROP FOREIGN KEY `FK308j7d5ln7xaq590xo8bxwul0`;
 
 ALTER TABLE funding
-    DROP FOREIGN KEY `FK5cxch4qfn9ynsvod79uyulcvj`;
+DROP FOREIGN KEY `FK5cxch4qfn9ynsvod79uyulcvj`;
 
 ALTER TABLE funding
-    DROP INDEX `idx_funding_member_id`;
+DROP INDEX `idx_funding_member_id`;
 
 ALTER TABLE funding
-    DROP INDEX `idx_funding_product_id`;
+DROP INDEX `idx_funding_product_id`;
 
 ALTER TABLE funding
     ADD CONSTRAINT `FK308j7d5ln7xaq590xo8bxwul0`

@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.funding.dto;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 public class FundingResponse {
     private final Long fundingId;
     private final String status;
+    private final LocalDateTime createdAt;
     private final LocalDate expiredAt;
     private final Long goalAmount;
     private final String brandName;
@@ -28,6 +30,7 @@ public class FundingResponse {
         return FundingResponse.builder()
                 .fundingId(funding.getFundingId())
                 .status(funding.getStatus().name())
+                .createdAt(funding.getCreatedAt())
                 .expiredAt(funding.getExpiredAt())
                 .goalAmount(funding.getGoalAmount())
                 .brandName(product.getBrand().getName())

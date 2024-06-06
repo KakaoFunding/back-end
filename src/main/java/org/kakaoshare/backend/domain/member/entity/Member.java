@@ -53,10 +53,10 @@ public class Member extends BaseTimeEntity {
     private Role role = USER;
 
     @Builder.Default
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<Wish> wishes = new ArrayList<>();
+    @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)
+    private List<Wish> wishes=new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Cart> carts = new ArrayList<>();
 
     protected Member() {

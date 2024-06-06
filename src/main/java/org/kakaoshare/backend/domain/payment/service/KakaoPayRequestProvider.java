@@ -1,6 +1,5 @@
 package org.kakaoshare.backend.domain.payment.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.kakaoshare.backend.domain.payment.dto.approve.request.KakaoPayApproveRequest;
 import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentCancelDto;
 import org.kakaoshare.backend.domain.payment.dto.kakaopay.cancel.request.KakaoPayCancelRequest;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@Slf4j
 public class KakaoPayRequestProvider {
     private static final String PRODUCT_NAME_SEPARATOR = " 외 ";
     private static final String PRODUCT_NAME_SUFFIX = "건";
