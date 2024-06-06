@@ -10,11 +10,11 @@ public enum JwtErrorCode implements ErrorCode {
     INVALID(CODE_PREFIX + "002", HttpStatus.UNAUTHORIZED,"유효하지 않은 토큰입니다."),
     EXPIRED(CODE_PREFIX + "003", HttpStatus.UNAUTHORIZED,"만료된 토큰입니다."),
     UNSUPPORTED(CODE_PREFIX + "004", HttpStatus.UNAUTHORIZED,"JWT를 지원하지 않습니다.");
-
+    
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;
-
+    
     JwtErrorCode(final String code, final HttpStatus httpStatus, final String message) {
         this.code = code;
         this.httpStatus = httpStatus;
