@@ -12,7 +12,7 @@ import static org.kakaoshare.backend.common.error.GlobalErrorCode.EXTERNAL_API_E
 
 @Getter
 public enum KakaoApiErrorCode implements ErrorCode {
-    INVALID_ACCESS_TOKEN(-401, CODE_PREFIX + "007", HttpStatus.BAD_REQUEST, "유효하지 않은 소셜 엑세스 토큰입니다.");
+    INVALID_ACCESS_TOKEN(-401, CODE_PREFIX + "008", HttpStatus.BAD_REQUEST, "유효하지 않은 소셜 엑세스 토큰입니다.");
 
     private final int serverErrorCode;
     private final String code;
