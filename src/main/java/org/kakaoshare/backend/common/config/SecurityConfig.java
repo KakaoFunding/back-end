@@ -24,7 +24,8 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final List<String> ORIGIN_PATTERN = List.of("https://www.kakaofunding.kro.kr/");
+//    private static final List<String> ORIGIN_PATTERN = List.of("https://www.kakaofunding.kro.kr/");
+    private static final List<String> ORIGIN_PATTERN = List.of("*");
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
     public static final String API_V_1 = "/api/v1/";
     private static final String ACTUATOR = "/actuator/**";
