@@ -86,10 +86,13 @@ services:
       - grafana-storage:/var/lib/grafana
 
   mysqld_exporter:
-    image: prom/mysqld-exporter
-    restart: always
-    environment:
-      - DATA_SOURCE_NAME=${MYSQL_USERNAME}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOST})/
+    image: quay.io/prometheus/mysqld-exporter
+    container_name: mysqld-exporter
+    restart: unless-stopped
+    command:
+      - "--mysqld.username=${MYSQL_USERNAME}"
+      - "--mysqld.password=${MYSQL_PASSWORD}"
+      - "--mysqld.address=${MYSQL_HOST}"
     ports:
       - "9104:9104"
 
