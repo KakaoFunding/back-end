@@ -90,11 +90,11 @@ services:
     container_name: mysqld-exporter
     restart: unless-stopped
     command:
-      - "--mysqld.username=${MYSQL_USERNAME}"
-      - "--mysqld.password=${MYSQL_PASSWORD}"
-      - "--mysqld.address=${MYSQL_HOST}"
+      - "--config.my-cnf=/etc/mysql/my.cnf"
     ports:
       - "9104:9104"
+    volumes:
+      - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
 
 volumes:
   grafana-storage:
