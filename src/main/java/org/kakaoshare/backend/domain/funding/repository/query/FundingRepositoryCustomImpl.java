@@ -32,15 +32,16 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Optional<FundingResponse> findByProductIdAndMemberId(Long productId, Long memberId) {
-
-        Funding funding = queryFactory
+    public List<FundingResponse> findFundingListByMemberId(Long memberId) {
+        List<Funding> fundings = queryFactory
                 .selectFrom(QFunding.funding)
-                .where(QFunding.funding.product.productId.eq(productId)
-                        .and(QFunding.funding.member.memberId.eq(memberId)))
-                .fetchOne();
+                .where(QFunding.funding.member.memberId.eq(memberId))
+                .fetch();
 
-        return Optional.ofNullable(funding).map(FundingResponse::from);
+        return fundings.stream()
+                .map(FundingResponse::from)
+                .toList();
+
     }
 
     @Override
@@ -66,12 +67,14 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
     }
 
     @Override
-    public Page<FundingResponse> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status, Pageable pageable) {
+    public Page<FundingResponse> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status,
+                                                                        Pageable pageable) {
         JPAQuery<FundingResponse> contentQuery = queryFactory
                 .select(Projections.constructor(
                         FundingResponse.class,
                         QFunding.funding.fundingId,
                         QFunding.funding.status.stringValue(),
+                        QFunding.funding.createdAt,
                         QFunding.funding.expiredAt,
                         QFunding.funding.goalAmount,
                         QFunding.funding.product.brandName,
@@ -81,7 +84,8 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
                         QFunding.funding.product.productId
                 ))
                 .from(QFunding.funding)
-                .leftJoin(QFunding.funding.product).on(QFunding.funding.product.productId.eq(QProduct.product.productId))
+                .leftJoin(QFunding.funding.product)
+                .on(QFunding.funding.product.productId.eq(QProduct.product.productId))
                 .where(QFunding.funding.member.memberId.eq(memberId)
                         .and(QFunding.funding.status.eq(status)))
                 .orderBy(SortUtil.from(pageable))
