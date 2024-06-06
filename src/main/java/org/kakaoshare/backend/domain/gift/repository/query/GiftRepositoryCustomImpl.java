@@ -82,17 +82,13 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                         gift.giftId,
                         gift.expiredAt,
                         receipt.recipient.name,
-                        JPAExpressions.select(product.name)
-                                .from(product)
-                                .where(product.productId.eq(receipt.product.productId)),
-                        JPAExpressions.select(productThumbnail.thumbnailUrl)
-                                .from(productThumbnail)
-                                .where(productThumbnail.product.productId.eq(receipt.product.productId))
-                                .limit(1),
+                        receipt.product.name,
+                        receipt.product.photo,
                         receipt.product.brandName,
                         gift.createdAt))
                 .from(gift)
                 .leftJoin(gift.receipt, receipt)
+                .leftJoin(receipt.product, product)
                 .where(gift.status.eq(status)
                         .and(receipt.recipient.memberId.eq(memberId)))
                 .offset(pageable.getOffset())
