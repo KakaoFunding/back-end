@@ -59,14 +59,20 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     restart: always
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   grafana:
     image: grafana/grafana
@@ -80,7 +86,7 @@ services:
       - grafana-storage:/var/lib/grafana
 
   mysqld_exporter:
-    image: prom/mysqld_exporter
+    image: prom/mysqld-exporter
     restart: always
     environment:
       - DATA_SOURCE_NAME=${MYSQL_USERNAME}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOST})/
@@ -89,3 +95,5 @@ services:
 
 volumes:
   grafana-storage:
+  prometheus-data:
+  redis-data:
