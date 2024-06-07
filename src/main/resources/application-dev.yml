@@ -84,7 +84,6 @@ pay:
     cancel: http://localhost:8080/payments/cancel
     fail: http://localhost:8080/payments/fail
 
-
 logging:
   level:
     org.springframework.security: trace
