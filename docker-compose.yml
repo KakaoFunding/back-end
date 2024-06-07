@@ -19,6 +19,8 @@ services:
       - app1
       - app2
       - app3
+      - prometheus
+      - grafana
 
   app1:
     image: "yeachan05/application:latest"
