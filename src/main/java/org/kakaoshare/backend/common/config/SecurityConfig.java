@@ -29,6 +29,7 @@ public class SecurityConfig {
     private static final String CORS_CONFIGURATION_PATTERN = "/**";
     public static final String API_V_1 = "/api/v1/";
     private static final String ACTUATOR = "/actuator/**";
+    private static final String FAVICON_URL = "/favicon.ico";
 
     private static final List<String> ALLOWED_HEADERS = Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With");
     private static final List<String> ALLOWED_METHODS = Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS");
@@ -45,6 +46,7 @@ public class SecurityConfig {
                                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                                 .requestMatchers(ACTUATOR).permitAll()
                                 .requestMatchers(METRICS).permitAll()
+                                .requestMatchers(FAVICON_URL).permitAll()
                                 .requestMatchers(API_V_1 + "oauth/login").permitAll()
                                 .requestMatchers(API_V_1 + "oauth/logout").authenticated()
                                 .requestMatchers(API_V_1 + "oauth/reissue").permitAll()
