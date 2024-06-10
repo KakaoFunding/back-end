@@ -14,4 +14,7 @@ public interface OptionRepository extends JpaRepository<Option, Long> {
             "LEFT JOIN od.option " +
             "WHERE od.optionDetailId IN :optionDetailIds")
     List<Option> findByOptionDetailIds(@Param("optionDetailIds") final List<Long> optionDetailIds);
+
+    @Query("SELECT o FROM Option o WHERE o.product.productId = :productId")
+    List<Option> findByProductId(@Param("productId") Long productId);
 }
