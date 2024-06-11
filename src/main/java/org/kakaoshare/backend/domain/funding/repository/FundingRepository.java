@@ -21,5 +21,5 @@ public interface FundingRepository extends JpaRepository<Funding, Long>, Funding
     @Query("SELECT f FROM Funding f WHERE f.member.memberId IN :memberIds AND f.status = :status")
     List<Funding> findActiveFundingItemsByMemberIds(List<Long> memberIds, String status);
     @Query("SELECT f FROM Funding f WHERE f.member.memberId = :memberId AND f.status = :status")
-    Optional<Funding> findByMemberIdAndStatus(@Param("memberId") Long memberId, @Param("status") String status);
+    Optional<Funding> findByMemberIdAndStatus(@Param("memberId") Long memberId, @Param("status") FundingStatus status);
 }
