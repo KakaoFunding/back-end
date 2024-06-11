@@ -57,7 +57,7 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/funding/friendItem")
+    @PostMapping("/funding/friendItem")
     public ResponseEntity<?> getFriendFundingProgress(@LoggedInMember String providerId, @RequestBody
     FriendFundingInquiryRequest inquiryRequest) {
         ProgressResponse response = fundingService.getFriendFundingProgress(providerId, inquiryRequest);
