@@ -84,7 +84,6 @@ public class FundingService {
         if (funding == null) {
             return null;
         }
-
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
 
