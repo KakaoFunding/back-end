@@ -79,10 +79,15 @@ public class FundingService {
     public ProgressResponse getMyFundingProgress(String providerId) {
         Member member = findMemberByProviderId(providerId);
         Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
-                .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
+                .orElse(null);
+
+        if (funding == null) {
+            return null;
+        }
 
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
+
 
     public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
         Member self = findMemberByProviderId(providerId);
