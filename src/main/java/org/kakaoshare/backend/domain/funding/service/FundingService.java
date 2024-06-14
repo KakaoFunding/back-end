@@ -84,7 +84,6 @@ public class FundingService {
         if (funding == null) {
             return null;
         }
-
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
 
@@ -128,7 +127,7 @@ public class FundingService {
 
     public ProgressResponse checkFundingItem(FundingCheckRequest fundingCheckRequest) {
         Member member = findMemberByProviderId(fundingCheckRequest.getProviderId());
-        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
+        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)
                 .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
 
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
