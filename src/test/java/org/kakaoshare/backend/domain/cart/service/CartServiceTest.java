@@ -23,6 +23,8 @@ import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.kakaoshare.backend.fixture.MemberFixture;
 import org.kakaoshare.backend.fixture.ProductFixture;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -43,6 +45,8 @@ public class CartServiceTest {
     private OptionRepository optionRepository;
     @Mock
     private OptionDetailRepository optionDetailRepository;
+    @Captor
+    private ArgumentCaptor<Cart> cartCaptor;
 
     @InjectMocks
     private CartService cartService;
@@ -53,9 +57,13 @@ public class CartServiceTest {
         Long productId = 1L;
         Member member = MemberFixture.KAKAO.생성();
         Product product = ProductFixture.TEST_PRODUCT.생성(1L);
+        Option defaultOption = new Option(1L, "Default Option", product);
+        OptionDetail defaultOptionDetail = new OptionDetail(1L, "Default Detail", 10, 1000L, null, defaultOption);
 
         when(memberRepository.findMemberByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(optionRepository.findByProductId(productId)).thenReturn(List.of(defaultOption)); // 기본 옵션 설정
+        when(optionDetailRepository.findByOptionId(defaultOption.getOptionsId())).thenReturn(List.of(defaultOptionDetail)); // 기본 옵션 상세 설정
         when(cartRepository.findByMemberIdAndProductId(member.getMemberId(), productId)).thenReturn(Optional.empty());
 
         CartRegisterRequest request = CartRegisterRequest.builder()
@@ -66,9 +74,14 @@ public class CartServiceTest {
 
         CartRegisterResponse response = cartService.registerItem(request, member.getProviderId());
 
+        verify(cartRepository).save(cartCaptor.capture());
+        Cart savedCart = cartCaptor.getValue();
+
+        assertNotNull(savedCart.getOption());
+        assertNotNull(savedCart.getOptionDetail());
         assertNotNull(response);
-        verify(cartRepository).save(any(Cart.class));
     }
+
 
     @Test
     @DisplayName("카트 아이템 등록 - 옵션 선택 포함")
@@ -78,13 +91,13 @@ public class CartServiceTest {
         Long optionDetailId = 1L;
         Member member = MemberFixture.KAKAO.생성();
         Product product = ProductFixture.TEST_PRODUCT.생성(1L);
-        Option mockOption = Mockito.mock(Option.class);
-        OptionDetail mockOptionDetail = Mockito.mock(OptionDetail.class);
+        Option defaultOption = new Option(1L, "Default Option", product);
+        OptionDetail defaultOptionDetail = new OptionDetail(1L, "Default Detail", 10, 1000L, null, defaultOption);
 
         when(memberRepository.findMemberByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(optionRepository.findById(optionId)).thenReturn(Optional.of(mockOption));
-        when(optionDetailRepository.findById(optionDetailId)).thenReturn(Optional.of(mockOptionDetail));
+        when(optionRepository.findById(optionId)).thenReturn(Optional.of(defaultOption));
+        when(optionDetailRepository.findById(optionDetailId)).thenReturn(Optional.of(defaultOptionDetail));
         when(cartRepository.findByMemberIdAndProductId(member.getMemberId(), productId)).thenReturn(Optional.empty());
 
         CartRegisterRequest request = CartRegisterRequest.builder()
@@ -95,8 +108,12 @@ public class CartServiceTest {
 
         CartRegisterResponse response = cartService.registerItem(request, member.getProviderId());
 
+        verify(cartRepository).save(cartCaptor.capture());
+        Cart savedCart = cartCaptor.getValue();
+
+        assertNotNull(savedCart.getOption());
+        assertNotNull(savedCart.getOptionDetail());
         assertNotNull(response);
-        verify(cartRepository).save(any(Cart.class));
     }
 
     @Test
