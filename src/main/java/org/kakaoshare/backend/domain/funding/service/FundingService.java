@@ -58,7 +58,7 @@ public class FundingService {
 
         List<FundingResponse> existingFundings = fundingRepository.findFundingListByMemberId(member.getMemberId());
         for (FundingResponse funding : existingFundings) {
-            if (PROGRESS_STATUS.equals(funding.getStatus())) {
+            if (funding.getStatus().equals(PROGRESS_STATUS)) {
                 throw new FundingException(FundingErrorCode.ALREADY_REGISTERED);
             }
         }
@@ -78,7 +78,7 @@ public class FundingService {
 
     public ProgressResponse getMyFundingProgress(String providerId) {
         Member member = findMemberByProviderId(providerId);
-        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
+        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)
                 .orElse(null);
 
         if (funding == null) {
@@ -128,7 +128,7 @@ public class FundingService {
 
     public ProgressResponse checkFundingItem(FundingCheckRequest fundingCheckRequest) {
         Member member = findMemberByProviderId(fundingCheckRequest.getProviderId());
-        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
+        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)
                 .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
 
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
