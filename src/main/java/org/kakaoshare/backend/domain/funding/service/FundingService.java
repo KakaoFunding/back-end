@@ -82,7 +82,7 @@ public class FundingService {
                 .orElse(null);
 
         if (funding == null) {
-            return null;
+            return ProgressResponse.empty();
         }
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
