@@ -87,7 +87,10 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - server-network
-
+    depends_on:
+      - app1
+      - app2
+      - app3
   grafana:
     image: grafana/grafana
     container_name: grafana
