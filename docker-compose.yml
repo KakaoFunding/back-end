@@ -21,8 +21,6 @@ services:
       - app3
       - prometheus
       - grafana
-    networks:
-      - server-network
 
   app1:
     image: "yeachan05/application:latest"
@@ -34,8 +32,6 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
-    networks:
-      - server-network
 
   app2:
     image: "yeachan05/application:latest"
@@ -47,8 +43,6 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
-    networks:
-      - server-network
 
   app3:
     image: "yeachan05/application:latest"
@@ -60,8 +54,6 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
-    networks:
-      - server-network
 
   redis:
     container_name: redis
@@ -71,8 +63,6 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    networks:
-      - server-network
 
   prometheus:
     image: prom/prometheus
@@ -85,8 +75,6 @@ services:
       - "9090:9090"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    networks:
-      - server-network
 
   grafana:
     image: grafana/grafana
@@ -98,8 +86,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
       - grafana-storage:/var/lib/grafana
-    networks:
-      - server-network
 
   mysqld_exporter:
     image: quay.io/prometheus/mysqld-exporter
@@ -111,14 +97,8 @@ services:
       - "9104:9104"
     volumes:
       - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - server-network
 
 volumes:
   grafana-storage:
   prometheus-data:
   redis-data:
-
-networks:
-  server-network:
-    driver: bridge
