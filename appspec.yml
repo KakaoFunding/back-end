@@ -5,6 +5,8 @@ files:
   - source: /
     destination: /home/ec2-user/cicd
     overwrite: yes
+    ignore:
+      - /home/ec2-user/cicd/src/main/resources/application-prod.yml
 
 file_exists_behavior: OVERWRITE
 
