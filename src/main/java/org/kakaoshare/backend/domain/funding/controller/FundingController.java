@@ -51,12 +51,6 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/funding/{fundingId}")
-    public ResponseEntity<?> getFundingProgress(@PathVariable Long fundingId, @LoggedInMember String providerId) {
-        ProgressResponse response = fundingService.getFundingItemProgress(fundingId, providerId);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/funding/friendItem")
     public ResponseEntity<?> getFriendFundingProgress(@LoggedInMember String providerId, @RequestBody
     FriendFundingInquiryRequest inquiryRequest) {
