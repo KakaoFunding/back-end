@@ -85,14 +85,17 @@ public class FundingServiceTest {
         Funding funding = FundingFixture.SAMPLE_FUNDING.생성(1L, member, product);
 
         given(memberRepository.findMemberByProviderId(member.getProviderId())).willReturn(Optional.of(member));
-        given(fundingRepository.findByIdAndMemberId(funding.getFundingId(), member.getMemberId())).willReturn(Optional.of(funding));
+        given(fundingRepository.findByIdAndMemberId(funding.getFundingId(), member.getMemberId())).willReturn(
+                Optional.of(funding));
 
-        ProgressResponse response = fundingService.getFundingItemProgress(funding.getFundingId(), member.getProviderId());
+        ProgressResponse response = fundingService.getFundingItemProgress(funding.getFundingId(),
+                member.getProviderId());
 
         assertThat(response).isNotNull();
 
         verify(memberRepository).findMemberByProviderId(member.getProviderId());
     }
+
     @Test
     @DisplayName("나의 등록된 펀딩아이템 조회")
     public void testGetMyFundingProgress_WithValidData() {
@@ -102,8 +105,10 @@ public class FundingServiceTest {
         Funding funding = FundingFixture.SAMPLE_FUNDING.생성(1L, member, product);
 
         when(memberRepository.findMemberByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
-        when(fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)).thenReturn(Optional.of(funding));
-        when(fundingRepository.findByIdAndMemberId(funding.getFundingId(),member.getMemberId())).thenReturn(Optional.of(funding));
+        when(fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)).thenReturn(
+                Optional.of(funding));
+        when(fundingRepository.findByIdAndMemberId(funding.getFundingId(), member.getMemberId())).thenReturn(
+                Optional.of(funding));
 
         ProgressResponse response = fundingService.getMyFundingProgress(member.getProviderId());
         assertNotNull(response, "ProgressResponse should not be null");
@@ -139,5 +144,37 @@ public class FundingServiceTest {
         assertThat(response.getItems()).hasSize(3);
         verify(fundingRepository).findFundingByMemberIdAndStatusWithPage(member.getMemberId(), null, pageable);
     }
+
+    @Test
+    @DisplayName("내가 등록했던 펀딩아이템 목록 조회 - CANCEL 상태만")
+    public void testGetMyFilteredFundingItemsForCancelStatus() {
+        Pageable pageable = PageRequest.of(0, 5);
+        Brand brand = BrandFixture.EDIYA.생성(1L);
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L, brand);
+        Funding funding1 = FundingFixture.SAMPLE_FUNDING.생성(1L, member, product, FundingStatus.CANCEL);
+        Funding funding2 = FundingFixture.SAMPLE_FUNDING.생성(2L, member, product, FundingStatus.COMPLETE);
+        Funding funding3 = FundingFixture.SAMPLE_FUNDING.생성(3L, member, product, FundingStatus.PROGRESS);
+
+        List<FundingResponse> fundingResponses = Arrays.asList(
+                FundingResponse.from(funding1),
+                FundingResponse.from(funding2),
+                FundingResponse.from(funding3)
+        );
+        Page<FundingResponse> allFundingsPage = new PageImpl<>(fundingResponses, pageable, fundingResponses.size());
+        Page<FundingResponse> cancelFundingsPage = new PageImpl<>(List.of(FundingResponse.from(funding1)), pageable, 1);
+
+        when(memberRepository.findMemberByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
+        when(fundingRepository.findFundingByMemberIdAndStatusWithPage(
+                eq(member.getMemberId()), eq(FundingStatus.CANCEL), eq(pageable)))
+                .thenReturn(cancelFundingsPage);
+
+        PageResponse<?> response = fundingService.getMyFilteredFundingProducts(member.getProviderId(), FundingStatus.CANCEL, pageable);
+
+        assertThat(response.getItems()).hasSize(1);
+        verify(fundingRepository).findFundingByMemberIdAndStatusWithPage(member.getMemberId(), FundingStatus.CANCEL, pageable);
+    }
+
+
 }
 
