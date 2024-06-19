@@ -91,8 +91,12 @@ public class FundingService {
     public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
         Member self = findMemberByProviderId(providerId);
         Member friend = findMemberByProviderId(inquiryRequest.getFriendProviderId()); //todo 친구 검증 메소드 추가해야함
-        Funding funding = findByIdAndMemberId(inquiryRequest.getFundingId(), friend.getMemberId());
-
+        Funding funding = fundingRepository.findByMemberIdAndStatus(friend.getMemberId(), FundingStatus.PROGRESS)
+                .orElse(null);
+        
+        if (funding == null) {
+            return new ProgressResponse();
+        }
         return getFundingProgress(funding.getFundingId(), friend.getMemberId());
     }
 
