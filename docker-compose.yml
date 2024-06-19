@@ -33,7 +33,8 @@ services:
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
     environment:
-      TZ: "Asia/Seoul"
+      - TZ=Asia/Seoul
+      - spring.application.name=app1
 
   app2:
     image: "yeachan05/application:latest"
@@ -46,7 +47,8 @@ services:
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
     environment:
-      TZ: "Asia/Seoul"
+      - TZ=Asia/Seoul
+      - spring.application.name=app2
 
   app3:
     image: "yeachan05/application:latest"
@@ -59,7 +61,8 @@ services:
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
     environment:
-      TZ: "Asia/Seoul"
+      - TZ=Asia/Seoul
+      - spring.application.name=app3
 
   redis:
     container_name: redis
