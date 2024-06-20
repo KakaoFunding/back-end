@@ -1,7 +1,7 @@
 package org.kakaoshare.backend.domain.order.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryRequest;
+import org.kakaoshare.backend.domain.order.dto.inquiry.request.OrderHistoryRequest;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewRequest;
 import org.kakaoshare.backend.domain.order.service.OrderService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;
