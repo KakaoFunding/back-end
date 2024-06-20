@@ -73,7 +73,7 @@ public class FundingController {
 
     @GetMapping("/members/funding/products")
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
-                                                     @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") FundingStatus status,
+                                                     @RequestParam(name = "status", required = false) FundingStatus status,
                                                      @PageableDefault(size = FUNDING_DEFAULT_SIZE) final Pageable pageable) {
         PageResponse<?> response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
         return ResponseEntity.ok(response);
