@@ -56,6 +56,8 @@ public class FundingService {
         Product product = findProductById(productId);
         Member member = findMemberByProviderId(providerId);
 
+        validateGoalAmount(request.goalAmount(), product.getPrice());
+
         List<FundingResponse> existingFundings = fundingRepository.findFundingListByMemberId(member.getMemberId());
         for (FundingResponse funding : existingFundings) {
             if (funding.getStatus().equals(PROGRESS_STATUS)) {
@@ -181,5 +183,13 @@ public class FundingService {
     private Funding findByIdAndMemberId(Long fundingId, Long memberId) {
         return fundingRepository.findByIdAndMemberId(fundingId, memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
+    }
+
+    private void validateGoalAmount(Long goalAmount, Long productPrice) {
+        if (!goalAmount.equals(productPrice)) {
+            if (goalAmount < 100 || goalAmount > productPrice - 100) {
+                throw new FundingException(FundingErrorCode.INVALID_GOAL_AMOUNT);
+            }
+        }
     }
 }
