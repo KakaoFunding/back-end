@@ -124,7 +124,8 @@ services:
       - /var/log:/var/log
       - ./promtail-config.yml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
-
+    environment:
+    - HOSTNAME=promtail
 volumes:
   grafana-storage:
   prometheus-data:
