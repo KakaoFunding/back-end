@@ -1,6 +1,5 @@
 server:
   http_listen_port: 9080
-  grpc_listen_port: 0
 
 positions:
   filename: /tmp/positions.yaml
@@ -16,10 +15,11 @@ scrape_configs:
         labels:
           job: varlogs
           __path__: /var/log/*log
+
   - job_name: applications
     static_configs:
       - targets:
           - localhost
         labels:
-          job: applications
+          job: applogs
           __path__: /path/to/your/application/logs/*.log
