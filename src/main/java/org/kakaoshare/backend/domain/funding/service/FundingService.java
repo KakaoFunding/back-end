@@ -58,8 +58,8 @@ public class FundingService {
 
         List<FundingResponse> existingFundings = fundingRepository.findFundingListByMemberId(member.getMemberId());
         for (FundingResponse funding : existingFundings) {
-            if (PROGRESS_STATUS.equals(funding.getStatus())) {
-                throw new IllegalStateException("There is already an active funding for this product and user.");
+            if (funding.getStatus().equals(PROGRESS_STATUS)) {
+                throw new FundingException(FundingErrorCode.ALREADY_REGISTERED);
             }
         }
 
@@ -78,18 +78,22 @@ public class FundingService {
 
     public ProgressResponse getMyFundingProgress(String providerId) {
         Member member = findMemberByProviderId(providerId);
-        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
-                .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
+        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)
+                .orElse(null);
 
+        if (funding == null) {
+            return new ProgressResponse();
+        }
         return getFundingProgress(funding.getFundingId(), member.getMemberId());
     }
+
 
     public ProgressResponse getFriendFundingProgress(String providerId, FriendFundingInquiryRequest inquiryRequest) {
         Member self = findMemberByProviderId(providerId);
         Member friend = findMemberByProviderId(inquiryRequest.getFriendProviderId()); //todo 친구 검증 메소드 추가해야함
-        Funding funding = findByIdAndMemberId(inquiryRequest.getFundingId(), friend.getMemberId());
-
-        return getFundingProgress(funding.getFundingId(), friend.getMemberId());
+        return fundingRepository.findByMemberIdAndStatus(friend.getMemberId(), FundingStatus.PROGRESS)
+                .map(funding -> getFundingProgress(funding.getFundingId(), friend.getMemberId()))
+                .orElse(new ProgressResponse());
     }
 
     public PageResponse<?> getMyFilteredFundingProducts(String providerId, FundingStatus status,
@@ -123,7 +127,7 @@ public class FundingService {
 
     public ProgressResponse checkFundingItem(FundingCheckRequest fundingCheckRequest) {
         Member member = findMemberByProviderId(fundingCheckRequest.getProviderId());
-        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), PROGRESS_STATUS)
+        Funding funding = fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)
                 .orElseThrow(() -> new FundingException(FundingErrorCode.NOT_FOUND));
 
         return getFundingProgress(funding.getFundingId(), member.getMemberId());

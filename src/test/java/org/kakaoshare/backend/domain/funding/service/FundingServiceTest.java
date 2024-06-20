@@ -8,6 +8,7 @@ import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
+import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
@@ -25,6 +26,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.*;
 
 
@@ -81,5 +84,19 @@ public class FundingServiceTest {
 
         verify(memberRepository).findMemberByProviderId(member.getProviderId());
     }
+    @Test
+    @DisplayName("나의 등록된 펀딩아이템 조회")
+    public void testGetMyFundingProgress_WithValidData() {
+        Brand brand = BrandFixture.EDIYA.생성(1L);
+        Member member = MemberFixture.KAKAO.생성();
+        Product product = ProductFixture.TEST_PRODUCT.생성(1L, brand);
+        Funding funding = FundingFixture.SAMPLE_FUNDING.생성(1L, member, product);
 
+        when(memberRepository.findMemberByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
+        when(fundingRepository.findByMemberIdAndStatus(member.getMemberId(), FundingStatus.PROGRESS)).thenReturn(Optional.of(funding));
+        when(fundingRepository.findByIdAndMemberId(funding.getFundingId(),member.getMemberId())).thenReturn(Optional.of(funding));
+
+        ProgressResponse response = fundingService.getMyFundingProgress(member.getProviderId());
+        assertNotNull(response, "ProgressResponse should not be null");
+    }
 }

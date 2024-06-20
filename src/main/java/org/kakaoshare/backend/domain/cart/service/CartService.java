@@ -35,8 +35,8 @@ public class CartService {
     public CartRegisterResponse registerItem(CartRegisterRequest request, String providerId) {
         Member member = findMemberByProviderId(providerId);
         Product product = findProductByProductId(request.getProductId());
-        Option option = getOptionById(request.getOptionId());
-        OptionDetail optionDetail = getOptionDetailById(request.getOptionDetailId());
+        Option option = resolveOption(request.getOptionId(), product);
+        OptionDetail optionDetail = resolveOptionDetail(request.getOptionDetailId(), option);
 
         Cart existingCart = cartRepository.findByMemberIdAndProductId(member.getMemberId(), product.getProductId())
                 .orElse(null);
@@ -133,6 +133,23 @@ public class CartService {
             return null;
         }
     }
+    private Option resolveOption(Long optionId, Product product) {
+        if (optionId == null) {
+            List<Option> options = optionRepository.findByProductId(product.getProductId());
+            return options.isEmpty() ? null : options.get(0);
+        }
+        return getOptionById(optionId);
+    }
 
+    private OptionDetail resolveOptionDetail(Long optionDetailId, Option option) {
+        if (optionDetailId == null) {
+            if (option != null) {
+                List<OptionDetail> details = optionDetailRepository.findByOptionId(option.getOptionsId());
+                return details.isEmpty() ? null : details.get(0);
+            }
+            return null;
+        }
+        return getOptionDetailById(optionDetailId);
+    }
 
 }

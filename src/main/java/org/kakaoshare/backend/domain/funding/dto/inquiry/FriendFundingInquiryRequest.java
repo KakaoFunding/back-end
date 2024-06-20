@@ -6,6 +6,5 @@ import lombok.Getter;
 @Getter
 @Builder
 public class FriendFundingInquiryRequest {
-    private final Long fundingId;
     private final String friendProviderId;
 }
