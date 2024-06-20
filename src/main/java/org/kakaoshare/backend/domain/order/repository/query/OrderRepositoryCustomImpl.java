@@ -185,6 +185,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 order.ordersId,
                 receipt.orderNumber,
                 receiver.name,
+                receiver.providerId,
                 getProductDto(),
                 receipt.quantity,
                 order.createdAt,
