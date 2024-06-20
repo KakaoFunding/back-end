@@ -25,15 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.kakaoshare.backend.domain.order.exception.OrderErrorCode.DATE_NOT_NULL;
-import static org.kakaoshare.backend.domain.order.exception.OrderErrorCode.INVALID_DATE;
-import static org.kakaoshare.backend.domain.order.exception.OrderErrorCode.INVALID_DATE_RANGE;
 
 @RequiredArgsConstructor
 @Service
@@ -106,20 +100,6 @@ public class OrderService {
         return orderPreviewRequests.stream()
                 .map(OrderPreviewRequest::productId)
                 .toList();
-    }
-
-    private void validateDateRange(final LocalDate startDate, final LocalDate endDate) {
-        if (startDate == null && endDate == null) {
-            throw new OrderException(DATE_NOT_NULL);
-        }
-
-        if (endDate.isBefore(startDate)) {
-            throw new OrderException(INVALID_DATE);
-        }
-
-        if (ChronoUnit.YEARS.between(endDate, startDate) >= MAX_DATE_PERIOD) {
-            throw new OrderException(INVALID_DATE_RANGE);
-        }
     }
 
     private OrderHistoryDetailDto findOrderHistoryDetailByOrderId(final Long orderId) {
