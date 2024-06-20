@@ -69,7 +69,19 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
     @Override
     public Page<FundingResponse> findFundingByMemberIdAndStatusWithPage(Long memberId, FundingStatus status,
                                                                         Pageable pageable) {
-        JPAQuery<FundingResponse> contentQuery = queryFactory
+        JPAQuery<FundingResponse> contentQuery = createFundingQuery(memberId, status, pageable);
+        JPAQuery<Long> countQuery = createCountQuery(memberId, status);
+
+        return RepositoryUtils.toPage(pageable, contentQuery, countQuery);
+    }
+
+    private JPAQuery<FundingResponse> createFundingQuery(Long memberId, FundingStatus status, Pageable pageable) {
+        BooleanExpression condition = QFunding.funding.member.memberId.eq(memberId);
+        if (status != null) {
+            condition = condition.and(QFunding.funding.status.eq(status));
+        }
+
+        return queryFactory
                 .select(Projections.constructor(
                         FundingResponse.class,
                         QFunding.funding.fundingId,
@@ -86,19 +98,22 @@ public class FundingRepositoryCustomImpl implements FundingRepositoryCustom, Sor
                 .from(QFunding.funding)
                 .leftJoin(QFunding.funding.product)
                 .on(QFunding.funding.product.productId.eq(QProduct.product.productId))
-                .where(QFunding.funding.member.memberId.eq(memberId)
-                        .and(QFunding.funding.status.eq(status)))
+                .where(condition)
                 .orderBy(SortUtil.from(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
+    }
 
-        JPAQuery<Long> countQuery = queryFactory
+    private JPAQuery<Long> createCountQuery(Long memberId, FundingStatus status) {
+        BooleanExpression condition = QFunding.funding.member.memberId.eq(memberId);
+        if (status != null) {
+            condition = condition.and(QFunding.funding.status.eq(status));
+        }
+
+        return queryFactory
                 .select(QFunding.funding.count())
                 .from(QFunding.funding)
-                .where(QFunding.funding.member.memberId.eq(memberId)
-                        .and(QFunding.funding.status.eq(status)));
-
-        return RepositoryUtils.toPage(pageable, contentQuery, countQuery);
+                .where(condition);
     }
 
 

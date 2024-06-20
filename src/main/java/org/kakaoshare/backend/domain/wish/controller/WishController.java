@@ -39,7 +39,7 @@ public class WishController {
         return ResponseEntity.ok().build();
     }
     
-    @GetMapping("/friends")
+    @PostMapping("/friends")
     public ResponseEntity<?> getFriendsWishList(@LoggedInMember String providerId,
                                                 @RequestBody FriendsWishRequest friendsWishRequest) {
         List<FriendWishDetail> membersWishList = wishService.getFriendsWishList(providerId,friendsWishRequest);

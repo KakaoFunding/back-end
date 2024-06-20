@@ -51,13 +51,7 @@ public class FundingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/funding/{fundingId}")
-    public ResponseEntity<?> getFundingProgress(@PathVariable Long fundingId, @LoggedInMember String providerId) {
-        ProgressResponse response = fundingService.getFundingItemProgress(fundingId, providerId);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/funding/friendItem")
+    @PostMapping("/funding/friendItem")
     public ResponseEntity<?> getFriendFundingProgress(@LoggedInMember String providerId, @RequestBody
     FriendFundingInquiryRequest inquiryRequest) {
         ProgressResponse response = fundingService.getFriendFundingProgress(providerId, inquiryRequest);
@@ -79,7 +73,7 @@ public class FundingController {
 
     @GetMapping("/members/funding/products")
     public ResponseEntity<?> getMyAllFundingProducts(@LoggedInMember String providerId,
-                                                     @RequestParam(name = "status", required = false, defaultValue = "PROGRESS") FundingStatus status,
+                                                     @RequestParam(name = "status", required = false) FundingStatus status,
                                                      @PageableDefault(size = FUNDING_DEFAULT_SIZE) final Pageable pageable) {
         PageResponse<?> response = fundingService.getMyFilteredFundingProducts(providerId, status, pageable);
         return ResponseEntity.ok(response);

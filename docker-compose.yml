@@ -19,6 +19,10 @@ services:
       - app1
       - app2
       - app3
+      - prometheus
+      - grafana
+    networks:
+      - server-network
 
   app1:
     image: "yeachan05/application:latest"
@@ -30,6 +34,8 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
+    networks:
+      - server-network
 
   app2:
     image: "yeachan05/application:latest"
@@ -41,6 +47,8 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
+    networks:
+      - server-network
 
   app3:
     image: "yeachan05/application:latest"
@@ -52,6 +60,8 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
+    networks:
+      - server-network
 
   redis:
     container_name: redis
@@ -59,14 +69,24 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - server-network
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     restart: always
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - server-network
 
   grafana:
     image: grafana/grafana
@@ -78,14 +98,27 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
       - grafana-storage:/var/lib/grafana
+    networks:
+      - server-network
 
   mysqld_exporter:
-    image: prom/mysqld_exporter
-    restart: always
-    environment:
-      - DATA_SOURCE_NAME=${MYSQL_USERNAME}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOST})/
+    image: quay.io/prometheus/mysqld-exporter
+    container_name: mysqld-exporter
+    restart: unless-stopped
+    command:
+      - "--config.my-cnf=/etc/mysql/my.cnf"
     ports:
       - "9104:9104"
+    volumes:
+      - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - server-network
 
 volumes:
   grafana-storage:
+  prometheus-data:
+  redis-data:
+
+networks:
+  server-network:
+    driver: bridge
