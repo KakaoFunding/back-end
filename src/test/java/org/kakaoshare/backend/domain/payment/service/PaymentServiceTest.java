@@ -217,7 +217,7 @@ class PaymentServiceTest {
                 new OrderSummaryResponse(cakeSummaryResponse, cakeStockQuantity, Collections.emptyList()),
                 new OrderSummaryResponse(coffeeSummaryResponse, coffeeStockQuantity, Collections.emptyList())
         );
-        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.from(member);
+        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.of(member, providerId);
         final PaymentGiftSuccessResponse expect = new PaymentGiftSuccessResponse(paymentSuccessReceiver, orderSummaries);
         final PaymentGiftSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
         assertThat(actual).isEqualTo(expect);   // TODO: 3/16/24 equals() 및 hashCode()가 재정의되있으므로 isEqualTo() 사용
@@ -279,7 +279,7 @@ class PaymentServiceTest {
                 new OrderSummaryResponse(cakeSummaryResponse, cakeStockQuantity, Collections.emptyList()),
                 new OrderSummaryResponse(coffeeSummaryResponse, coffeeStockQuantity, Collections.emptyList())
         );
-        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.from(receiverMember);
+        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.of(receiverMember, providerId);
         final PaymentGiftSuccessResponse expect = new PaymentGiftSuccessResponse(paymentSuccessReceiver, orderSummaries);
         final PaymentGiftSuccessResponse actual = paymentService.approve(providerId, paymentSuccessRequest);
         assertThat(actual).isEqualTo(expect);   // TODO: 3/16/24 equals() 및 hashCode()가 재정의되있으므로 isEqualTo() 사용
@@ -365,7 +365,7 @@ class PaymentServiceTest {
         doReturn(Optional.of(contributor)).when(memberRepository).findMemberByProviderId(providerId);
 
         final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(cake);
-        final PaymentFundingSuccessResponse expect = new PaymentFundingSuccessResponse(PaymentSuccessReceiver.from(creator), productSummaryResponse, (long) attributeAmount);
+        final PaymentFundingSuccessResponse expect = new PaymentFundingSuccessResponse(PaymentSuccessReceiver.of(creator, providerId), productSummaryResponse, (long) attributeAmount);
         final PaymentFundingSuccessResponse actual = paymentService.approveFunding(providerId, paymentSuccessRequest);
 
         assertThat(actual).isEqualTo(expect);

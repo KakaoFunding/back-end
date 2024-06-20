@@ -144,6 +144,8 @@ public class PaymentService {
     public PaymentGiftSuccessResponse approve(final String providerId,
                                               final PaymentSuccessRequest paymentSuccessRequest) {
         final KakaoPayApproveResponse approveResponse = webClientService.approve(providerId, paymentSuccessRequest);
+        // approveResponse.partner_user_id() == providerId 검증 필요
+
         final Payment payment = saveAndGetPayment(approveResponse);
         final OrderDetails orderDetails = redisUtils.remove(approveResponse.partner_order_id(), OrderDetails.class);
 
@@ -156,7 +158,7 @@ public class PaymentService {
         saveOrders(payment, receipts);
 
         final List<OrderSummaryResponse> orderSummaries = getOrderSummaries(orderDetails);
-        return new PaymentGiftSuccessResponse(PaymentSuccessReceiver.from(receiver), orderSummaries);
+        return new PaymentGiftSuccessResponse(PaymentSuccessReceiver.of(receiver, providerId), orderSummaries);
     }
 
     @Transactional
@@ -182,7 +184,7 @@ public class PaymentService {
 
         final Product product = funding.getProduct();
         final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(product);
-        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.from(funding.getMember());
+        final PaymentSuccessReceiver paymentSuccessReceiver = PaymentSuccessReceiver.of(funding.getMember(), providerId);
         return new PaymentFundingSuccessResponse(paymentSuccessReceiver, productSummaryResponse, amount);
     }
 

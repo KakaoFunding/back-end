@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.order.dto.inquiry;
+package org.kakaoshare.backend.domain.order.dto.inquiry.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
