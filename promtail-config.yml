@@ -14,6 +14,7 @@ scrape_configs:
           - localhost
         labels:
           job: varlogs
+          host: ${HOSTNAME}
           __path__: /var/log/*log
 
   - job_name: applications
@@ -22,4 +23,5 @@ scrape_configs:
           - localhost
         labels:
           job: applogs
+          host: ${HOSTNAME}
           __path__: /path/to/your/application/logs/*.log
