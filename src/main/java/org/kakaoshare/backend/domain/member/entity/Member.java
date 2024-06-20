@@ -81,6 +81,10 @@ public class Member extends BaseTimeEntity {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public boolean equalsProviderId(final String providerId) {
+        return this.providerId.equals(providerId);
+    }
+
     @Override
     public String toString() {
         return "Member{" +
