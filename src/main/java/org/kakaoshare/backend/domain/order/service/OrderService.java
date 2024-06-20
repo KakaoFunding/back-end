@@ -5,9 +5,9 @@ import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryRequest;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
-import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailResponse;
-import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryRequest;
-import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
+import org.kakaoshare.backend.domain.order.dto.inquiry.request.OrderHistoryRequest;
+import org.kakaoshare.backend.domain.order.dto.inquiry.response.OrderHistoryDetailResponse;
+import org.kakaoshare.backend.domain.order.dto.inquiry.response.OrderHistoryResponse;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewRequest;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewResponse;
 import org.kakaoshare.backend.domain.order.exception.OrderErrorCode;
@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class OrderService {
-    private static final int MAX_DATE_PERIOD = 1;
-
     private final ProductRepository productRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final OrderRepository orderRepository;
@@ -58,7 +56,8 @@ public class OrderService {
                                   final OrderHistoryRequest orderHistoryRequest,
                                   final Pageable pageable) {
         final OrderHistoryDate date = orderHistoryRequest.toDate();
-        final Page<OrderProductDto> page = orderRepository.findAllOrderProductDtoByCondition(providerId, date, pageable);
+        final Page<OrderHistoryResponse> page = orderRepository.findAllOrderProductDtoByCondition(providerId, date, pageable)
+                .map(orderProductDto -> OrderHistoryResponse.of(orderProductDto, providerId));
         return PageResponse.from(page);
     }
 
