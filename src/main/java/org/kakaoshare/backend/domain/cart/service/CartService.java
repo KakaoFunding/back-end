@@ -94,8 +94,9 @@ public class CartService {
     }
 
     public CartItemCountResponse getCartItemCount(String providerId) {
-        List<CartResponse> cartResponseList = getCartItems(providerId);
-        return CartItemCountResponse.from(cartResponseList);
+        Member member = findMemberByProviderId(providerId);
+        int count = cartRepository.countByMemberId(member.getMemberId());
+        return CartItemCountResponse.from(count);
     }
 
     @Transactional
