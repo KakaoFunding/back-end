@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.common.vo.date.exception.DateException;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryDto;
-import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryResponse;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.response.ContributedFundingHistoryResponse;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
