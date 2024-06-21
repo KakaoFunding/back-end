@@ -4,10 +4,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.kakaoshare.backend.domain.cart.dto.inquiry.CartItemCountResponse;
 import org.kakaoshare.backend.domain.cart.dto.inquiry.CartResponse;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterRequest;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterResponse;
@@ -196,4 +198,30 @@ public class CartServiceTest {
 
         verify(cartRepository).delete(cart);
     }
+
+    @Test
+    @DisplayName("장바구니 아이템 수 조회")
+    void getCartItemCount() {
+        String providerId = "provider123";
+        Member member = MemberFixture.KAKAO.생성();
+        Product product1 = ProductFixture.TEST_PRODUCT.생성(1L);
+        Product product2 = ProductFixture.TEST_PRODUCT.생성(2L);
+
+        List<Cart> carts = List.of(
+                new Cart(1L, 2, member, product1, null, null),
+                new Cart(2L, 1, member, product2, null, null)
+        );
+
+        when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
+        when(cartRepository.findByMemberId(member.getMemberId())).thenReturn(carts);
+
+        CartItemCountResponse response = cartService.getCartItemCount(providerId);
+
+        assertNotNull(response);
+        assertEquals(2, response.getItemCount());
+        verify(cartRepository).findByMemberId(member.getMemberId());
+    }
+
+
+
 }
