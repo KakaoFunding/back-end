@@ -5,13 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
 import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
-import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.gift.dto.GiftResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.repository.GiftRepository;
-import org.kakaoshare.backend.domain.member.entity.Member;
-import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
-import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,15 +37,11 @@ public class GiftService {
         return giftDescriptionResponse;
     }
 
-    public PageResponse<?> getMyGiftBox(String providerId, Pageable pageable, GiftStatus status) {
-        Member member = findMemberByProviderId(providerId);
-        Page<GiftResponse> gifts = giftRepository.findGiftsByMemberIdAndStatus(member.getMemberId(), status,
-                pageable);
-        return PageResponse.from(gifts);
-    }
-
-    private Member findMemberByProviderId(String providerId) {
-        return memberRepository.findMemberByProviderId(providerId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
+    public PageResponse<?> getMyGiftBox(final String providerId,
+                                        final GiftStatus status,
+                                        final Pageable pageable) {
+        final Page<?> page = giftRepository.findHistoryByProviderIdAndStatus(providerId, status, pageable)
+                .map(giftDto -> GiftResponse.of(giftDto, providerId));
+        return PageResponse.from(page);
     }
 }
