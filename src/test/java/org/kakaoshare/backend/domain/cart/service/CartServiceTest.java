@@ -65,7 +65,8 @@ public class CartServiceTest {
         when(memberRepository.findMemberByProviderId(member.getProviderId())).thenReturn(Optional.of(member));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(optionRepository.findByProductId(productId)).thenReturn(List.of(defaultOption)); // 기본 옵션 설정
-        when(optionDetailRepository.findByOptionId(defaultOption.getOptionsId())).thenReturn(List.of(defaultOptionDetail)); // 기본 옵션 상세 설정
+        when(optionDetailRepository.findByOptionId(defaultOption.getOptionsId())).thenReturn(
+                List.of(defaultOptionDetail)); // 기본 옵션 상세 설정
         when(cartRepository.findByMemberIdAndProductId(member.getMemberId(), productId)).thenReturn(Optional.empty());
 
         CartRegisterRequest request = CartRegisterRequest.builder()
@@ -124,7 +125,7 @@ public class CartServiceTest {
         String providerId = "provider123";
         Member member = MemberFixture.KAKAO.생성();
         Product product = ProductFixture.TEST_PRODUCT.생성(1L);
-        List<Cart> carts = List.of(new Cart(1L, 2, member, product, null, null));
+        List<Cart> carts = List.of(new Cart(1L, 2, true, member, product, null, null));
 
         when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
         when(cartRepository.findByMemberId(member.getMemberId())).thenReturn(carts);
@@ -145,7 +146,7 @@ public class CartServiceTest {
         Option option = new Option(1L, "색상", product);
         OptionDetail optionDetail = new OptionDetail(1L, "빨강", 1, 1000L, "url", option);
 
-        List<Cart> carts = List.of(new Cart(1L, 3, member, product, option, optionDetail));
+        List<Cart> carts = List.of(new Cart(1L, 3, true, member, product, option, optionDetail));
 
         when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
         when(cartRepository.findByMemberId(member.getMemberId())).thenReturn(carts);
@@ -159,6 +160,7 @@ public class CartServiceTest {
         assertEquals("빨강", responses.get(0).getOptionDetailName());
         verify(cartRepository).findByMemberId(member.getMemberId());
     }
+
     @Test
     @DisplayName("장바구니 아이템 수량 수정")
     void updateCartItem() {
@@ -168,7 +170,7 @@ public class CartServiceTest {
 
         Member member = MemberFixture.KAKAO.생성();
         Product product = ProductFixture.TEST_PRODUCT.생성(1L);
-        Cart cart = new Cart(1L, 2, member, product, null, null);
+        Cart cart = new Cart(1L, 2, true, member, product, null, null);
 
         when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
@@ -188,7 +190,7 @@ public class CartServiceTest {
 
         Member member = MemberFixture.KAKAO.생성();
         Product product = ProductFixture.TEST_PRODUCT.생성(1L);
-        Cart cart = new Cart(1L, 2, member, product, null, null);
+        Cart cart = new Cart(1L, 2, true, member, product, null, null);
 
         when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
@@ -208,8 +210,8 @@ public class CartServiceTest {
         Product product2 = ProductFixture.TEST_PRODUCT.생성(2L);
 
         List<Cart> carts = List.of(
-                new Cart(1L, 2, member, product1, null, null),
-                new Cart(2L, 1, member, product2, null, null)
+                new Cart(1L, 2, true, member, product1, null, null),
+                new Cart(2L, 1, true, member, product2, null, null)
         );
 
         when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
@@ -221,7 +223,6 @@ public class CartServiceTest {
         assertEquals(2, response.getItemCount());
         verify(cartRepository).findByMemberId(member.getMemberId());
     }
-
 
 
 }
