@@ -10,8 +10,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.common.vo.date.exception.DateException;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryDto;
-import org.kakaoshare.backend.domain.funding.dto.inquiry.response.ContributedFundingHistoryResponse;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.response.ContributedFundingHistoryResponse;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -72,21 +72,17 @@ public class FundingDetailServiceTest {
 
         final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
         final FundingHistoryDate date = contributedFundingHistoryRequest.toDate();
-        final List<ContributedFundingHistoryResponse> content = List.of(
-                new ContributedFundingHistoryResponse(
-                        getProductDto(cake),
-                        getFundingHistoryDto(1L, 1L, LocalDateTime.now().minusDays(20L), creator.getName(), status)
-                ),
-                new ContributedFundingHistoryResponse(
-                        getProductDto(coffee),
-                        getFundingHistoryDto(2L, 2L, LocalDateTime.now().minusDays(20L), creator.getName(), status)
-                )
+        final List<ContributedFundingHistoryDto> content = List.of(
+                getFundingHistoryDto(getProductDto(cake), 1L, 1L, LocalDateTime.now().minusDays(20L), providerId, creator.getName(), status),
+                getFundingHistoryDto(getProductDto(coffee), 2L, 2L, LocalDateTime.now().minusDays(20L), providerId, creator.getName(), status)
         );
-        final Page<?> page = new PageImpl<>(content, pageable, content.size());
+        final Page<ContributedFundingHistoryDto> page = new PageImpl<>(content, pageable, content.size());
         doReturn(page).when(fundingDetailRepository).findHistoryByCondition(providerId, date, status, pageable);
 
+        final Page<ContributedFundingHistoryResponse> contributedFundingHistoryResponses = page.map(historyDto -> ContributedFundingHistoryResponse.of(historyDto, providerId));
+
         final PageResponse<?> actual = fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable);
-        final PageResponse<?> expect = PageResponse.from(page);
+        final PageResponse<?> expect = PageResponse.from(contributedFundingHistoryResponses);
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
@@ -104,21 +100,17 @@ public class FundingDetailServiceTest {
 
         final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
         final FundingHistoryDate date = contributedFundingHistoryRequest.toDate();
-        final List<ContributedFundingHistoryResponse> content = List.of(
-                new ContributedFundingHistoryResponse(
-                        getProductDto(cake),
-                        getFundingHistoryDto(1L, 1L, LocalDateTime.now().minusDays(20L), creator.getName(), COMPLETE.name())
-                ),
-                new ContributedFundingHistoryResponse(
-                        getProductDto(coffee),
-                        getFundingHistoryDto(2L, 2L, LocalDateTime.now().minusDays(20L), creator.getName(), PROGRESS.name()
-                        )
-                ));
-        final Page<?> page = new PageImpl<>(content, pageable, content.size());
+        final List<ContributedFundingHistoryDto> content = List.of(
+                getFundingHistoryDto(getProductDto(cake), 1L, 1L, LocalDateTime.now().minusDays(20L), providerId, creator.getName(), COMPLETE.name()),
+                getFundingHistoryDto(getProductDto(coffee), 2L, 2L, LocalDateTime.now().minusDays(20L), providerId, creator.getName(), PROGRESS.name())
+        );
+        final Page<ContributedFundingHistoryDto> page = new PageImpl<>(content, pageable, content.size());
         doReturn(page).when(fundingDetailRepository).findHistoryByConditionWithoutStatus(providerId, date, pageable);
 
+        final Page<ContributedFundingHistoryResponse> contributedFundingHistoryResponses = page.map(historyDto -> ContributedFundingHistoryResponse.of(historyDto, providerId));
+
         final PageResponse<?> actual = fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable);
-        final PageResponse<?> expect = PageResponse.from(page);
+        final PageResponse<?> expect = PageResponse.from(contributedFundingHistoryResponses);
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
@@ -174,10 +166,13 @@ public class FundingDetailServiceTest {
         );
     }
 
-    private ContributedFundingHistoryDto getFundingHistoryDto(final Long fundingId,
-                                                             final Long fundingDetailId,
-                                                             final LocalDateTime contributedAt,
-                                                             final String creatorName, final String status) {
-        return new ContributedFundingHistoryDto(fundingId, fundingDetailId, 1000L, contributedAt, creatorName, status);
+    private ContributedFundingHistoryDto getFundingHistoryDto(final ProductDto productDto,
+                                                              final Long fundingId,
+                                                              final Long fundingDetailId,
+                                                              final LocalDateTime contributedAt,
+                                                              final String creatorName,
+                                                              final String providerId,
+                                                              final String status) {
+        return new ContributedFundingHistoryDto(productDto, fundingId, fundingDetailId, 1000L, contributedAt, providerId, creatorName, status);
     }
 }
