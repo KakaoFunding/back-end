@@ -186,10 +186,11 @@ public class FundingService {
     }
 
     private void validateGoalAmount(Long goalAmount, Long productPrice) {
-        if (!goalAmount.equals(productPrice)) {
-            if (goalAmount < 100 || goalAmount > productPrice - 100) {
-                throw new FundingException(FundingErrorCode.INVALID_GOAL_AMOUNT);
-            }
+        if (!goalAmount.equals(productPrice) && (goalAmount < 100 || goalAmount > productPrice - 100)) {
+            throw new FundingException(FundingErrorCode.INVALID_GOAL_AMOUNT);
+        }
+        if (goalAmount > productPrice){
+            throw new FundingException(FundingErrorCode.GOAL_AMOUNT_EXCEEDS_PRODUCT_PRICE);
         }
     }
 }
