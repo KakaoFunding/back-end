@@ -9,9 +9,10 @@ import org.kakaoshare.backend.common.vo.date.exception.DateException;
 import org.kakaoshare.backend.domain.option.dto.OptionSummaryResponse;
 import org.kakaoshare.backend.domain.option.repository.OptionDetailRepository;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailDto;
-import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryDetailResponse;
-import org.kakaoshare.backend.domain.order.dto.inquiry.OrderHistoryRequest;
+import org.kakaoshare.backend.domain.order.dto.inquiry.response.OrderHistoryDetailResponse;
+import org.kakaoshare.backend.domain.order.dto.inquiry.request.OrderHistoryRequest;
 import org.kakaoshare.backend.domain.order.dto.inquiry.OrderProductDto;
+import org.kakaoshare.backend.domain.order.dto.inquiry.response.OrderHistoryResponse;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewRequest;
 import org.kakaoshare.backend.domain.order.dto.preview.OrderPreviewResponse;
 import org.kakaoshare.backend.domain.order.exception.OrderException;
@@ -118,15 +119,19 @@ class OrderServiceTest {
 
         final OrderHistoryRequest orderHistoryRequest = new OrderHistoryRequest(startDate, endDate);
         final List<OrderProductDto> orderProductDtos = List.of(
-                new OrderProductDto(1L, "123", "받는이1", getProductDto(cake), 1, LocalDateTime.of(2024, 1, 1, 0, 0), COMPLETE_PAYMENT.getDescription()),
-                new OrderProductDto(2L, "456", "받는이2", getProductDto(coffee), 2, LocalDateTime.of(2024, 1, 3, 0, 0), COMPLETE_PAYMENT.getDescription())
+                new OrderProductDto(1L, "123", "받는이1", providerId, getProductDto(cake), 1, LocalDateTime.of(2024, 1, 1, 0, 0), COMPLETE_PAYMENT.getDescription()),
+                new OrderProductDto(2L, "456", "받는이2", providerId, getProductDto(coffee), 2, LocalDateTime.of(2024, 1, 3, 0, 0), COMPLETE_PAYMENT.getDescription())
         );
 
         final OrderHistoryDate date = orderHistoryRequest.toDate();
         final Page<OrderProductDto> page = new PageImpl<>(orderProductDtos, pageable, orderProductDtos.size());
         doReturn(page).when(orderRepository).findAllOrderProductDtoByCondition(providerId, date, pageable);
 
-        final PageResponse<?> expect = PageResponse.from(page);
+        final Page<OrderHistoryResponse> orderHistoryResponses = page.map(
+                orderProductDto -> OrderHistoryResponse.of(orderProductDto, providerId)
+        );
+
+        final PageResponse<?> expect = PageResponse.from(orderHistoryResponses);
         final PageResponse<?> actual = orderService.lookUp(providerId, orderHistoryRequest, pageable);
 
         assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
