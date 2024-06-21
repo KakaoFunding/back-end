@@ -215,14 +215,13 @@ public class CartServiceTest {
         );
 
         when(memberRepository.findMemberByProviderId(providerId)).thenReturn(Optional.of(member));
-        when(cartRepository.findByMemberId(member.getMemberId())).thenReturn(carts);
+        when(cartRepository.countByMemberId(member.getMemberId())).thenReturn(carts.size());
 
         CartItemCountResponse response = cartService.getCartItemCount(providerId);
 
         assertNotNull(response);
-        assertEquals(2, response.getItemCount());
-        verify(cartRepository).findByMemberId(member.getMemberId());
+        assertEquals(carts.size(), response.getCount());
+        verify(cartRepository).countByMemberId(member.getMemberId());
     }
-
 
 }
