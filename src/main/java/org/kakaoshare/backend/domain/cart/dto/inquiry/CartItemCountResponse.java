@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CartItemCountResponse {
-    private final int itemCount;
+    private final int count;
 
-    public static CartItemCountResponse from(List<CartResponse> cartResponseList) {
+    public static CartItemCountResponse from(int count) {
         return CartItemCountResponse.builder()
-                .itemCount(cartResponseList.size())
+                .count(count)
                 .build();
     }
 }
