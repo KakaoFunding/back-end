@@ -1,12 +1,13 @@
 package org.kakaoshare.backend.domain.funding.service;
 
 import com.querydsl.core.util.StringUtils;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 import org.kakaoshare.backend.domain.friend.service.KakaoFriendService;
-import org.kakaoshare.backend.domain.funding.dto.inquiry.response.FundingContributorResponse;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryDto;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.response.ContributedFundingHistoryResponse;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.response.FundingContributorResponse;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +32,12 @@ public class FundingDetailService {
                                   final Pageable pageable) {
         final String status = contributedFundingHistoryRequest.getStatus();
         final FundingHistoryDate date = contributedFundingHistoryRequest.toDate();
-        final Page<?> page = getFundingDetailHistoryResponse(providerId, date, status, pageable);
+        final Page<?> page = getFundingDetailHistoryDto(providerId, date, status, pageable)
+                .map(historyDto -> ContributedFundingHistoryResponse.of(historyDto, providerId));
         return PageResponse.from(page);
     }
 
-    private Page<?> getFundingDetailHistoryResponse(final String providerId, final FundingHistoryDate date, final String status, final Pageable pageable) {
+    private Page<ContributedFundingHistoryDto> getFundingDetailHistoryDto(final String providerId, final FundingHistoryDate date, final String status, final Pageable pageable) {
         if (StringUtils.isNullOrEmpty(status)) {
             return fundingDetailRepository.findHistoryByConditionWithoutStatus(providerId, date, pageable);
         }
