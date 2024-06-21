@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.gift.dto;
+package org.kakaoshare.backend.domain.gift.dto.inquiry.history;
 
 import com.querydsl.core.annotations.QueryProjection;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;

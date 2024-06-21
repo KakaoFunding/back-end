@@ -2,8 +2,8 @@ package org.kakaoshare.backend.domain.gift.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
-import org.kakaoshare.backend.domain.gift.dto.GiftDescriptionResponse;
-import org.kakaoshare.backend.domain.gift.dto.GiftDetailResponse;
+import org.kakaoshare.backend.domain.gift.dto.inquiry.detail.response.GiftDescriptionResponse;
+import org.kakaoshare.backend.domain.gift.dto.inquiry.detail.response.GiftDetailResponse;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.service.GiftService;
 import org.kakaoshare.backend.jwt.util.LoggedInMember;

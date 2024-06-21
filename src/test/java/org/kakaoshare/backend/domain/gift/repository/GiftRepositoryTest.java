@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.kakaoshare.backend.common.RepositoryTest;
-import org.kakaoshare.backend.domain.gift.dto.GiftDto;
+import org.kakaoshare.backend.domain.gift.dto.inquiry.history.GiftDto;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
