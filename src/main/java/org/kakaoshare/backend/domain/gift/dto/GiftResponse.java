@@ -1,10 +1,10 @@
 package org.kakaoshare.backend.domain.gift.dto;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.kakaoshare.backend.domain.gift.entity.Gift;
+
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -16,17 +16,20 @@ public class GiftResponse {
     private final String productName;
     private final String productThumbnail;
     private final String brandName;
+    private final Boolean self;
     private final LocalDateTime receivedAt;
 
-    public static GiftResponse from(Gift gift){
-        return GiftResponse.builder()
-                .giftId(gift.getGiftId())
-                .expiredAt(gift.getExpiredAt())
-                .senderName(gift.getReceipt().getRecipient().getName())
-                .productName(gift.getReceipt().getProduct().getName())
-                .brandName(gift.getReceipt().getProduct().getBrandName())
-                .productThumbnail(gift.getReceipt().getProduct().getPhoto())
-                .receivedAt(gift.getCreatedAt())
-                .build();
+    public static GiftResponse of(final GiftDto giftDto,
+                                  final String providerId) {
+        return new GiftResponse(
+                giftDto.giftId(),
+                giftDto.expiredAt(),
+                giftDto.senderName(),
+                giftDto.productDto().getName(),
+                giftDto.productDto().getPhoto(),
+                giftDto.productDto().getBrandName(),
+                giftDto.senderProviderId().equals(providerId),
+                giftDto.createdAt()
+        );
     }
 }
