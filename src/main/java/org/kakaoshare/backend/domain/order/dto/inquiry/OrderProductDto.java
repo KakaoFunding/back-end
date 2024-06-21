@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public record OrderProductDto(Long id,
                               String orderNumber,
                               String receiverName,
+                              String receiverProviderId,
                               ProductDto product,
                               Integer quantity,
                               LocalDateTime orderDate,
