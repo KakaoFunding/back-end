@@ -109,10 +109,12 @@ public class FundingDetailRepositoryCustomImpl implements FundingDetailRepositor
 
     private QContributedFundingHistoryDto getContributedFundingHistoryDto() {
         return new QContributedFundingHistoryDto(
+                getProductDto(),
                 funding.fundingId,
                 fundingDetail.fundingDetailId,
                 fundingDetail.amount,
                 fundingDetail.createdAt,
+                member.providerId,
                 member.name,
                 fundingDetail.status.stringValue()
         );
