@@ -60,7 +60,7 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/clear")
+    @DeleteMapping()
     public ResponseEntity<CartClearResponse> clearCart(@LoggedInMember String providerId) {
         CartClearResponse response = cartService.clearCartItems(providerId);
         return ResponseEntity.ok(response);
