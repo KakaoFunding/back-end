@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.cart.dto.CartIdResponse;
 import org.kakaoshare.backend.domain.cart.dto.delete.CartClearResponse;
 import org.kakaoshare.backend.domain.cart.dto.delete.CartDeleteResponse;
+import org.kakaoshare.backend.domain.cart.dto.inquiry.CartItemCountResponse;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterRequest;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.dto.inquiry.CartResponse;
@@ -89,6 +90,11 @@ public class CartService {
         return carts.stream()
                 .map(CartResponse::from)
                 .toList();
+    }
+
+    public CartItemCountResponse getCartItemCount(String providerId) {
+        List<CartResponse> cartResponseList = getCartItems(providerId);
+        return CartItemCountResponse.from(cartResponseList);
     }
 
     @Transactional
