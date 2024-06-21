@@ -52,6 +52,7 @@ public class CartService {
                     .option(option)
                     .optionDetail(optionDetail)
                     .itemCount(request.getItemCount())
+                    .isSelected(true)
                     .build();
             cartRepository.save(newCart);
             return CartIdResponse.from(newCart, CartRegisterResponse.class);
