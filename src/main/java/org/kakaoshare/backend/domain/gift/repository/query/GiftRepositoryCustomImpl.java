@@ -90,7 +90,7 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                 .leftJoin(gift.receipt, receipt)
                 .leftJoin(receipt.product, product)
                 .where(gift.status.eq(status)
-                        .and(receipt.recipient.memberId.eq(memberId)))
+                        .and(receipt.receiver.memberId.eq(memberId)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
 
@@ -98,8 +98,9 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                 .select(gift.count())
                 .from(gift)
                 .where(gift.status.eq(status)
-                        .and(receipt.recipient.memberId.eq(memberId)));
+                        .and(receipt.receiver.memberId.eq(memberId)));
 
         return toPage(pageable, contentQuery, countQuery);
     }
+
 }
