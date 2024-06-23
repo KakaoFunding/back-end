@@ -98,8 +98,9 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                 .select(gift.count())
                 .from(gift)
                 .where(gift.status.eq(status)
-                        .and(receipt.recipient.memberId.eq(memberId)));
+                        .and(receipt.receiver.memberId.eq(memberId)));
 
         return toPage(pageable, contentQuery, countQuery);
     }
+
 }
