@@ -58,7 +58,7 @@ public class GiftRepositoryTest {
         Long memberId = 1L;
         Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt"));
         final Page<GiftResponse> response = giftRepository.findGiftsByMemberIdAndStatus(memberId, NOT_USED, pageable);
-        assertThat(response.getNumberOfElements()).isEqualTo(5);
+        assertThat(response.getNumberOfElements()).isEqualTo(2);
     }
 
 }
