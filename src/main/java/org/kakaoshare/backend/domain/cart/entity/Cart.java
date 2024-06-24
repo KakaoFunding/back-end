@@ -79,4 +79,9 @@ public class Cart extends BaseTimeEntity {
                 ", isSelected=" + isSelected +
                 '}';
     }
+
+    public void changeIsSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
+
 }
