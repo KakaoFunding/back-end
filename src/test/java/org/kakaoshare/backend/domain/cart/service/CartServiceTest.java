@@ -224,4 +224,18 @@ public class CartServiceTest {
         verify(cartRepository).countByMemberId(member.getMemberId());
     }
 
+    @Test
+    @DisplayName("장바구니 아이템 선택 상태 업데이트")
+    void updateCartSelectionTest() {
+        Long cartId = 1L;
+        boolean newSelectionStatus = false;
+        Cart cart = new Cart(1L, 2, true, null, null, null, null);
+
+        when(cartRepository.findById(cartId)).thenReturn(Optional.of(cart));
+
+        cartService.updateCartSelection(cartId, newSelectionStatus);
+
+        verify(cartRepository).save(cart);
+        assertFalse(cart.isSelected());
+    }
 }
