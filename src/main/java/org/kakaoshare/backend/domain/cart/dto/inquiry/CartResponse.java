@@ -1,11 +1,13 @@
 package org.kakaoshare.backend.domain.cart.dto.inquiry;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class CartResponse {
     private Long cartId;
     private Long productId;

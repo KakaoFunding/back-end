@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.cart.dto.CartIdResponse;
 import org.kakaoshare.backend.domain.cart.dto.delete.CartClearResponse;
 import org.kakaoshare.backend.domain.cart.dto.delete.CartDeleteResponse;
+import org.kakaoshare.backend.domain.cart.dto.inquiry.CartItemCountResponse;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterRequest;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.dto.inquiry.CartResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
+import org.kakaoshare.backend.domain.cart.exception.CartErrorCode;
+import org.kakaoshare.backend.domain.cart.exception.CartException;
 import org.kakaoshare.backend.domain.cart.repository.CartRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
@@ -51,6 +54,7 @@ public class CartService {
                     .option(option)
                     .optionDetail(optionDetail)
                     .itemCount(request.getItemCount())
+                    .isSelected(true)
                     .build();
             cartRepository.save(newCart);
             return CartIdResponse.from(newCart, CartRegisterResponse.class);
@@ -89,6 +93,22 @@ public class CartService {
         return carts.stream()
                 .map(CartResponse::from)
                 .toList();
+    }
+
+    public CartItemCountResponse getCartItemCount(String providerId) {
+        Member member = findMemberByProviderId(providerId);
+        int count = cartRepository.countByMemberId(member.getMemberId());
+        return CartItemCountResponse.from(count);
+    }
+
+    @Transactional
+    public CartRegisterResponse updateCartSelection(Long cartId, boolean isSelected) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new CartException(CartErrorCode.CART_NOT_FOUND));
+        cart.changeIsSelected(isSelected);
+        cartRepository.save(cart);
+
+        return CartIdResponse.from(cart, CartRegisterResponse.class);
     }
 
     @Transactional
@@ -133,6 +153,7 @@ public class CartService {
             return null;
         }
     }
+
     private Option resolveOption(Long optionId, Product product) {
         if (optionId == null) {
             List<Option> options = optionRepository.findByProductId(product.getProductId());
