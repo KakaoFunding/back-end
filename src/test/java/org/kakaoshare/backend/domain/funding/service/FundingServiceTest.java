@@ -13,6 +13,7 @@ import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingStatus;
+import org.kakaoshare.backend.domain.funding.exception.FundingException;
 import org.kakaoshare.backend.domain.funding.repository.FundingRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
@@ -35,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.*;
@@ -60,7 +62,7 @@ public class FundingServiceTest {
     void registerFundingItem_Success() {
         Long productId = 1L;
         String providerId = "provider123";
-        RegisterRequest request = new RegisterRequest(1000L, LocalDate.now().plusDays(30));
+        RegisterRequest request = new RegisterRequest(999L, LocalDate.now().plusDays(30));
 
         Product product = ProductFixture.TEST_PRODUCT.생성();
         Member member = MemberFixture.KAKAO.생성();
@@ -74,6 +76,25 @@ public class FundingServiceTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(funding.getFundingId());
+    }
+
+    @Test
+    @DisplayName("펀딩 아이템 등록 실패 - 금액 유효성 검증 실패")
+    void registerFundingItem_Fail() {
+        Long productId = 1L;
+        String providerId = "provider123";
+        RegisterRequest request = new RegisterRequest(900L , LocalDate.now().plusDays(30));
+
+        Product product = ProductFixture.TEST_PRODUCT.생성();
+        Member member = MemberFixture.KAKAO.생성();
+
+        given(productRepository.findById(productId)).willReturn(Optional.of(product));
+        given(memberRepository.findMemberByProviderId(providerId)).willReturn(Optional.of(member));
+
+        assertThatThrownBy(() -> fundingService.registerFundingItem(productId, providerId, request))
+                .isInstanceOf(FundingException.class);
+
+        verify(fundingRepository, never()).save(any(Funding.class));
     }
 
     @Test
