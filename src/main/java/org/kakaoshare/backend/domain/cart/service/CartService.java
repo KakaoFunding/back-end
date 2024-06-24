@@ -10,6 +10,8 @@ import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterRequest;
 import org.kakaoshare.backend.domain.cart.dto.register.CartRegisterResponse;
 import org.kakaoshare.backend.domain.cart.dto.inquiry.CartResponse;
 import org.kakaoshare.backend.domain.cart.entity.Cart;
+import org.kakaoshare.backend.domain.cart.exception.CartErrorCode;
+import org.kakaoshare.backend.domain.cart.exception.CartException;
 import org.kakaoshare.backend.domain.cart.repository.CartRepository;
 import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
@@ -100,6 +102,16 @@ public class CartService {
     }
 
     @Transactional
+    public CartRegisterResponse updateCartSelection(Long cartId, boolean isSelected) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new CartException(CartErrorCode.CART_NOT_FOUND));
+        cart.changeIsSelected(isSelected);
+        cartRepository.save(cart);
+
+        return CartIdResponse.from(cart, CartRegisterResponse.class);
+    }
+
+    @Transactional
     public CartClearResponse clearCartItems(String providerId) {
         Member member = findMemberByProviderId(providerId);
         cartRepository.deleteByMemberId(member.getMemberId());
@@ -141,6 +153,7 @@ public class CartService {
             return null;
         }
     }
+
     private Option resolveOption(Long optionId, Product product) {
         if (optionId == null) {
             List<Option> options = optionRepository.findByProductId(product.getProductId());
