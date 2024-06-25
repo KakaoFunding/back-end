@@ -8,8 +8,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
@@ -37,10 +36,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.kakaoshare.backend.fixture.MemberFixture.KAKAO;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class OAuthServiceTest {
@@ -136,9 +139,8 @@ class OAuthServiceTest {
         doReturn(newRefreshToken).when(refreshTokenProvider).createToken(providerId);
         doReturn(newRefreshToken).when(refreshTokenRepository).save(newRefreshToken);
 
-        final ReissueRequest reissueRequest = new ReissueRequest(refreshTokenValue);
-        final ReissueResponse actual = oAuthService.reissue(reissueRequest);
-        final ReissueResponse expect = ReissueResponse.of(accessToken, newRefreshToken);
+        final ReissueResult actual = oAuthService.reissue(refreshTokenValue);
+        final ReissueResult expect = ReissueResult.of(accessToken, newRefreshToken);
 
         assertThat(actual).isEqualTo(expect);
     }
