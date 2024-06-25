@@ -225,10 +225,17 @@ public class PaymentService {
                                     final PaymentFundingDetailCancelRequest paymentFundingCancelRequest) {
         final Long fundingDetailId = paymentFundingCancelRequest.fundingDetailId();
         final FundingDetail fundingDetail = findFundingDetailById(fundingDetailId);
+        final Long amount = paymentFundingCancelRequest.amount();
+        validateCancelAmount(fundingDetail, amount);
         validateAlreadyCanceled(fundingDetail, FundingDetail::canceled);
         validateMemberFundingDetail(providerId, fundingDetail);
-        final Long amount = paymentFundingCancelRequest.amount();
         refundFundingDetails(amount, fundingDetail);
+    }
+
+    private void validateCancelAmount(final FundingDetail fundingDetail, final Long amount) {
+        if (fundingDetail.getAmount() < amount) {
+            throw new FundingDetailException(INVALID_CANCEL_AMOUNT);
+        }
     }
 
     private Order findOrderByPaymentId(final Long paymentId) {
