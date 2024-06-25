@@ -74,6 +74,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode.INVALID_CANCEL_AMOUNT;
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ATTRIBUTE_AMOUNT;
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_STATUS;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
@@ -170,7 +171,7 @@ public class PaymentService {
         final Funding funding = findFundingById(fundingOrderDetail.fundingId());
         final Member member = findMemberByProviderId(providerId);
         final Long amount = payment.getTotalPrice();
-        saveOrReflectFundingDetail(payment, funding, member, amount);
+        saveFundingDetail(payment, funding, member);
         funding.increaseAccumulateAmount(amount);
 
         // TODO: 5/10/24 결제 후 목표 금액 달성 시
@@ -480,11 +481,8 @@ public class PaymentService {
                 .orElseThrow(() -> new FundingDetailException(FundingDetailErrorCode.NOT_FOUND));
     }
 
-    private void saveOrReflectFundingDetail(final Payment payment, final Funding funding, final Member member, final Long amount) {
-        fundingDetailRepository.findByFundingAndMember(funding, member)
-                .ifPresentOrElse(
-                        fundingDetail -> fundingDetail.increaseAmountAndRate(amount),
-                        () -> fundingDetailRepository.save(new FundingDetail(member, funding, payment))
-                );
+    private void saveFundingDetail(final Payment payment, final Funding funding, final Member member) {
+        final FundingDetail fundingDetail = new FundingDetail(member, funding, payment);
+        fundingDetailRepository.save(fundingDetail);
     }
 }
