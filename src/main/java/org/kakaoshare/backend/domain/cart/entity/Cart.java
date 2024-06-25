@@ -40,6 +40,9 @@ public class Cart extends BaseTimeEntity {
     @Column(nullable = false)
     private int itemCount;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean isSelected;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -73,6 +76,12 @@ public class Cart extends BaseTimeEntity {
                 ", product=" + product +
                 ", option=" + option +
                 ", optionDetail=" + optionDetail +
+                ", isSelected=" + isSelected +
                 '}';
     }
+
+    public void changeIsSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
+
 }

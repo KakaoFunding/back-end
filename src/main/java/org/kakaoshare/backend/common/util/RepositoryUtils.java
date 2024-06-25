@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpression;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.core.types.dsl.EnumExpression;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.SimpleExpression;
@@ -49,6 +50,15 @@ public final class RepositoryUtils {
 
     public static <T extends ComparableExpression<?>> BooleanExpression eqExpression(
             final SimpleExpression<T> simpleExpression, final T target) {
+        if (target == null) {
+            return null;
+        }
+
+        return simpleExpression.eq(target);
+    }
+
+    public static <T extends Enum<T>> BooleanExpression eqExpression(final EnumExpression<T> simpleExpression,
+                                                                     final T target) {
         if (target == null) {
             return null;
         }

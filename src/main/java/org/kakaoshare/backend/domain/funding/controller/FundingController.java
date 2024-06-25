@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.common.dto.PageResponse;
 
 import org.kakaoshare.backend.domain.funding.dto.FundingCheckRequest;
-import org.kakaoshare.backend.domain.funding.dto.inquiry.FriendFundingInquiryRequest;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.request.FriendFundingInquiryRequest;
 import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;

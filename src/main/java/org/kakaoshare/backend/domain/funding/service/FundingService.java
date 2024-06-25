@@ -8,11 +8,10 @@ import org.kakaoshare.backend.domain.funding.dto.FriendFundingItemRequest;
 
 import org.kakaoshare.backend.domain.funding.dto.FundingCheckRequest;
 import org.kakaoshare.backend.domain.funding.dto.FundingResponse;
-import org.kakaoshare.backend.domain.funding.dto.FundingSliceResponse;
 import org.kakaoshare.backend.domain.funding.dto.ProgressResponse;
 import org.kakaoshare.backend.domain.funding.dto.RegisterRequest;
 import org.kakaoshare.backend.domain.funding.dto.RegisterResponse;
-import org.kakaoshare.backend.domain.funding.dto.inquiry.FriendFundingInquiryRequest;
+import org.kakaoshare.backend.domain.funding.dto.inquiry.request.FriendFundingInquiryRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingPreviewRequest;
 import org.kakaoshare.backend.domain.funding.dto.preview.request.FundingProductDto;
 import org.kakaoshare.backend.domain.funding.dto.preview.response.FundingPreviewResponse;
@@ -26,7 +25,6 @@ import org.kakaoshare.backend.domain.member.entity.Member;
 import org.kakaoshare.backend.domain.member.exception.MemberErrorCode;
 import org.kakaoshare.backend.domain.member.exception.MemberException;
 import org.kakaoshare.backend.domain.member.repository.MemberRepository;
-import org.kakaoshare.backend.domain.member.service.oauth.OAuthWebClientService;
 import org.kakaoshare.backend.domain.product.dto.ProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.exception.ProductErrorCode;
@@ -34,12 +32,10 @@ import org.kakaoshare.backend.domain.product.exception.ProductException;
 import org.kakaoshare.backend.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -55,6 +51,8 @@ public class FundingService {
     public RegisterResponse registerFundingItem(Long productId, String providerId, RegisterRequest request) {
         Product product = findProductById(productId);
         Member member = findMemberByProviderId(providerId);
+
+        validateGoalAmount(request.goalAmount(), product.getPrice());
 
         List<FundingResponse> existingFundings = fundingRepository.findFundingListByMemberId(member.getMemberId());
         for (FundingResponse funding : existingFundings) {
@@ -181,5 +179,14 @@ public class FundingService {
     private Funding findByIdAndMemberId(Long fundingId, Long memberId) {
         return fundingRepository.findByIdAndMemberId(fundingId, memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid fundingId"));
+    }
+
+    private void validateGoalAmount(Long goalAmount, Long productPrice) {
+        if (!goalAmount.equals(productPrice) && (goalAmount < 100 || goalAmount > productPrice - 100)) {
+            throw new FundingException(FundingErrorCode.INVALID_GOAL_AMOUNT);
+        }
+        if (goalAmount > productPrice){
+            throw new FundingException(FundingErrorCode.GOAL_AMOUNT_EXCEEDS_PRODUCT_PRICE);
+        }
     }
 }
