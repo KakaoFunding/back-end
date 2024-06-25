@@ -46,6 +46,7 @@ public class SecurityConfig {
                                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                                 .requestMatchers(ACTUATOR).permitAll()
                                 .requestMatchers(METRICS).permitAll()
+                                .requestMatchers(FAVICON_URL).permitAll()
                                 .requestMatchers(API_V_1 + "oauth/login").permitAll()
                                 .requestMatchers(API_V_1 + "oauth/logout").authenticated()
                                 .requestMatchers(API_V_1 + "oauth/reissue").permitAll()
