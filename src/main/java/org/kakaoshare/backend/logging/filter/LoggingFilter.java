@@ -38,6 +38,9 @@ public class LoggingFilter extends OncePerRequestFilter {
     private static final String PARAM_DELIMITER = "&";
     private static final String KEY_VALUE_DELIMITER = "=";
 
+    private static final String METRIC_URL_PREFIX = "/actuator";
+    private static final String FAVICON_URL = "/favicon.ico";
+
     private final StopWatch apiTimer;
     private final ApiQueryCounter apiQueryCounter;
 
@@ -47,6 +50,10 @@ public class LoggingFilter extends OncePerRequestFilter {
                                     final FilterChain filterChain) throws ServletException, IOException {
         final ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
         final ContentCachingResponseWrapper cachingResponse = new ContentCachingResponseWrapper(response);
+        final String requestURI = cachingRequest.getRequestURI();
+        if (requestURI.contains(METRIC_URL_PREFIX) || requestURI.contains(FAVICON_URL)) {
+            return;
+        }
 
         apiTimer.start();
         filterChain.doFilter(cachingRequest, cachingResponse);
