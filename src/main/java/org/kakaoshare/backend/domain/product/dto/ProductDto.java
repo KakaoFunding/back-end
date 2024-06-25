@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.product.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
+import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Getter
 public class ProductDto {
@@ -20,5 +21,15 @@ public class ProductDto {
         this.photo = photo;
         this.price = price;
         this.brandName = brandName;
+    }
+
+    public static ProductDto from(final Product product) {
+        return new ProductDto(
+                product.getProductId(),
+                product.getName(),
+                product.getPhoto(),
+                product.getPrice(),
+                product.getBrandName()
+        );
     }
 }
