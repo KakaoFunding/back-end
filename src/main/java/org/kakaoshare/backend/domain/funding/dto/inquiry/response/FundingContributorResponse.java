@@ -1,8 +1,7 @@
-package org.kakaoshare.backend.domain.funding.dto.inquiry;
+package org.kakaoshare.backend.domain.funding.dto.inquiry.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.kakaoshare.backend.domain.friend.dto.response.Friend;
 
 @Getter
 @Builder

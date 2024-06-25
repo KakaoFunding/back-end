@@ -1,11 +1,7 @@
-package org.kakaoshare.backend.domain.gift.dto;
+package org.kakaoshare.backend.domain.gift.dto.inquiry.detail.response;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import org.kakaoshare.backend.domain.option.dto.OptionResponse;
-import org.kakaoshare.backend.domain.option.entity.Option;
-import org.kakaoshare.backend.domain.product.dto.DetailResponse;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
 

@@ -1,4 +1,4 @@
-package org.kakaoshare.backend.domain.gift.dto;
+package org.kakaoshare.backend.domain.gift.dto.inquiry.detail.response;
 
 import java.time.LocalDateTime;
 import lombok.Builder;
