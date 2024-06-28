@@ -2,7 +2,7 @@ package org.kakaoshare.backend.domain.member.service.oauth;
 
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResult;
@@ -42,7 +42,7 @@ public class OAuthService {
     private final OAuthWebClientService webClientService;
 
     @Transactional
-    public OAuthLoginResponse login(final OAuthLoginRequest oAuthLoginRequest) {
+    public OAuthLoginResult login(final OAuthLoginRequest oAuthLoginRequest) {
         final ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(oAuthLoginRequest.provider());
         final OAuthProfile oAuthProfile = getProfile(oAuthLoginRequest, registration);
         final UserDetails userDetails = addOrFindByProfile(oAuthProfile);
@@ -50,7 +50,7 @@ public class OAuthService {
         final RefreshToken refreshToken = refreshTokenProvider.createToken(userDetails.getUsername());
         refreshTokenRepository.save(refreshToken);
 
-        return OAuthLoginResponse.of(accessToken, refreshToken, oAuthProfile);
+        return OAuthLoginResult.of(accessToken, refreshToken, oAuthProfile);
     }
 
     @Transactional

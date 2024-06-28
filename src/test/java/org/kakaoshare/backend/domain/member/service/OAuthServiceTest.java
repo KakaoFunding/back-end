@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResult;
@@ -101,8 +101,8 @@ class OAuthServiceTest {
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
         doReturn(refreshToken).when(refreshTokenRepository).save(any());
 
-        final OAuthLoginResponse expect = OAuthLoginResponse.of(accessToken, refreshToken, oAuthProfile);
-        final OAuthLoginResponse actual = oAuthService.login(request);
+        final OAuthLoginResult expect = OAuthLoginResult.of(accessToken, refreshToken, oAuthProfile);
+        final OAuthLoginResult actual = oAuthService.login(request);
         assertThat(expect).isEqualTo(actual);
     }
 
@@ -122,8 +122,8 @@ class OAuthServiceTest {
         doReturn(refreshToken).when(refreshTokenProvider).createToken(userDetails.getUsername());
         doReturn(refreshToken).when(refreshTokenRepository).save(any());
 
-        final OAuthLoginResponse expect = OAuthLoginResponse.of(accessToken, refreshToken, oAuthProfile);
-        final OAuthLoginResponse actual = oAuthService.login(request);
+        final OAuthLoginResult expect = OAuthLoginResult.of(accessToken, refreshToken, oAuthProfile);
+        final OAuthLoginResult actual = oAuthService.login(request);
         assertThat(expect).isEqualTo(actual);
     }
 
