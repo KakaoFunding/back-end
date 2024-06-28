@@ -3,7 +3,7 @@ run-name: Running
 on:
   push:
     branches:
-      - deploy    # deploy 브런치로 푸쉬했을 때 실행
+      - deploy
   pull_request:
     branches:
       - deploy
