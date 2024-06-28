@@ -11,6 +11,7 @@ import org.kakaoshare.backend.domain.gift.entity.Gift;
 import org.kakaoshare.backend.domain.gift.entity.GiftStatus;
 import org.kakaoshare.backend.domain.gift.exception.GiftErrorCode;
 import org.kakaoshare.backend.domain.gift.exception.GiftException;
+import org.kakaoshare.backend.domain.member.entity.QMember;
 import org.kakaoshare.backend.domain.product.dto.QProductDto;
 import org.kakaoshare.backend.domain.product.entity.Product;
 import org.kakaoshare.backend.domain.product.entity.ProductThumbnail;
@@ -28,7 +29,6 @@ import static org.kakaoshare.backend.common.util.RepositoryUtils.createOrderSpec
 import static org.kakaoshare.backend.common.util.RepositoryUtils.eqExpression;
 import static org.kakaoshare.backend.common.util.RepositoryUtils.toPage;
 import static org.kakaoshare.backend.domain.gift.entity.QGift.gift;
-import static org.kakaoshare.backend.domain.member.entity.QMember.member;
 import static org.kakaoshare.backend.domain.product.entity.QProduct.product;
 import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
 
@@ -36,6 +36,9 @@ import static org.kakaoshare.backend.domain.receipt.entity.QReceipt.receipt;
 @Repository
 @RequiredArgsConstructor
 public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
+    private static final QMember receiver = new QMember("receiver");
+    private static final QMember recipient = new QMember("recipient");
+
     private final JPAQueryFactory queryFactory;
 
     @Override
@@ -89,9 +92,10 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                 .from(gift)
                 .innerJoin(gift.receipt, receipt)
                 .innerJoin(receipt.product, product)
-                .innerJoin(receipt.recipient, member)
+                .innerJoin(receipt.recipient, recipient)
+                .innerJoin(receipt.receiver, receiver)
                 .where(
-                        eqExpression(receipt.recipient.providerId, providerId),
+                        eqExpression(receiver.providerId, providerId),
                         eqExpression(gift.status, status)
                 );
     }
@@ -126,8 +130,8 @@ public class GiftRepositoryCustomImpl implements GiftRepositoryCustom {
                 gift.giftId,
                 gift.expiredAt,
                 gift.createdAt,
-                member.name,
-                member.providerId,
+                recipient.name,
+                recipient.providerId,
                 getProductDto()
         );
     }
