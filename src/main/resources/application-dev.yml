@@ -65,7 +65,7 @@ spring:
 security:
   token:
     access:
-      expire-time: 3600000
+      expire-time: 10000
     refresh:
       expire-time: 86400000
 friend:
