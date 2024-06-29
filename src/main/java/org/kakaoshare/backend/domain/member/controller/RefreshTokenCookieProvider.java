@@ -1,6 +1,7 @@
 package org.kakaoshare.backend.domain.member.controller;
 
 import org.apache.logging.log4j.util.Strings;
+import org.kakaoshare.backend.domain.member.dto.oauth.token.RefreshTokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.ResponseCookie;
@@ -20,8 +21,8 @@ public class RefreshTokenCookieProvider {
         this.expireTime = expireTime;
     }
 
-    public ResponseCookie createCookie(final String tokenValue) {
-        return createTokenCookieBuilder(tokenValue)
+    public ResponseCookie createCookie(final RefreshTokenDto refreshToken) {
+        return createTokenCookieBuilder(refreshToken.value())
                 .maxAge(expireTime)
                 .build();
     }
