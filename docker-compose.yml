@@ -62,7 +62,7 @@ services:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
     environment:
       - TZ=Asia/Seoul
-      - spring.application.name=app1
+      - spring.application.name=app3
 
   redis:
     container_name: redis
@@ -82,20 +82,18 @@ services:
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"
-    networks:
-      - monitoring
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command:
-      - --storage.tsdb.retention.time=14d
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=168h'
+
   grafana:
     image: grafana/grafana
     container_name: grafana
     restart: always
     ports:
       - "3009:3000"
-    networks:
-      - monitoring
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
@@ -109,11 +107,28 @@ services:
       - "--config.my-cnf=/etc/mysql/my.cnf"
     ports:
       - "9104:9104"
-    networks:
-      - monitoring
     volumes:
       - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
 
+#  loki:
+#    image: grafana/loki:latest
+#    container_name: loki
+#    restart: always
+#    ports:
+#      - "3100:3100"
+#    volumes:
+#      - ./loki-config.yml:/etc/loki/local-config.yaml
+#
+#  promtail:
+#    image: grafana/promtail:latest
+#    container_name: promtail
+#    restart: always
+#    volumes:
+#      - /var/log:/var/log
+#      - ./promtail-config.yml:/etc/promtail/config.yml
+#    command: -config.file=/etc/promtail/config.yml
+#    environment:
+#    - HOSTNAME=promtail
 volumes:
   grafana-storage:
   prometheus-data:
