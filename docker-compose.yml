@@ -84,9 +84,6 @@ services:
       - "9090:9090"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=168h'
 
   grafana:
     image: grafana/grafana
@@ -111,24 +108,22 @@ services:
       - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
 
 #  loki:
-#    image: grafana/loki:latest
+#    image: grafana/loki:2.3.0
 #    container_name: loki
-#    restart: always
 #    ports:
 #      - "3100:3100"
 #    volumes:
 #      - ./loki-config.yml:/etc/loki/local-config.yaml
+#    command: -config.file=/etc/loki/local-config.yaml
 #
 #  promtail:
-#    image: grafana/promtail:latest
+#    image: grafana/promtail:2.3.0
 #    container_name: promtail
-#    restart: always
 #    volumes:
 #      - /var/log:/var/log
-#      - ./promtail-config.yml:/etc/promtail/config.yml
-#    command: -config.file=/etc/promtail/config.yml
-#    environment:
-#    - HOSTNAME=promtail
+#      - ./promtail-config.yml:/etc/promtail/promtail-config.yml
+#    command: -config.file=/etc/promtail/promtail-config.yml
+
 volumes:
   grafana-storage:
   prometheus-data:
