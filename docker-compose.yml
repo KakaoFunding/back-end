@@ -21,8 +21,6 @@ services:
       - app3
       - prometheus
       - grafana
-    networks:
-      - server-network
 
   app1:
     image: "yeachan05/application:latest"
@@ -34,8 +32,9 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
-    networks:
-      - server-network
+    environment:
+      - TZ=Asia/Seoul
+      - spring.application.name=app1
 
   app2:
     image: "yeachan05/application:latest"
@@ -47,8 +46,9 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
-    networks:
-      - server-network
+    environment:
+      - TZ=Asia/Seoul
+      - spring.application.name=app2
 
   app3:
     image: "yeachan05/application:latest"
@@ -60,8 +60,9 @@ services:
       - redis
     volumes:
       - /home/ec2-user/application-prod.yml:/config/application-prod.yml
-    networks:
-      - server-network
+    environment:
+      - TZ=Asia/Seoul
+      - spring.application.name=app3
 
   redis:
     container_name: redis
@@ -71,8 +72,6 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    networks:
-      - server-network
 
   prometheus:
     image: prom/prometheus
@@ -85,8 +84,10 @@ services:
       - "9090:9090"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    networks:
-      - server-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=168h'
+      - '--storage.tsdb.path=/prometheus'
 
   grafana:
     image: grafana/grafana
@@ -98,8 +99,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
       - grafana-storage:/var/lib/grafana
-    networks:
-      - server-network
 
   mysqld_exporter:
     image: quay.io/prometheus/mysqld-exporter
@@ -111,15 +110,27 @@ services:
       - "9104:9104"
     volumes:
       - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - server-network
 
+#  loki:
+#    image: grafana/loki:latest
+#    container_name: loki
+#    restart: always
+#    ports:
+#      - "3100:3100"
+#    volumes:
+#      - ./loki-config.yml:/etc/loki/local-config.yaml
+#
+#  promtail:
+#    image: grafana/promtail:latest
+#    container_name: promtail
+#    restart: always
+#    volumes:
+#      - /var/log:/var/log
+#      - ./promtail-config.yml:/etc/promtail/config.yml
+#    command: -config.file=/etc/promtail/config.yml
+#    environment:
+#    - HOSTNAME=promtail
 volumes:
   grafana-storage:
   prometheus-data:
   redis-data:
-
-networks:
-  server-network:
-    driver: bridge
-    external: true
