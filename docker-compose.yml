@@ -84,11 +84,6 @@ services:
       - "9090:9090"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=168h'
-    networks:
-      - monitoring
 
   grafana:
     image: grafana/grafana
@@ -100,8 +95,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
       - grafana-storage:/var/lib/grafana
-    networks:
-      - monitoring
 
   mysqld_exporter:
     image: quay.io/prometheus/mysqld-exporter
@@ -113,8 +106,7 @@ services:
       - "9104:9104"
     volumes:
       - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - monitoring
+
 #  loki:
 #    image: grafana/loki:latest
 #    container_name: loki
@@ -138,7 +130,3 @@ volumes:
   grafana-storage:
   prometheus-data:
   redis-data:
-
-networks:
-  monitoring:
-    driver: bridge
