@@ -87,9 +87,9 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.retention.time=168h'
-      - '--storage.tsdb.path=/prometheus'
     networks:
       - monitoring
+
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -102,6 +102,7 @@ services:
       - grafana-storage:/var/lib/grafana
     networks:
       - monitoring
+
   mysqld_exporter:
     image: quay.io/prometheus/mysqld-exporter
     container_name: mysqld-exporter
