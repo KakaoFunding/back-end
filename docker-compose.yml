@@ -89,6 +89,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     restart: always
+    user: ec2-user
     ports:
       - "3009:3000"
     environment:
