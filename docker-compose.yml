@@ -89,12 +89,13 @@ services:
     image: grafana/grafana
     container_name: grafana
     restart: always
+    user: "$UID:$GID"
     ports:
       - "3009:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - ./grafana-data:/var/lib/grafana
 
   mysqld_exporter:
     image: quay.io/prometheus/mysqld-exporter
@@ -106,26 +107,6 @@ services:
       - "9104:9104"
     volumes:
       - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
-
-#  loki:
-#    image: grafana/loki:latest
-#    container_name: loki
-#    restart: always
-#    ports:
-#      - "3100:3100"
-#    volumes:
-#      - ./loki-config.yml:/etc/loki/local-config.yaml
-#
-#  promtail:
-#    image: grafana/promtail:latest
-#    container_name: promtail
-#    restart: always
-#    volumes:
-#      - /var/log:/var/log
-#      - ./promtail-config.yml:/etc/promtail/config.yml
-#    command: -config.file=/etc/promtail/config.yml
-#    environment:
-#    - HOSTNAME=promtail
 volumes:
   grafana-storage:
   prometheus-data:
