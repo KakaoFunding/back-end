@@ -89,7 +89,6 @@ services:
     image: grafana/grafana
     container_name: grafana
     restart: always
-    user: "$UID:$GID"
     ports:
       - "3009:3000"
     environment:
