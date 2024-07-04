@@ -50,10 +50,10 @@ public class LoggingFilter extends OncePerRequestFilter {
                                     final FilterChain filterChain) throws ServletException, IOException {
         final ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
         final ContentCachingResponseWrapper cachingResponse = new ContentCachingResponseWrapper(response);
-        final String requestURI = cachingRequest.getRequestURI();
-        if (requestURI.contains(METRIC_URL_PREFIX) || requestURI.contains(FAVICON_URL)) {
-            return;
-        }
+        // final String requestURI = cachingRequest.getRequestURI();
+        // if (requestURI.contains(METRIC_URL_PREFIX) || requestURI.contains(FAVICON_URL)) {
+        //    return;
+        // }
 
         apiTimer.start();
         filterChain.doFilter(cachingRequest, cachingResponse);
