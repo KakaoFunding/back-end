@@ -59,9 +59,9 @@ public class LoggingInterceptor extends WebRequestHandlerInterceptorAdapter {
                                 final HttpServletResponse response,
                                 final Object handler,
                                 final Exception ex) throws Exception  {
+        apiTimer.stop();
         final ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
         final ContentCachingResponseWrapper cachingResponse = new ContentCachingResponseWrapper(response);
-        apiTimer.stop();
         logRequestAndResponse(cachingRequest, cachingResponse);
         cachingResponse.copyBodyToResponse();
     }
