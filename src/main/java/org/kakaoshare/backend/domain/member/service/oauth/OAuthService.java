@@ -5,9 +5,7 @@ import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginReq
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueResponse;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
-import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfile;
 import org.kakaoshare.backend.domain.member.dto.oauth.profile.OAuthProfileFactory;
@@ -56,8 +54,7 @@ public class OAuthService {
     }
 
     @Transactional
-    public void logout(final OAuthLogoutRequest oAuthLogoutRequest) {
-        final String refreshTokenValue = oAuthLogoutRequest.refreshToken();
+    public void logout(final String refreshTokenValue) {
         final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
         refreshTokenRepository.delete(refreshToken);
     }
@@ -69,8 +66,7 @@ public class OAuthService {
     }
 
     @Transactional
-    public ReissueResponse reissue(final ReissueRequest reissueRequest) {
-        final String refreshTokenValue = reissueRequest.refreshToken();
+    public ReissueResult reissue(final String refreshTokenValue) {
         final RefreshToken refreshToken = findRefreshTokenByValue(refreshTokenValue);
         final String providerId = refreshToken.getProviderId();
         final UserDetails userDetails = findUserDetailsByProviderId(providerId);
@@ -79,7 +75,7 @@ public class OAuthService {
         refreshTokenRepository.delete(refreshToken);
         refreshTokenRepository.save(newRefreshToken);
 
-        return ReissueResponse.of(accessToken, newRefreshToken);
+        return ReissueResult.of(accessToken, newRefreshToken);
     }
 
     public OAuthReissueResponse socialReissue(final OAuthReissueRequest oAuthReissueRequest) {
