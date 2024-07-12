@@ -1,20 +1,19 @@
-package org.kakaoshare.backend.logging.filter;
+package org.kakaoshare.backend.logging.interceptor;
+
 
 import com.querydsl.core.util.StringUtils;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kakaoshare.backend.logging.util.ApiQueryCounter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.context.request.WebRequestInterceptor;
+import org.springframework.web.servlet.handler.WebRequestHandlerInterceptorAdapter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -26,8 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
-public class LoggingFilter extends OncePerRequestFilter {
+public class LoggingInterceptor extends WebRequestHandlerInterceptorAdapter {
     private static final String REQUEST_LOG_NO_BODY_FORMAT = "REQUEST :: METHOD: {}, URL: {}, HAS_AUTHORIZATION: {}";
     private static final String REQUEST_LOG_FORMAT = REQUEST_LOG_NO_BODY_FORMAT + ", BODY: {}";
     private static final String RESPONSE_LOG_NO_BODY_FORMAT = "RESPONSE :: STATUS_CODE: {}, METHOD: {}, URL: {}, QUERY_COUNT: {}, TIME_TAKEN: {}ms";
@@ -41,17 +39,29 @@ public class LoggingFilter extends OncePerRequestFilter {
     private final StopWatch apiTimer;
     private final ApiQueryCounter apiQueryCounter;
 
+    @Autowired
+    public LoggingInterceptor(final WebRequestInterceptor requestInterceptor,
+                              final StopWatch apiTimer,
+                              final ApiQueryCounter apiQueryCounter) {
+        super(requestInterceptor);
+        this.apiTimer = apiTimer;
+        this.apiQueryCounter = apiQueryCounter;
+    }
+
     @Override
-    protected void doFilterInternal(final HttpServletRequest request,
-                                    final HttpServletResponse response,
-                                    final FilterChain filterChain) throws ServletException, IOException {
+    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
+        apiTimer.start();
+        return true;
+    }
+
+    @Override
+    public void afterCompletion(final HttpServletRequest request,
+                                final HttpServletResponse response,
+                                final Object handler,
+                                final Exception ex) throws Exception  {
+        apiTimer.stop();
         final ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
         final ContentCachingResponseWrapper cachingResponse = new ContentCachingResponseWrapper(response);
-
-        apiTimer.start();
-        filterChain.doFilter(cachingRequest, cachingResponse);
-        apiTimer.stop();
-
         logRequestAndResponse(cachingRequest, cachingResponse);
         cachingResponse.copyBodyToResponse();
     }

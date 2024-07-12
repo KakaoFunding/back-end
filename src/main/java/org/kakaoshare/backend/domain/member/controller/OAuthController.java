@@ -5,12 +5,20 @@ import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueRequest;
-import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthLogoutRequest;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.logout.OAuthSocialLogoutRequest;
 import org.kakaoshare.backend.domain.member.service.oauth.OAuthService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import static org.kakaoshare.backend.domain.member.controller.RefreshTokenCookieProvider.REFRESH_TOKEN;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/oauth")
@@ -20,29 +28,40 @@ public class OAuthController {
     private final RefreshTokenCookieProvider refreshTokenCookieProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<OAuthLoginResponse> login(@RequestBody @Valid final OAuthLoginRequest oAuthLoginRequest) {
+    public ResponseEntity<?> login(@RequestBody @Valid final OAuthLoginRequest oAuthLoginRequest) {
+        final OAuthLoginResponse loginResponse = oAuthService.login(oAuthLoginRequest);
+        final ResponseCookie cookie = refreshTokenCookieProvider.createCookie(loginResponse.refreshToken());
         return ResponseEntity.ok()
-                .body(oAuthService.login(oAuthLoginRequest));
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(loginResponse);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody final OAuthLogoutRequest oAuthLogoutRequest) {
-        oAuthService.logout(oAuthLogoutRequest);
+    public ResponseEntity<?> logout(
+            @CookieValue(value = REFRESH_TOKEN, required = false) final String refreshTokenValue
+    ) {
+        oAuthService.logout(refreshTokenValue);
         return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieProvider.createLogoutCookie().toString())
                 .build();
     }
 
     @PostMapping("/social/logout")
-    public ResponseEntity<Void> socialLogout(@RequestBody final OAuthSocialLogoutRequest oAuthSocialLogoutRequest) {
+    public ResponseEntity<?> socialLogout(@RequestBody final OAuthSocialLogoutRequest oAuthSocialLogoutRequest) {
         oAuthService.socialLogout(oAuthSocialLogoutRequest);
         return ResponseEntity.noContent()
                 .build();
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@RequestBody final ReissueRequest reissueRequest) {
+    public ResponseEntity<?> reissue(
+            @CookieValue(value = REFRESH_TOKEN, required = false) final String refreshTokenValue
+    ) {
+        final ReissueResult reissueResult = oAuthService.reissue(refreshTokenValue);
+        final ResponseCookie cookie = refreshTokenCookieProvider.createCookie(reissueResult.refreshToken());
         return ResponseEntity.ok()
-                .body(oAuthService.reissue(reissueRequest));
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(ReissueResponse.from(reissueResult));
     }
 
     @PostMapping("/social/reissue")
