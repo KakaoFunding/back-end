@@ -128,7 +128,7 @@ public class Funding extends BaseTimeEntity {
     }
 
     public boolean isAttributableAmount(final int attributeAmount) {
-        return getRemainAmount() >= attributeAmount;
+        return (100 <= attributeAmount && attributeAmount <= getRemainAmount() - 100) || attributeAmount == getRemainAmount();
     }
 
     public boolean canceled() {
