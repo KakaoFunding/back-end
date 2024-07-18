@@ -71,13 +71,6 @@ public class FundingDetail extends BaseTimeEntity {
         this.rate = calculateRate(this.amount);
     }
 
-    public void increaseAmountAndRate(final Long amount) {
-        if (amount != null) {
-            this.rate += calculateRate(amount);
-            this.amount += amount;
-        }
-    }
-
     public void partialCancel(final Long amount) {
         this.rate -= calculateRate(amount);
         this.amount -= amount;

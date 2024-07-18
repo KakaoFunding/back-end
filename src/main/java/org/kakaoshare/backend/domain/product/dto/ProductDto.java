@@ -1,10 +1,14 @@
 package org.kakaoshare.backend.domain.product.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import org.kakaoshare.backend.domain.product.entity.Product;
 
 @Getter
+@EqualsAndHashCode(callSuper = false)
+@ToString
 public class ProductDto {
     protected final Long productId;
     protected final String name;

@@ -30,7 +30,11 @@ import org.kakaoshare.backend.domain.payment.dto.cancel.request.PaymentFundingDe
 import org.kakaoshare.backend.domain.payment.dto.kakaopay.Amount;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewRequest;
 import org.kakaoshare.backend.domain.payment.dto.preview.PaymentPreviewResponse;
-import org.kakaoshare.backend.domain.payment.dto.ready.request.*;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentFundingReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyItem;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyReceiver;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentGiftReadyRequest;
+import org.kakaoshare.backend.domain.payment.dto.ready.request.PaymentReadyProductDto;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.KakaoPayReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.ready.response.PaymentReadyResponse;
 import org.kakaoshare.backend.domain.payment.dto.success.request.PaymentSuccessRequest;
@@ -49,13 +53,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.kakaoshare.backend.fixture.BrandFixture.STARBUCKS;
 import static org.kakaoshare.backend.fixture.FundingFixture.SAMPLE_FUNDING;
-import static org.kakaoshare.backend.fixture.MemberFixture.*;
+import static org.kakaoshare.backend.fixture.MemberFixture.HAN;
+import static org.kakaoshare.backend.fixture.MemberFixture.KAKAO;
+import static org.kakaoshare.backend.fixture.MemberFixture.KIM;
 import static org.kakaoshare.backend.fixture.ProductFixture.CAKE;
 import static org.kakaoshare.backend.fixture.ProductFixture.COFFEE;
 import static org.mockito.ArgumentMatchers.any;
@@ -361,7 +371,6 @@ class PaymentServiceTest {
         final Funding funding = SAMPLE_FUNDING.생성(1L, creator, cake);
         doReturn(fundingOrderDetail).when(redisUtils).remove(orderDetailsKey, FundingOrderDetail.class);
         doReturn(Optional.of(funding)).when(fundingRepository).findById(funding.getFundingId());
-        doReturn(Optional.empty()).when(fundingDetailRepository).findByFundingAndMember(funding, contributor);
         doReturn(Optional.of(contributor)).when(memberRepository).findMemberByProviderId(providerId);
 
         final ProductSummaryResponse productSummaryResponse = ProductSummaryResponse.from(cake);
