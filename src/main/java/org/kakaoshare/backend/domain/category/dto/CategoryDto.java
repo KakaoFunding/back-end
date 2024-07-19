@@ -1,14 +1,15 @@
 package org.kakaoshare.backend.domain.category.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Builder;
-import lombok.Getter;
-import org.kakaoshare.backend.domain.category.entity.Category;
-
+import com.querydsl.core.annotations.QueryProjection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.Builder;
+import lombok.Getter;
+import org.kakaoshare.backend.domain.category.entity.Category;
 
 @Getter
 @JsonSerialize
@@ -20,18 +21,28 @@ public class CategoryDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long parentId;
     
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude(Include.NON_EMPTY)
     private final List<CategoryDto> subCategories = new ArrayList<>();
-    private final TabType defaultTab;
+
+    private final TabType defaultTab=TabType.BRAND;
     private int level;
-    
-    
+
     @Builder
+    @QueryProjection
+    public CategoryDto(Long categoryId, String categoryName, Long parentId, List<CategoryDto> subCategories) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.parentId = parentId;
+        this.subCategories.addAll(subCategories);
+        this.level = 1;
+    }
+
+    @QueryProjection
     public CategoryDto(Long categoryId, String categoryName, Long parentId) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.parentId = parentId;
-        this.defaultTab = TabType.BRAND;//브랜드를 조회하는것이 화면 로딩과정에서 쿼리를 최소화 가능해보임
+        this.level = 2;
     }
 
     public static CategoryDto from(final Category category) {
