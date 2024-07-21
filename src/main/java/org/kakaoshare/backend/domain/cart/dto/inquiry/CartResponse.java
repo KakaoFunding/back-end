@@ -21,6 +21,7 @@ public class CartResponse {
     private String optionName;
     private String optionDetailName;
     private Long totalPrice;
+    private boolean isSelected;
 
     public static CartResponse from(Cart cart){
         Long totalPrice = cart.calculateTotalPrice();
@@ -38,6 +39,7 @@ public class CartResponse {
                 .totalPrice(totalPrice)
                 .optionName(cart.getOption() != null ? cart.getOption().getName() : null)
                 .optionDetailName(cart.getOptionDetail() != null ? cart.getOptionDetail().getName() : null)
+                .isSelected(cart.isSelected())
                 .build();
     }
 }

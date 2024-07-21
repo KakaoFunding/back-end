@@ -74,6 +74,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static org.kakaoshare.backend.domain.funding.exception.FundingDetailErrorCode.INVALID_CANCEL_AMOUNT;
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_ATTRIBUTE_AMOUNT;
 import static org.kakaoshare.backend.domain.funding.exception.FundingErrorCode.INVALID_STATUS;
 import static org.kakaoshare.backend.domain.member.exception.MemberErrorCode.NOT_FOUND;
@@ -170,7 +171,7 @@ public class PaymentService {
         final Funding funding = findFundingById(fundingOrderDetail.fundingId());
         final Member member = findMemberByProviderId(providerId);
         final Long amount = payment.getTotalPrice();
-        saveOrReflectFundingDetail(payment, funding, member, amount);
+        saveFundingDetail(payment, funding, member);
         funding.increaseAccumulateAmount(amount);
 
         // TODO: 5/10/24 결제 후 목표 금액 달성 시
@@ -224,10 +225,17 @@ public class PaymentService {
                                     final PaymentFundingDetailCancelRequest paymentFundingCancelRequest) {
         final Long fundingDetailId = paymentFundingCancelRequest.fundingDetailId();
         final FundingDetail fundingDetail = findFundingDetailById(fundingDetailId);
+        final Long amount = paymentFundingCancelRequest.amount();
+        validateCancelAmount(fundingDetail, amount);
         validateAlreadyCanceled(fundingDetail, FundingDetail::canceled);
         validateMemberFundingDetail(providerId, fundingDetail);
-        final Long amount = paymentFundingCancelRequest.amount();
         refundFundingDetails(amount, fundingDetail);
+    }
+
+    private void validateCancelAmount(final FundingDetail fundingDetail, final Long amount) {
+        if (fundingDetail.getAmount() < amount) {
+            throw new FundingDetailException(INVALID_CANCEL_AMOUNT);
+        }
     }
 
     private Order findOrderByPaymentId(final Long paymentId) {
@@ -480,11 +488,8 @@ public class PaymentService {
                 .orElseThrow(() -> new FundingDetailException(FundingDetailErrorCode.NOT_FOUND));
     }
 
-    private void saveOrReflectFundingDetail(final Payment payment, final Funding funding, final Member member, final Long amount) {
-        fundingDetailRepository.findByFundingAndMember(funding, member)
-                .ifPresentOrElse(
-                        fundingDetail -> fundingDetail.increaseAmountAndRate(amount),
-                        () -> fundingDetailRepository.save(new FundingDetail(member, funding, payment))
-                );
+    private void saveFundingDetail(final Payment payment, final Funding funding, final Member member) {
+        final FundingDetail fundingDetail = new FundingDetail(member, funding, payment);
+        fundingDetailRepository.save(fundingDetail);
     }
 }

@@ -20,9 +20,9 @@ import org.kakaoshare.backend.domain.base.entity.BaseTimeEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        indexes = {@Index(name = "idx_receipt_option_receipt_id",columnList = "receipt_id",unique = true)}
+        indexes = {@Index(name = "idx_receipt_option_receipt_id", columnList = "receipt_id", unique = false)}
 )
-public class ReceiptOption {
+public class ReceiptOption extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

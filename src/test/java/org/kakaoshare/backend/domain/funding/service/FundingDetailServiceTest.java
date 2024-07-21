@@ -2,6 +2,7 @@ package org.kakaoshare.backend.domain.funding.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -12,6 +13,7 @@ import org.kakaoshare.backend.common.vo.date.exception.DateException;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.ContributedFundingHistoryDto;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.request.ContributedFundingHistoryRequest;
 import org.kakaoshare.backend.domain.funding.dto.inquiry.response.ContributedFundingHistoryResponse;
+import org.kakaoshare.backend.domain.funding.dto.rank.response.TopContributorResponse;
 import org.kakaoshare.backend.domain.funding.repository.FundingDetailRepository;
 import org.kakaoshare.backend.domain.funding.vo.FundingHistoryDate;
 import org.kakaoshare.backend.domain.member.entity.Member;
@@ -154,6 +156,25 @@ public class FundingDetailServiceTest {
         final ContributedFundingHistoryRequest contributedFundingHistoryRequest = new ContributedFundingHistoryRequest(startDate, endDate, status);
         assertThatThrownBy(() -> fundingDetailService.lookUp(providerId, contributedFundingHistoryRequest, pageable))
                 .isInstanceOf(DateException.class);
+    }
+
+
+    @Test
+    @DisplayName("최대 기여자 조회")
+    public void getTopContributors() throws Exception {
+        final Long fundingId = 1L;
+        final List<TopContributorResponse> content = List.of(
+                new TopContributorResponse("profileUrl1", "테스터1", 30.0),
+                new TopContributorResponse("profileUrl1", "테스터2", 20.0),
+                new TopContributorResponse("profileUrl1", "테스터3", 10.0)
+        );
+
+        final Page<TopContributorResponse> page = new PageImpl<>(content, pageable, content.size());
+        doReturn(page).when(fundingDetailRepository).findTopContributorsByFundingId(fundingId, pageable);
+
+        final PageResponse<?> expect = PageResponse.from(page);
+        final PageResponse<?> actual = fundingDetailService.getTopContributors(fundingId, pageable);
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expect);
     }
 
     private ProductDto getProductDto(final Product product) {
