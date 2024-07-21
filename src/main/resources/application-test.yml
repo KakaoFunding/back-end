@@ -1,0 +1,85 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  jwt:
+    secret: 0f4aeeb70d87e0cd8e6b224c31f56911134c713ea35d2cdf8209fe31047b9c1dc2f11086ed708fc2a605f8b2f019121c8f471e68d0061bce30a2139c0b60a383
+    exception-request-attribute-name : jwtException
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:testdata/initial_*.sql
+  datasource:
+    url: jdbc:h2:mem:test
+    username: root
+    password:
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: false
+    baseline-on-migrate: false
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 92e3a72f071fe2c4cc18146bb33652d1
+            client-secret: QH0n8i9qoDE4TkeVl9p9aFPRQVcIgXHC
+            client-authentication-method: POST
+            client-name: kakao
+            authorization-grant-type: refresh_token
+            scope:
+              - profile_nickname
+              - profile_image
+              - name
+              - gender
+              - age_range
+              - birthday
+              - birthyear
+              - phone_number
+              - friends
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+        other:
+          kakao:
+            logout-url: https://kapi.kakao.com/v1/user/logout
+
+security:
+  token:
+    access:
+      expire-time: 3600000
+    refresh:
+      expire-time: 86400000
+friend:
+  request-url: https://kapi.kakao.com/v1/api/talk/friends
+pay:
+  client:
+    id: TC0ONETIME
+    secret: EA249FF02E1D8AB792A2
+  secret-key: DEVE0FAC7BBB6C06C73602C9676CEC0BA0D655EA
+  request-url:
+    ready: https://open-api.kakaopay.com/online/v1/payment/ready
+    approve: https://open-api.kakaopay.com/online/v1/payment/approve
+    cancel: https://open-api.kakaopay.com/online/v1/payment/cancel
+  redirect-url:
+    approval: http://localhost:8080/payments/success
+    cancel: http://localhost:8080/payments/cancel
+    fail: http://localhost:8080/payments/fail
+
+

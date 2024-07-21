@@ -1,0 +1,113 @@
+version: '3.8'
+services:
+  nginx:
+    container_name: nginx
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt/live/fundina.shop/fullchain.pem:/etc/ssl/certs/fullchain.pem
+      - /etc/letsencrypt/live/fundina.shop/privkey.pem:/etc/ssl/private/privkey.pem
+      - /etc/letsencrypt/options-ssl-nginx.conf:/etc/nginx/snippets/options-ssl-nginx.conf
+      - /etc/letsencrypt/ssl-dhparams.pem:/etc/ssl/certs/ssl-dhparams.pem
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - TZ=Asia/Seoul
+    depends_on:
+      - app1
+      - app2
+      - app3
+      - prometheus
+      - grafana
+
+  app1:
+    image: "yeachan05/application:latest"
+    restart: always
+    container_name: "app1"
+    ports:
+      - "8081:8080"
+    depends_on:
+      - redis
+    volumes:
+      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
+    environment:
+      - TZ=Asia/Seoul
+      - spring.application.name=app1
+
+  app2:
+    image: "yeachan05/application:latest"
+    restart: always
+    container_name: "app2"
+    ports:
+      - "8082:8080"
+    depends_on:
+      - redis
+    volumes:
+      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
+    environment:
+      - TZ=Asia/Seoul
+      - spring.application.name=app2
+
+  app3:
+    image: "yeachan05/application:latest"
+    restart: always
+    container_name: "app3"
+    ports:
+      - "8083:8080"
+    depends_on:
+      - redis
+    volumes:
+      - /home/ec2-user/application-prod.yml:/config/application-prod.yml
+    environment:
+      - TZ=Asia/Seoul
+      - spring.application.name=app3
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    user: "472"
+    ports:
+      - "3009:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+  mysqld_exporter:
+    image: quay.io/prometheus/mysqld-exporter
+    container_name: mysqld-exporter
+    restart: unless-stopped
+    command:
+      - "--config.my-cnf=/etc/mysql/my.cnf"
+    ports:
+      - "9104:9104"
+    volumes:
+      - /home/ec2-user/my.cnf:/etc/mysql/my.cnf
+volumes:
+  grafana-storage:
+  prometheus-data:
+  redis-data:
