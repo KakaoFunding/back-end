@@ -1,5 +1,6 @@
 package org.kakaoshare.backend.domain.funding.repository;
 
+import org.kakaoshare.backend.domain.funding.dto.rank.response.TopContributorResponse;
 import org.kakaoshare.backend.domain.funding.entity.Funding;
 import org.kakaoshare.backend.domain.funding.entity.FundingDetail;
 import org.kakaoshare.backend.domain.funding.repository.query.FundingDetailRepositoryCustom;
@@ -21,7 +22,9 @@ public interface FundingDetailRepository extends JpaRepository<FundingDetail, Lo
             "WHERE fd.funding.fundingId =:fundingId")
     List<FundingDetail> findAllByFundingId(@Param("fundingId") final Long fundingId);
 
-    @Query("SELECT fd FROM FundingDetail fd WHERE fd.funding.fundingId = :fundingId ORDER BY fd.amount DESC")
-    Page<FundingDetail> findTopContributorsByFundingId(@Param("fundingId") Long fundingId, Pageable pageable);
-
+    @Query("SELECT NEW org.kakaoshare.backend.domain.funding.dto.rank.response.TopContributorResponse(fd.member.profileImageUrl, fd.member.name, fd.rate) " +
+            "FROM FundingDetail fd " +
+            "LEFT JOIN fd.member m ON m.memberId = fd.member.memberId " +
+            "WHERE fd.funding.fundingId = :fundingId")
+    Page<TopContributorResponse> findTopContributorsByFundingId(@Param("fundingId") Long fundingId, Pageable pageable);
 }
