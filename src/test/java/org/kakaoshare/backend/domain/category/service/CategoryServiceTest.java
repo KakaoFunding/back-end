@@ -1,5 +1,12 @@
 package org.kakaoshare.backend.domain.category.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,14 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.StopWatch;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
@@ -59,7 +58,7 @@ class CategoryServiceTest {
         // given
         Category parent = getParent();
         parent.getChildren().addAll(mockChildren(parent));
-        given(categoryRepository.findParentCategoryWithChildren(PARENT_ID)).willReturn(Optional.of(parent));
+        given(categoryRepository.findParentCategoryWithChildren(PARENT_ID)).willReturn(Optional.of(CategoryDto.from(parent)));
         
         
         CategoryDto category = categoryService.getParentCategory(PARENT_ID);
@@ -80,7 +79,8 @@ class CategoryServiceTest {
     @DisplayName("자식 카테고리는 자신의 자식 카테고리를 가지고 있지 않다")
     void testChildCategory() {
         Category child=mockChild();
-        given(categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID)).willReturn(Optional.of(child));
+//        given(categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID)).willReturn(Optional.of(child));
+        given(categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID)).willReturn(Optional.of(CategoryDto.from(child)));
         CategoryDto category = categoryService.getChildCategory(PARENT_ID, CHILD_ID);
         
         assertThat(category).isNotNull();
