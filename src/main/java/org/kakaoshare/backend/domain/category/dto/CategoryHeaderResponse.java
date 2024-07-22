@@ -4,13 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class CategoryHeaderResponse {
-    private final Long brandCount;
-    private final Long productCount;
-    private final Long totalCount;
-    private final List<SimpleCategoryDto> simpleCategoryDtos;
+    private Long brandCount;
+    private Long productCount;
+    private Long totalCount;
+    private List<SimpleCategoryDto> simpleCategoryDtos;
     @Builder
     private CategoryHeaderResponse(final Long brandCount, final Long productCount, Long totalCount, final List<SimpleCategoryDto> simpleCategoryDtos) {
         this.brandCount = brandCount;
