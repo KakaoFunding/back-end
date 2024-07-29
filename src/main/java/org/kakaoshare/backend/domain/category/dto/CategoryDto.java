@@ -1,61 +1,43 @@
 package org.kakaoshare.backend.domain.category.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Builder;
-import lombok.Getter;
-import org.kakaoshare.backend.domain.category.entity.Category;
-
+import com.querydsl.core.annotations.QueryProjection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @JsonSerialize
+@NoArgsConstructor
 public class CategoryDto {
     public static final long PARENT_ID = -1L;
-    private final Long categoryId;
-    private final String categoryName;
+    private Long categoryId;
+    private String categoryName;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long parentId;
+    private Long parentId;
     
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude(Include.NON_EMPTY)
     private final List<CategoryDto> subCategories = new ArrayList<>();
-    private final TabType defaultTab;
-    private int level;
-    
-    
-    @Builder
+
+    private final TabType defaultTab=TabType.BRAND;
+
+    @QueryProjection
+    public CategoryDto(Long categoryId, String categoryName, Long parentId, List<CategoryDto> subCategories) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.parentId = parentId;
+        this.subCategories.addAll(subCategories);
+    }
+
+    @QueryProjection
     public CategoryDto(Long categoryId, String categoryName, Long parentId) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.parentId = parentId;
-        this.defaultTab = TabType.BRAND;//브랜드를 조회하는것이 화면 로딩과정에서 쿼리를 최소화 가능해보임
-    }
-
-    public static CategoryDto from(final Category category) {
-        CategoryDto categoryDto = CategoryDto
-                .getCategoryDtoBuilder(category)
-                .build();
-
-        giveLevelAndSubCategories(categoryDto, category);
-
-        return categoryDto;
-    }
-
-    private static void giveLevelAndSubCategories(CategoryDto dto, Category category) {
-        dto.level=2;
-        if (!category.isChildEmpty()) {
-            dto.level = 1;
-            dto.getSubCategories().addAll(getChildrenDtos(category));
-        }
-    }
-    
-    private static List<CategoryDto> getChildrenDtos(final Category category) {
-        return category.getChildren().stream()
-                .map(CategoryDto::from)
-                .toList();
     }
     
     @Override
@@ -69,17 +51,5 @@ public class CategoryDto {
                         .toList() +
                 ", defaultTab=" + defaultTab +
                 '}';
-    }
-
-    private static CategoryDtoBuilder getCategoryDtoBuilder(final Category category) {
-        Long parentId = Optional
-                .ofNullable(category.getParent())
-                .map(Category::getCategoryId)
-                .orElse(null);
-
-        return CategoryDto.builder()
-                .categoryId(category.getCategoryId())
-                .categoryName(category.getName())
-                .parentId(parentId);
     }
 }

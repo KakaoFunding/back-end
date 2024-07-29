@@ -30,30 +30,33 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(
-        indexes = {@Index(name = "idx_category_parent_id",columnList = "parent_id")}
+        indexes = {
+                @Index(name = "idx_category_parent_id", columnList = "parent_id"),
+                @Index(name = "idx_category_id_parent_id", columnList = "category_id, parent_id")
+        }
 )
 public class Category extends BaseTimeEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     private Long categoryId;
-    
+
     @Column(nullable = false)
     private String name;
-    
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id", referencedColumnName = "category_id")
     private Category parent;
-    
+
     @BatchSize(size = 100)//TODO 2024 02 26 21:15:10 : 추후 부모 카테고리당 자식 카테고리 수에 따라 결정하여 최적화
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children;
-    
+
     public boolean isChildEmpty() {
         return children.isEmpty();
     }
-    
+
     @Override
     public String toString() {
         return "Category{" +

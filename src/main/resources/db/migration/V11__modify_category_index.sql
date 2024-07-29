@@ -1,0 +1,1 @@
+CREATE INDEX idx_category_id_parent_id ON category (category_id, parent_id);
