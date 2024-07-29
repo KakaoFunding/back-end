@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResponse;
+import org.kakaoshare.backend.domain.member.dto.oauth.authenticate.OAuthLoginResult;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.OAuthReissueRequest;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResponse;
 import org.kakaoshare.backend.domain.member.dto.oauth.issue.ReissueResult;
@@ -29,11 +30,11 @@ public class OAuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid final OAuthLoginRequest oAuthLoginRequest) {
-        final OAuthLoginResponse loginResponse = oAuthService.login(oAuthLoginRequest);
-        final ResponseCookie cookie = refreshTokenCookieProvider.createCookie(loginResponse.refreshToken());
+        final OAuthLoginResult oAuthLoginResult = oAuthService.login(oAuthLoginRequest);
+        final ResponseCookie cookie = refreshTokenCookieProvider.createCookie(oAuthLoginResult.refreshToken());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(loginResponse);
+                .body(OAuthLoginResponse.from(oAuthLoginResult));
     }
 
     @PostMapping("/logout")

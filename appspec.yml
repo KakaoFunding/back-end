@@ -5,6 +5,8 @@ files:
   - source: /
     destination: /home/ec2-user/cicd
     overwrite: yes
+    exclude:
+      - /home/ec2-user/cicd/src/main/resources/application-prod.yml
 
 file_exists_behavior: OVERWRITE
 
@@ -31,6 +33,11 @@ permissions:
       - file
 
 hooks:
+  BeforeInstall:
+    - location: scripts/backup.sh
+      timeout: 60
+      runas: ec2-user
+
   ApplicationStop:
     - location: scripts/stop.sh
       timeout: 60
@@ -39,4 +46,9 @@ hooks:
   ApplicationStart:
     - location: scripts/deploy.sh
       timeout: 600
+      runas: ec2-user
+
+  AfterInstall:
+    - location: scripts/restore.sh
+      timeout: 60
       runas: ec2-user
