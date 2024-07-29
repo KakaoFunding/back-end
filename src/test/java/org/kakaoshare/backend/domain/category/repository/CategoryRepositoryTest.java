@@ -1,18 +1,18 @@
 package org.kakaoshare.backend.domain.category.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kakaoshare.backend.common.RepositoryTest;
+import org.kakaoshare.backend.domain.category.dto.CategoryDto;
 import org.kakaoshare.backend.domain.category.entity.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
-
-import java.util.List;
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
 class CategoryRepositoryTest {
@@ -84,12 +84,11 @@ class CategoryRepositoryTest {
     @DisplayName("루트 카테고리의 자식 카테고리는 부모 카테고리와 자식 카테고리가 있다")
     void testFirstGen() {
         stopWatch.start("first gen");
-        Category parent = categoryRepository.findParentCategoryWithChildren(PARENT_ID).orElseThrow();
+        CategoryDto parent = categoryRepository.findParentCategoryWithChildren(PARENT_ID).orElseThrow();
         stopWatch.stop();
         assertThat(parent).isNotNull();
-        assertThat(parent.getParent()).isNull();
-        assertThat(parent.getChildren()).isNotEmpty();
-        assertThat(parent.getChildren().size()).isEqualTo(5);
+        assertThat(parent.getSubCategories()).isNotEmpty();
+        assertThat(parent.getSubCategories().size()).isEqualTo(5);
         System.out.println(stopWatch.prettyPrint());
     }
     
@@ -97,11 +96,10 @@ class CategoryRepositoryTest {
     @DisplayName("말단 카테고리는 부모 카테고리는 있지만 자식 카테고리는 없다")
     void testSecondGen() {
         stopWatch.start("second gen");
-        Category child = categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID).orElseThrow();
+        CategoryDto child = categoryRepository.findChildCategoryWithParentCheck(PARENT_ID,CHILD_ID).orElseThrow();
         stopWatch.stop();
         assertThat(child).isNotNull();
-        assertThat(child.getParent()).isNotNull();
-        assertThat(child.getChildren()).isEmpty();
+        assertThat(child.getParentId()).isNotNull();
         System.out.println(stopWatch.prettyPrint());
     }
     

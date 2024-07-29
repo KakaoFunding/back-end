@@ -1,23 +1,27 @@
 package org.kakaoshare.backend.domain.category.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
-import org.kakaoshare.backend.domain.category.entity.Category;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class SimpleCategoryDto {
-    private final Long categoryId;
-    private final String categoryName;
+    private Long categoryId;
+    private String categoryName;
+
     @Builder
-    private SimpleCategoryDto(Long categoryId, String categoryName) {
+    @QueryProjection
+    public SimpleCategoryDto(Long categoryId, String categoryName) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
     }
-    
-    public static SimpleCategoryDto from(final Category category){
+
+    public static SimpleCategoryDto from(final CategoryDto categoryDto) {
         return SimpleCategoryDto.builder()
-                .categoryId(category.getCategoryId())
-                .categoryName(category.getName())
+                .categoryId(categoryDto.getCategoryId())
+                .categoryName(categoryDto.getCategoryName())
                 .build();
     }
 }
